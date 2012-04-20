@@ -68,7 +68,7 @@ class Flux(object):
         Jv = self.Jv; psi_e = self.psi_e; psi_base = self.psi_base
 
         # Select the base of the root
-        v_base = g.component_roots_at_scale(g.root, scale=g.max_scale())
+        v_base = g.component_roots_at_scale(g.root, scale=g.max_scale()).next()
 
         # Add properties
         g.add_property('Keq')
@@ -104,5 +104,7 @@ class Flux(object):
             j[v] = (psi_e-psi_in[v]) * k[v]
 
 
-def flux():
-    pass
+def flux(g,  k, K, Jv, psi_e, psi_base):
+    f = Flux(g,  k, K, Jv, psi_e, psi_base)
+    f.run()
+    return f.g
