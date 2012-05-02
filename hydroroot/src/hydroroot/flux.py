@@ -79,7 +79,7 @@ class Flux(object):
 
         # Conductance computation
         Keq = g.property('Keq')
-        for v in traversal.post_order(g, v_base):
+        for v in traversal.post_order2(g, v_base):
             r = 1./(k[v] + sum(Keq[cid] for cid in g.children(v))) 
             R = 1./K[v]
             Keq[v] = 1./(r+R)
