@@ -1,4 +1,4 @@
-#from hydroroot.flux import *
+from hydroroot.flux import *
 from openalea.mtg import *
 from openalea.mtg import algo
 
