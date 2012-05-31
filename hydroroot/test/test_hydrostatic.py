@@ -1,4 +1,4 @@
-from hydroroot.flux import *
+#from hydroroot.flux import *
 from openalea.mtg import *
 from openalea.mtg import algo
 
@@ -15,10 +15,9 @@ def tap_root(n=5):
 	return g
 
 
-#TODO : add a proper law to control main axis and branch lengths
 #BUG : the produced MTG do not have node 1 ?
-def branched_root(n_elements=20, branching_chance=0.25, max_branch_length=5, branching_delay = 3):
-	""" Create a MTG of n elements with a given chance to branch (no multiple branching per element allowed, no branching on an axis until the branching_delay is past) and random branch length (up to max_branch_length).
+def random_branched_root(n_elements=20, branching_chance=0.25, max_branch_length=5, branching_delay = 3):
+	""" Create a random MTG of max n elements with a given chance to branch (no multiple branching per element allowed, no branching on an axis until the branching_delay is past) and random branch length (up to max_branch_length).
 
 	"""
 	g = MTG()
@@ -30,33 +29,75 @@ def branched_root(n_elements=20, branching_chance=0.25, max_branch_length=5, bra
 	branch_length = {}    # keep track of branch length still left to build
 	branching_point = {}  # keep track of branching points id
 	branch_elements = n   # keep track of the number of elements still available to build the MTG
-	delay = branching_delay             # keep track of the delay between successive branching points
+	delay = branching_delay   # keep track of the delay between successive branching events
 
+	# budget the length of the main axis
+	branch_length[1] = random.randint(max(1,branching_delay),min(max_branch_length,branch_elements))
+	branch_elements -= branch_length[1]
+
+	# build the MTG
 	for i in range(n-1):
-		if (random.random()<branching_chance) and (branch_elements) and (g.node(vid).nb_children() == 0) and (delay == 0):   # branching only if they are elements left to build new branches & there is no branch already at the current node & the branching delay is passed
+		print current_scale,branch_length[current_scale]
+		print "left", branch_elements
+		if (random.random()<branching_chance) and (branch_elements) and (g.node(vid).nb_children() == 0) and (delay == 0) and (branch_length[current_scale]>branching_delay):   # branching only if they are elements left to build new branches & there is no branch already at the current node & the branching delay is passed & we are not too close from the tip (more than branching_delay element left in the supporting axis)
 			current_scale += 1   # go up one scale at each branching point
-			delay = branching_delay
-			branching_point[current_scale] = vid # keep track of the branching point id at the current scale to come back there at the end of the branch
-			branch_length[current_scale] = random.randint(1,min(max_branch_length,branch_elements)) # new branch can use up to max_branch_length elements or what is left over
+			delay = branching_delay   # block future branching for a given time
+			branching_point[current_scale] = vid   # keep track of the branching point id at the current scale to come back there at the end of the branch
+			branch_length[current_scale] = random.randint(1,min(max_branch_length,branch_elements)) # new branch can use up to max_branch_length elements or what is left over from the pool of elements
 			branch_elements -= branch_length[current_scale]  # keep track of the number of elements left to build the rest of the MTG
 			vid = g.add_child(vid, edge_type='+', scale_id = current_scale)  # add the branch element
 			branch_length[current_scale] -= 1 # decrease the length of the branch left to build at this scale
 			if not branch_length[current_scale] : # last branch element was added, end the branch
 				vid = branching_point[current_scale]  # next element will be added as a child to the last branching point
 				current_scale -= 1
-		else:   # no branching, add child element linearly
+		elif (branch_length[current_scale]):   # no branching, add child element linearly if there are still some left to add in the current axis
 			vid = g.add_child(vid, edge_type='<', scale_id = current_scale)
+			branch_length[current_scale]-= 1  # decrease length of axis left to build
+			if (current_scale>1) and not (branch_length[current_scale]) : # if it was the last element of a branch, get down one scale
+				vid = branching_point[current_scale] # next element will be added as a child to the last recorded branching point
+				current_scale -= 1
 			if delay :  # decrease delay before the next branching if it is not passed already
 				delay -= 1
-			if not(branch_length.has_key(1)) :   # if it was the first axis, budget its length from available elements
-				branch_length[1] = random.randint(1,branch_elements)
-				branch_elements -= branch_length[1]
-			elif (current_scale>1):
-				if branch_length[current_scale] :   # decrease length of branch still to built
-					branch_length[current_scale] -= 1
-				if not branch_length[current_scale] : # if it was the last branch element, get down one scale
-					vid = branching_point[current_scale] # next element will be added as a child to the last branching point
-					current_scale -= 1
+
+	return g
+
+
+
+#BUG : the produced MTG do not have node 1 ?
+def grown_branched_root(n_elements=20, branching_chance=0.25, branching_delay = 3):
+	""" Create a MTG of n elements by growing it with a given chance to branch (no multiple branching per element allowed, no branching on an axis until the branching_delay is past).
+
+	"""
+	g = MTG()
+	root = g.root
+	vid = g.add_component(root)
+
+	n = int(n_elements)
+	branch_count = 1                     # main root is labelled 1
+	branches_tips = {}                   # keep track of branches tips
+	branches_tips[branch_count] = vid    # initial tip of the main root
+	branch_elements = n                  # keep track of the number of elements still available to build the MTG
+	delay = {}							 # keep track of branching clock of the different axis
+	delay[branch_count] = branching_delay   # initial clock for the first axis
+
+	# build the MTG
+	while (branch_elements>0) :
+
+		for branch in branches_tips.keys() :  # for each axis, either grow or branch
+			reserved = branching_delay*branch_count    # keep enough elements to end each axis by a non branched tip
+			if (random.random()<branching_chance) and (branch_elements>reserved) and (g.node(branches_tips[branch]).nb_children() == 0) and (delay[branch] == 0) :   # branching only if they are elements left to build new branches & there is no branch already at the current node & the branching delay is passed & we are not too close from the tip (branching_delay elements left for each axis)
+				delay[branch] = branching_delay  # reset clock for the bearing branch
+				branch_count += 1   #  increase branch count
+				delay[branch_count] = branching_delay  # start the clock for the new branch
+				vid = g.add_child(branches_tips[branch], edge_type='+', branch_id = branch_count)  # add first element of new branch
+				branches_tips[branch_count] = vid    # record the id of new branch tip
+				branch_elements -= 1   # decrease the number of available elements
+			elif (branch_elements>0) :   # grow
+				vid = g.add_child(branches_tips[branch], edge_type='<', branch_id = branch)   # add element to existing branch
+				branches_tips[branch] = vid  # record this element as the new tip
+				branch_elements -= 1   # decrease the number of available elements
+				if (delay[branch]>0) :  # decrease branching clock for current branch
+					delay[branch] -= 1
 	return g
 
 
@@ -126,7 +167,7 @@ def discont_radius(g, r_base, r_tip):
 		for tip in tips[order]:
 			max_len = max(max_len, len(list(algo.axis(g,tip))))
 	assert (max_len>1), "MTG too short for analysis"
-	growth_rate = (r_base-r_tip)/(max_len-1)
+	growth_rate = (r_base-r_tip)/(max_len-1)    #define growth rate according to radius extremities of the longest axis
 
 	# radius are computed from tips to bases according to growth rate extrapolated from absolute longest axis of the MTG
 	for order in range(max_order+1):
