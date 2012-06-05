@@ -1,9 +1,15 @@
 import random
+from matplotlib import pyplot, mpl
+from pylab import cm, colorbar
+from pylab import plot as pylab_plot
+from matplotlib.colors import Normalize, LogNorm
+import numpy as np
 
 from hydroroot.flux import *
 from openalea.mtg import *
 from openalea.mtg import algo
 from openalea.mtg import turtle as turt
+import openalea.plantgl.all as pgl
 
 def tap_root(n=5):
     """ 
@@ -11,9 +17,9 @@ def tap_root(n=5):
     """
     g = MTG()
     root = g.root
-    vid = g.add_component(root)
+    vid = g.add_component(root, order=0)
     for i in range(n-1):
-        vid = g.add_child(vid, edge_type='<')
+        vid = g.add_child(vid, edge_type='<', order=0)
 
     return g
 
@@ -256,16 +262,10 @@ def compute_K(g, cte=10):
     K = dict((vid, poiseuille(radius[vid])) for vid in g.vertices(scale=g.max_scale()))
     return K
 
-
-def test_linear(n=5, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
-    """ Test flux and water potential computation on a linear root. """
-    # topology
-    #n=40
-
+def compute_flux(g, n=20,psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
     k0 = float(k0) / n
     p_cst = float(p_cst) / n
-    g = tap_root(n)
-    discont_radius(g, r_base=10, r_tip=1)
+    discont_radius(g, r_base=1., r_tip=0.25)
     k = compute_k(g, k0)
     K = compute_K(g,p_cst)
 
@@ -277,8 +277,52 @@ def test_linear(n=5, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
     assert all(v>0 for v in J_out.values()), J_out.values()
     return g
 
+def test_linear(n=30, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
+    """ Test flux and water potential computation on a linear root. """
+    # topology
+    #n=40
 
-def plot(length=5., r_base=1., r_tip=0.25):
+    g = tap_root(n)
+    g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, p_cst = p_cst)
+    scene = plot(g, prop_cmap='J_out', has_radius=True)
+    return g, scene
+    
+
+def test_tree(n=30,psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
+    """ Test flux and water potential computation on a linear root. """
+    # topology
+    #n=40
+
+    g = random_binary_tree(nb_vertices=n)
+    g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, p_cst = p_cst)
+    scene = plot(g, prop_cmap='J_out', has_radius=True)
+    return g, scene
+
+def root_visitor(g, v, turtle):
+    angles = [90,45]+[30]*5
+    n = g.node(v)
+    radius = n.radius
+    order = n.order
+    length = n.length
+
+    if g.edge_type(v) == '+':
+        angle = angles[order]
+        turtle.down(angle)
+
+
+    turtle.setId(v)
+    turtle.setWidth(radius)
+    for c in n.children():
+        if c.edge_type() == '+':
+            turtle.rollL(130)
+    #turtle.setColor(order+1)
+    turtle.F(length)
+
+    # define the color property
+    #n.color = random.random()
+
+
+def plot(g =None, length=5., has_radius=False, r_base=1., r_tip=0.25, visitor=root_visitor, prop_cmap='radius'):
     """
     Exemple:
 
@@ -287,36 +331,50 @@ def plot(length=5., r_base=1., r_tip=0.25):
         >>> shapes = dict( (x.getId(), x.geometry) for x in s)
         >>> Viewer.display(s)
     """
-    g = random_binary_tree()
-    print 'Nb vertices ', len(g)
+    if g is None:
+        g = random_binary_tree()
+
     # compute length
     for v in g:
         n = g.node(v)
         n.length = length 
     
-    discont_radius(g,r_base=r_base, r_tip=r_tip)
-
-    angles = [90,45]+[30]*5
-    def root_visitor(g, v, turtle):
-        n = g.node(v)
-        radius = n.radius
-        order = n.order
-        length = n.length
-
-        if g.edge_type(v) == '+':
-            angle = angles[order]
-            turtle.down(angle)
-
-
-        turtle.setId(v)
-        turtle.setWidth(radius)
-        for c in n.children():
-            if c.edge_type() == '+':
-                turtle.rollL(180)
-        turtle.setColor(order+1)
-        turtle.F(length)
+    if not has_radius:
+        discont_radius(g,r_base=r_base, r_tip=r_tip)
 
     turtle = turt.PglTurtle()
     turtle.down(180)
     scene = turt.TurtleFrame(g, visitor=root_visitor, turtle=turtle, gc=False)
+
+    # Compute color from radius
+    my_colormap(g,prop_cmap)
+
+    shapes = dict( (sh.getId(),sh) for sh in scene)
+
+    colors = g.property('color')
+    for vid in colors:
+        shapes[vid].appearance = pgl.Material(colors[vid])
+    scene = pgl.Scene(shapes.values())
     return scene
+
+def my_colormap(g, property_name, cmap='jet',lognorm=False):
+    prop = g.property(property_name)
+    keys = prop.keys()
+    values = np.array(prop.values())
+    m, M = int(values.min()), int(values.max())
+    print m, M
+    _cmap = cm.get_cmap(cmap)
+    norm = Normalize() if not lognorm else LogNorm() 
+    values = norm(values)
+    #my_colorbar(values, _cmap, norm)
+
+    colors = (_cmap(values)[:,0:3])*255
+    colors = np.array(colors,dtype=np.int).tolist()
+
+    g.properties()['color'] = dict(zip(keys,colors))
+    
+def my_colorbar(values, cmap, norm):
+    fig = pyplot.figure(figsize=(8,3))
+    ax = fig.add_axes([0.05, 0.65, 0.9, 0.15])
+    cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap, norm=norm, values=values)
+    
