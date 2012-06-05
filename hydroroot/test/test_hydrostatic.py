@@ -357,7 +357,7 @@ def plot(g =None, length=5., has_radius=False, r_base=1., r_tip=0.25, visitor=ro
     scene = pgl.Scene(shapes.values())
     return scene
 
-def my_colormap(g, property_name, cmap='jet',lognorm=False):
+def my_colormap(g, property_name, cmap='jet',lognorm=True):
     prop = g.property(property_name)
     keys = prop.keys()
     values = np.array(prop.values())
