@@ -27,12 +27,13 @@ def poiseuille(radius, length, viscosity=1e-9):
         
     .. seealso:: http://en.wikipedia.org/wiki/Poiseuille
     """
-    return pi*(r**4) / ( 8 * viscosity * length)
+    return pi*(radius**4) / ( 8 * viscosity * length)
 
 
-def compute_k(g, k0 = 0.1):
+def compute_k(g, k0 = 0.1, length=1.e-4):
     """ Set radial conductances in a MTG at a given value. """
-    k = dict.fromkeys(g.vertices(scale=g.max_scale()), k0)
+    radius = g.property('radius')
+    k = dict( (vid,radius[vid]*2*pi*length*k0) for vid in g.vertices(scale=g.max_scale()))
     return k
 
 
@@ -48,7 +49,8 @@ def compute_K(g, length=1.e-4, nb_xylem=5, radius_scale = 1/10.):
 
     radius = g.property('radius_xylem')
     if not radius:
-        radius = dict( (vid,r*radius_scale) for vid,r in radius.iteritems())
+        full_radius = g.property('radius')
+        radius = dict( (vid,r*radius_scale) for vid,r in full_radius.iteritems())
     nb_xylem = g.property('nb_xylem')
     if not nb_xylem:
         nb_xylem = defaultdict(lambda : 5)
