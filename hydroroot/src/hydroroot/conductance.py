@@ -4,7 +4,7 @@ from collections import defaultdict
 from openalea.mtg import *
 from openalea.mtg import algo
 
-def poiseuille(radius, length, viscosity=1e-9):
+def poiseuille(radius, length, viscosity=1e-3):
     """
     Compute a conductance of a xylem element based on their radius and length.
     
