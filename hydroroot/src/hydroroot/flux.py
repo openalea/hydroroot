@@ -35,9 +35,9 @@ class Flux(object):
             - `g` (MTG) - the root architecture
             - `k` (dict) - lateral conductance
             - `K` (dict) - axial conductance
-            - `Jv` (float) - water flux at the root base
-            - `psi_e` - hydric potential outside the roots (pressure chamber)
-            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant)
+            - `Jv` (float) - water flux at the root base in m**3/s
+            - `psi_e` - hydric potential outside the roots (pressure chamber) in Pa
+            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in Pa
 
         :Example:
 
@@ -95,14 +95,19 @@ class Flux(object):
             if parent is None:
                 assert v == v_base
                 psi_out[v] = psi_base
+                #print 'psi_out',v,psi_out[v]
                 J_out[v] = Jv
+                #print 'j_out',v,J_out[v]
             else:
                 psi_out[v] = psi_in[parent]
+                #print 'psi_out',v,psi_out[v]
                 J_out[v] = ((J_out[parent] - j[parent]) * Keq[v]) / (sum( Keq[cid] for cid in g.children(parent)))
+                #print 'j_out',v,J_out[v]
 
             psi_in[v] = (J_out[v] / K[v]) + psi_out[v]
+            #print 'psi_in',v,psi_in[v]
             j[v] = (psi_e-psi_in[v]) * k[v]
-
+            #print 'j',v,j[v]
 
 def flux(g,  k, K, Jv, psi_e, psi_base):
     f = Flux(g,  k, K, Jv, psi_e, psi_base)
