@@ -16,7 +16,7 @@ from hydroroot import radius, conductance, markov
 
 
 def compute_flux(g, n=300, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, length=1e-4):
-    k0 = float(k0) 
+    k0 = float(k0)
     radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
     k = conductance.compute_k(g, k0,length)
     K = conductance.compute_K(g,length=length)
@@ -38,17 +38,17 @@ def test_linear(n=300, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, length=1e-4):
     g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, length=length)
     scene = plot(g, prop_cmap='J_out', has_radius=True)
     return g, scene
-    
 
-def test_tree(n=30,psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, length=1e-4):
+
+def test_tree(g = None, n=30, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, length=1e-4, prop_cmap='radius'):
     """ Test flux and water potential computation on a linear root. """
     # topology
     #n=40
-
-    g = markov.markov_binary_tree(nb_vertices=n)
+    if g is None :
+        g = markov.markov_binary_tree(nb_vertices=n)
     g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, length=length)
-    #scene = plot(g, prop_cmap='J_out', has_radius=True)
-    scene = None
+    scene = plot(g, prop_cmap=prop_cmap, has_radius=True)
+    #scene = None
     return g, scene
 
 def root_visitor(g, v, turtle):
