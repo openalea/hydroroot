@@ -1,6 +1,7 @@
 import random
 import numpy as np
 
+from math import pi
 from matplotlib import pyplot, mpl
 from pylab import cm, colorbar
 from pylab import plot as pylab_plot
@@ -14,10 +15,19 @@ from hydroroot import radius, conductance, markov
 
 
 
+def surface(g, length=1e-4):
+    surf = 0
+    radius = g.property('radius')
+    for vid in g.vertices():
+        if radius.has_key(vid):
+            surf += 2 * pi * radius[vid] * length
+    return surf
 
 def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, length=1e-4):
     k0 = float(k0)
     radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
+    surf = surface(g)
+    print 'surf',surf
     k = conductance.compute_k(g, k0,length)
     K = conductance.compute_K(g,length=length)
 
@@ -26,11 +36,11 @@ def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, le
     g = flux(g, k, K, Jv, psi_e, psi_base)
 
     J_out = g.property('J_out')
-    #assert all(v>0 for v in J_out.values()), J_out.values()
+    assert all(v>0 for v in J_out.values()), J_out.values()
     return g
 
 def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, length=1e-4):
-    """ Test flux and water potential computation on a linear root. 
+    """ Test flux and water potential computation on a linear root.
 
     Units :
     psi_e & psi_base in Pa - Psi atmospheric = 101325 Pa at sea level
