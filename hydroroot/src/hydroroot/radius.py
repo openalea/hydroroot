@@ -53,7 +53,7 @@ def discont_radius(g, r_base, r_tip):
     base = g.node(base)
     base.radius = r_base
 
-    _tips = dict((vid, g.order(vid)) for vid in g.vertices(scale = g.max_scale()) if g.is_leaf(vid))
+    _tips = dict((vid, g.order(vid)) for vid in g.vertices(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
     tips = {}
     for tip,order in _tips.iteritems():
         tips.setdefault(order, []).append(tip)
@@ -70,13 +70,10 @@ def discont_radius(g, r_base, r_tip):
     # radius are computed from tips to bases according to growth rate extrapolated from absolute longest axis of the MTG
     for order in range(max_order+1):
         for tip in tips[order]:
-            l = [g.node(vid) for vid in algo.axis(g,tip)]
-            for i in range(len(l)):
-                node = l.pop()   # this assume that the l list is ordered, with root tip at the last place
-                if g.is_leaf(node.index()):   # root tip have small radius
-                    node.radius = r_tip
-                else :  # root segment get bigger as we get away from the tip
-                    suc_index = algo.successor(g,node.index())
-                    node.radius = g.node(suc_index).radius + growth_rate
+            node = g.node(tip)
+            node.radius = r_tip
+            while node and node.parent() and node.edge_type() != '+':
+                node.parent().radius = node.radius + growth_rate
+                node = node.parent()
 
 
