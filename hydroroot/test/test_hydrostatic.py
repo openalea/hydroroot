@@ -53,7 +53,8 @@ def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, length
 
     g = markov.linear(n)
     g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, length=length)
-    scene = plot(g, prop_cmap='J_out', has_radius=True)
+    #scene = plot(g, prop_cmap='J_out', has_radius=True)
+    scene= None
     return g, scene
 
 
@@ -72,7 +73,6 @@ def test_tree(g = None, n=30, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.5, l
         g = markov.markov_binary_tree(nb_vertices=n)
     g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, length=length)
     scene = plot(g, prop_cmap=prop_cmap, has_radius=True)
-    #scene = None
     return g, scene
 
 def root_visitor(g, v, turtle):
