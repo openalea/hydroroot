@@ -24,8 +24,8 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=300,
         - vid : id of the root of the MTG where the generating tree will be added
         - nb_vertices : number of element of the main axis
         - branching_chance : probability of ramification at each point
-        - branching_delay: minimal distance between the tip and the first branching axis 
-        - seed : Seed for random number generator (default=None). 
+        - branching_delay: minimal distance between the tip and the first branching axis
+        - seed : Seed for random number generator (default=None).
     """
     if g is None:
         g = MTG()
@@ -90,27 +90,5 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=300,
 
     fat_mtg(g)
     return g
-
-
-def test_linear(n=30, psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
-    """ Test flux and water potential computation on a linear root. """
-    # topology
-    #n=40
-
-    g = linear(n)
-    g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, p_cst = p_cst)
-    scene = plot(g, prop_cmap='J_out', has_radius=True)
-    return g, scene
-
-
-def test_tree(n=30,psi_e=0.3, psi_base=0.1, Jv=15, k0=0.5, p_cst = 50.):
-    """ Test flux and water potential computation on a linear root. """
-    # topology
-    #n=40
-
-    g = markov_binary_tree(nb_vertices=n)
-    g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, p_cst = p_cst)
-    scene = plot(g, prop_cmap='J_out', has_radius=True)
-    return g, scene
 
 
