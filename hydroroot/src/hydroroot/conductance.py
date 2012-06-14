@@ -31,7 +31,7 @@ def poiseuille(radius, length, viscosity=1e-3):
 
 
 def compute_k(g, k0 = 0.1, length=1.e-4):
-    """ Set radial conductances in a MTG at a given value. """
+    """ Set radial conductances (k) in a MTG at a given value. """
     radius = g.property('radius')
     k = dict( (vid,radius[vid]*2*pi*length*k0) for vid in g.vertices(scale=g.max_scale()))
     return k
@@ -39,7 +39,7 @@ def compute_k(g, k0 = 0.1, length=1.e-4):
 
 def compute_K(g, length=1.e-4, nb_xylem=5, radius_scale = 1/10.):
     """ 
-    Set axial conductances in a MTG according to Poiseuille law. 
+    Set axial conductances (K) in a MTG according to Poiseuille law. 
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
     and on the length of a root segment.

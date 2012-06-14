@@ -43,13 +43,13 @@ __all__.append('mbt')
 
 cck=Factory(name='compute axial conductance',
            nodemodule='hydro',
-           nodeclass='compute_k',
+           nodeclass='compute_K',
             )
 __all__.append('cck')
 
 ccrk=Factory(name='compute radial conductance',
            nodemodule='hydro',
-           nodeclass='compute_K',
+           nodeclass='compute_k',
             )
 __all__.append('ccrk')
 
