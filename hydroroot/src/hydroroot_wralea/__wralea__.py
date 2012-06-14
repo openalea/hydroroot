@@ -21,7 +21,7 @@ __all__ = []
 
 
 r1=Factory(name='discont_radius',
-           nodemodule='hydroroot.radius',
+           nodemodule='hydro',
            nodeclass='discont_radius',
            inputs=[dict(name='g'), 
                    dict(name='r_base', interface='IFloat', value=1e-4),
@@ -30,37 +30,37 @@ r1=Factory(name='discont_radius',
 __all__.append('r1')
 
 lr=Factory(name='linear root',
-           nodemodule='hydroroot.markov',
+           nodemodule='hydro',
            nodeclass='linear',
             )
 __all__.append('lr')
 
 mbt=Factory(name='markov binary tree',
-           nodemodule='hydroroot.markov',
+           nodemodule='hydro',
            nodeclass='markov_binary_tree',
             )
 __all__.append('mbt')
 
 cck=Factory(name='compute axial conductance',
-           nodemodule='hydroroot.conductance',
+           nodemodule='hydro',
            nodeclass='compute_k',
             )
 __all__.append('cck')
 
 ccrk=Factory(name='compute radial conductance',
-           nodemodule='hydroroot.conductance',
+           nodemodule='hydro',
            nodeclass='compute_K',
             )
 __all__.append('ccrk')
 
 _flux=Factory(name='flux',
-           nodemodule='hydroroot.flux',
+           nodemodule='hydro',
            nodeclass='flux',
             )
 __all__.append('_flux')
 
 _plot=Factory(name='plot root',
-              nodemodule='hydroroot.display',
+              nodemodule='hydro',
               nodeclass='plot',
            inputs=[dict(name='g'), 
                    dict(name='length', interface='IFloat', value=1e-4),

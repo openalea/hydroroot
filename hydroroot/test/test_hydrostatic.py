@@ -23,7 +23,7 @@ def surface(g, length=1e-4):
             surf += 2 * pi * radius[vid] * length
     return surf
 
-def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, length=1e-4):
+def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.0005, length=1e-4):
     k0 = float(k0)
     radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
     surf = surface(g)
@@ -35,11 +35,11 @@ def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, le
 
     g = flux(g, k, K, Jv, psi_e, psi_base)
 
-    J_out = g.property('J_out')
-    assert all(v>0 for v in J_out.values()), J_out.values()
+    J_out = g.property('radius')
+    #assert all(v>0 for v in J_out.values()), J_out.values()
     return g
 
-def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, length=1e-4):
+def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.005, length=1e-4):
     """ Test flux and water potential computation on a linear root.
 
     Units :
@@ -57,7 +57,7 @@ def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.5, length
     return g, scene
 
 
-def test_tree(g = None, n=30, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.5, length=1e-4, prop_cmap='radius'):
+def test_tree(g = None, n=30, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.005, length=1e-4, prop_cmap='radius'):
     """ Test flux and water potential computation on a linear root. 
     
     Units :
