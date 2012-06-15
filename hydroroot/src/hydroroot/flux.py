@@ -28,7 +28,7 @@ class Flux(object):
 
     """
 
-    def __init__(self, g, k, K, Jv, psi_e, psi_base):
+    def __init__(self, g, Jv, psi_e, psi_base, k=None, K=None):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -44,8 +44,8 @@ class Flux(object):
             flux = Flux(g, ...)
         """
         self.g = g
-        self.k = k
-        self.K = K
+        self.k = k if k else g.property('k')
+        self.K = K if K else g.property('K')
         self.Jv = Jv
         self.psi_e = psi_e
         self.psi_base = psi_base
@@ -109,7 +109,25 @@ class Flux(object):
             j[v] = (psi_e-psi_in[v]) * k[v]
             #print 'j',v,j[v]
 
-def flux(g,  k, K, Jv, psi_e, psi_base):
-    f = Flux(g,  k, K, Jv, psi_e, psi_base)
+
+def flux(g, Jv=1e-10, psi_e=300000., psi_base=101325., k=None, K=None):
+    """ flux computes water potential and fluxes at each vertex of the MTG `g`.
+
+        :Parameters:
+            - `g` (MTG) - the root architecture
+            - `Jv` (float) - water flux at the root base in m**3/s
+            - `psi_e` - hydric potential outside the roots (pressure chamber) in Pa
+            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in Pa
+
+
+        :Optional Parameters:
+            - `k` (dict) - lateral conductance
+            - `K` (dict) - axial conductance
+
+        :Example::
+
+            my_flux = flux(g)
+    """    
+    f = Flux(g, Jv, psi_e, psi_base, k=k, K=K)
     f.run()
     return f.g

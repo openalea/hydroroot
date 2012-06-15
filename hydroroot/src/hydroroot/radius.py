@@ -11,7 +11,10 @@ from openalea.mtg import algo
 
 
 def cont_radius(g, r_base, r_tip):
-    """ Set radius for elements of a mtg with an increase rate computed from given base and tip radius in a continuous way.
+    """ Compute the radius of each segment of a root system.
+
+    Set radius for elements of a mtg with an increase rate computed from 
+    given base and tip radius in a continuous way.
     """
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
@@ -41,10 +44,16 @@ def cont_radius(g, r_base, r_tip):
                         continue
                     node.radius = node.parent().radius - dr  # decrease the radius from base to tip
 
+    return g
 
 def discont_radius(g, r_base, r_tip):
-    """ Set radius for elements of a mtg with an increase rate computed from the length of the longest axis and its base and tip radius.
-        Radius can be discontinuous e.g. for a young/small lateral on an old root, the yound root radius is very small initially compared to the old one.
+    """ Compute the radius of each segment of a root system.
+
+    Set radius for elements of a mtg with an increase rate computed 
+    from the length of the longest axis and its base and tip radius.
+    
+    Radius can be discontinuous e.g. for a young/small lateral on an old root, 
+    the yound root radius is very small initially compared to the old one.
     """
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
@@ -76,4 +85,5 @@ def discont_radius(g, r_base, r_tip):
                 node.parent().radius = node.radius + growth_rate
                 node = node.parent()
 
+    return g
 

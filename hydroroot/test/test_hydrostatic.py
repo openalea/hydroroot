@@ -25,17 +25,19 @@ def surface(g, length=1e-4):
 
 def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.0005, length=1e-4):
     k0 = float(k0)
-    radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
+    g = radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
     surf = surface(g)
     print 'surf',surf
-    k = conductance.compute_k(g, k0,length)
-    K = conductance.compute_K(g,length=length)
+    g = conductance.compute_k(g, k0,length)
+    g = conductance.compute_K(g,length=length)
 
+    k = g.property('k')
+    K = g.property('K')
     assert all(v>0 for v in K.values()),K
 
-    g = flux(g, k, K, Jv, psi_e, psi_base)
+    g = flux(g, Jv, psi_e, psi_base)
 
-    J_out = g.property('radius')
+    J_out = g.property('J_out')
     #assert all(v>0 for v in J_out.values()), J_out.values()
     return g
 

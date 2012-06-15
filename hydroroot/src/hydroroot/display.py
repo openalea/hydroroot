@@ -71,8 +71,7 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True):
     prop = g.property(property_name)
     keys = prop.keys()
     values = np.array(prop.values())
-    m, M = int(values.min()), int(values.max())
-    print m, M
+    #m, M = int(values.min()), int(values.max())
     _cmap = cm.get_cmap(cmap)
     norm = Normalize() if not lognorm else LogNorm() 
     values = norm(values)

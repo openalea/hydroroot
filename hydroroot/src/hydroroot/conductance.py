@@ -31,15 +31,24 @@ def poiseuille(radius, length, viscosity=1e-3):
 
 
 def compute_k(g, k0 = 0.1, length=1.e-4):
-    """ Set radial conductances (k) in a MTG at a given value. """
+    """ Compute the radial conductances (k) of each segment of the MTG.
+
+    Parameters
+    ==========
+
+        - `g` - the RSA
+        - `k0` - the radial conductance for one element of surface
+        - `length` - the length of a segment
+
+    """
     radius = g.property('radius')
     k = dict( (vid,radius[vid]*2*pi*length*k0) for vid in g.vertices(scale=g.max_scale()))
-    return k
+    g.properties()['k'] = k
+    return g
 
 
 def compute_K(g, length=1.e-4, nb_xylem=5, radius_scale = 1/10.):
-    """ 
-    Set axial conductances (K) in a MTG according to Poiseuille law. 
+    """ Compute the axial conductances (K) in a MTG according to Poiseuille law. 
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
     and on the length of a root segment.
@@ -54,7 +63,9 @@ def compute_K(g, length=1.e-4, nb_xylem=5, radius_scale = 1/10.):
     nb_xylem = g.property('nb_xylem')
     if not nb_xylem:
         nb_xylem = defaultdict(lambda : 5)
-    K = dict((vid, nb_xylem[vid]*poiseuille(radius[vid], length)) for vid in g.vertices(scale=g.max_scale()))
-    return K
+    K = dict((vid, nb_xylem[vid]*poiseuille(radius[vid], length)) 
+                for vid in g.vertices(scale=g.max_scale()))
+    g.properties()['K'] = K
+    return g
 
 
