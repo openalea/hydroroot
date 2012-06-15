@@ -21,7 +21,8 @@ __all__ = []
 
 
 r1=Factory(name='discont_radius',
-           nodemodule='hydroroot.radius',
+#nodemodule='hydroroot.radius',
+           nodemodule='hydro',
            nodeclass='discont_radius',
            inputs=[dict(name='g'), 
                    dict(name='r_base', interface='IFloat', value=1e-4),
@@ -42,19 +43,22 @@ mbt=Factory(name='markov binary tree',
 __all__.append('mbt')
 
 cck=Factory(name='compute axial conductance',
-           nodemodule='hydroroot.conductance',
+           nodemodule='hydro',
+           #nodemodule='hydroroot.conductance',
            nodeclass='compute_K',
             )
 __all__.append('cck')
 
 ccrk=Factory(name='compute radial conductance',
-           nodemodule='hydroroot.conductance',
+           nodemodule='hydro',
+           #nodemodule='hydroroot.conductance',
            nodeclass='compute_k',
             )
 __all__.append('ccrk')
 
 _flux=Factory(name='flux',
-           nodemodule='hydroroot.flux',
+           nodemodule='hydro',
+           #nodemodule='hydroroot.flux',
            nodeclass='flux',
             )
 __all__.append('_flux')
