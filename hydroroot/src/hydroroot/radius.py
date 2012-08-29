@@ -16,6 +16,7 @@ def cont_radius(g, r_base, r_tip):
     Set radius for elements of a mtg with an increase rate computed from 
     given base and tip radius in a continuous way.
     """
+    r_base, r_tip = float(r_base), float(r_tip)
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
 
@@ -55,6 +56,7 @@ def discont_radius(g, r_base, r_tip):
     Radius can be discontinuous e.g. for a young/small lateral on an old root, 
     the yound root radius is very small initially compared to the old one.
     """
+    r_base, r_tip = float(r_base), float(r_tip)
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
 
@@ -84,6 +86,33 @@ def discont_radius(g, r_base, r_tip):
             while node and node.parent() and node.edge_type() != '+':
                 node.parent().radius = node.radius + growth_rate
                 node = node.parent()
+
+    return g
+
+def compute_length(g, length = 1.e-4):
+    length = float(length)
+    for vid in g.vertices(scale=g.max_scale()):
+        g.node(vid).length = length
+    return g
+
+def compute_relative_position(g):
+    scale = g.max_scale()
+    position = {}
+    axis_length = {}
+    root_id = g.component_roots_at_scale(g.root, scale=scale).next()
+    for vid in traversal.post_order2(g, root_id):
+        sons = algo.sons(g,vid,EdgeType='<')
+        position[vid] = position[sons[0]]+1 if sons else 0
+        if g.edge_type(vid) == '+' or g.parent(vid) is None:
+            axis_length[vid] = position[vid]
+
+    relative_position = {}
+    for axis_id, _length in axis_length.iteritems():
+        _length = float(max(1, _length))
+        for v in algo.local_axis(g,axis_id):
+            relative_position[v] = position[v] / _length
+
+    g.properties()['relative_position'] = relative_position
 
     return g
 

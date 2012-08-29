@@ -25,8 +25,8 @@ r1=Factory(name='discont_radius',
            nodemodule='hydro',
            nodeclass='discont_radius',
            inputs=[dict(name='g'), 
-                   dict(name='r_base', interface='IFloat', value=1e-4),
-                   dict(name='r_tip', interface='IFloat', value=5e-5), ],
+                   dict(name='r_base', interface='IStr', value='1e-4'),
+                   dict(name='r_tip', interface='IStr', value='5e-5'), ],
             )
 __all__.append('r1')
 
@@ -67,14 +67,52 @@ _plot=Factory(name='plot root',
               nodemodule='hydro',
               nodeclass='plot',
            inputs=[dict(name='g'), 
-                   dict(name='length', interface='IFloat', value=1e-4),
                    dict(name='has_radius', interface='IBool', value=True, hide=True),
-                   dict(name='r_base', interface='IFloat', value=1e-4),
-                   dict(name='r_tip', interface='IFloat', value=5e-5),
+                   dict(name='r_base', interface='IStr', value='1e-4'),
+                   dict(name='r_tip', interface='IStr', value='5e-5'),
                    dict(name='visitor', interface='IFunction'),
-                   dict(name='protperty', interface='IStr', value='radius'),
+                   dict(name='property', interface='IStr', value='radius'),
+                   dict(name='colormap', interface='IStr', value='spectral'),
+                   dict(name='lognorm', interface='IBool', value=True),
                     ],
 
             )
 __all__.append('_plot')
+
+_cb=Factory(name='colorbar',
+           nodemodule='hydro',
+           nodeclass='colorbar',
+           inputs = [dict(name='g'), 
+                   dict(name='property_name', interface='IStr'),
+                   dict(name='colormap', interface='IStr', value='spectral'),
+                   dict(name='lognorm', interface='IBool', value=True),
+                   ],
+            outputs = [dict(name='g'), dict(name='colorbar')],
+            )
+__all__.append('_cb')
+
+cl=Factory(name='compute_length',
+           nodemodule='hydro',
+           nodeclass='compute_length',
+           inputs = [dict(name='g'), 
+                   dict(name='length', interface='IStr', value='1.e-4'),
+                   ],
+            outputs = [dict(name='g')],
+            )
+__all__.append('cl')
+
+crp=Factory(name='compute_relative_position',
+           nodemodule='hydro',
+           nodeclass='compute_relative_position',
+           inputs = [dict(name='g'), 
+                   ],
+            outputs = [dict(name='g')],
+            )
+__all__.append('crp')
+
+fK=Factory(name='fit_K',
+           nodemodule='hydro',
+           nodeclass='fit_K',
+            )
+__all__.append('fK')
 
