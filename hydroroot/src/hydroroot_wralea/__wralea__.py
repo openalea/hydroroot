@@ -82,7 +82,7 @@ __all__.append('_plot')
 _cb=Factory(name='colorbar',
            nodemodule='hydro',
            nodeclass='colorbar',
-           inputs = [dict(name='g'), 
+           inputs = [dict(name='g'),
                    dict(name='property_name', interface='IStr'),
                    dict(name='colormap', interface='IStr', value='spectral'),
                    dict(name='lognorm', interface='IBool', value=True),
@@ -94,7 +94,7 @@ __all__.append('_cb')
 cl=Factory(name='compute_length',
            nodemodule='hydro',
            nodeclass='compute_length',
-           inputs = [dict(name='g'), 
+           inputs = [dict(name='g'),
                    dict(name='length', interface='IStr', value='1.e-4'),
                    ],
             outputs = [dict(name='g')],
@@ -104,7 +104,7 @@ __all__.append('cl')
 crp=Factory(name='compute_relative_position',
            nodemodule='hydro',
            nodeclass='compute_relative_position',
-           inputs = [dict(name='g'), 
+           inputs = [dict(name='g'),
                    ],
             outputs = [dict(name='g')],
             )
@@ -115,4 +115,28 @@ fK=Factory(name='fit_K',
            nodeclass='fit_K',
             )
 __all__.append('fK')
+
+fpfc=Factory(name='fit_property_from_csv',
+           nodemodule='hydro',
+           nodeclass='fit_property_from_csv',
+           inputs = [dict(name='g'),
+                   dict(name='csvdata'),
+                   dict(name='prop_in', interface='IStr', value='None'),
+                   dict(name='prop_out', interface='IStr', value='None'),
+                   dict(name='smoothing degree', value='3'),
+                   dict(name='smoothing factor', value='0.'),
+                   ],
+            outputs = [dict(name='g')],
+            )
+__all__.append('fpfc')
+
+rcf=Factory(name='readCSVFile',
+           nodemodule='hydro',
+           nodeclass='readCSVFile',
+           #inputs=[dict(name='filename',interface: 'file')],
+           # outputs=[dict(name='data')],
+           inputs=[{'interface': IFileStr, 'name': 'file', 'value': None, 'desc': ''}],
+           outputs=[{'interface': None, 'name': 'data', 'desc': ''}],
+            )
+__all__.append('rcf')
 

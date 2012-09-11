@@ -34,7 +34,7 @@ def poiseuille(radius, length, viscosity=1e-3):
     return pi*(radius**4) / ( 8 * viscosity * length)
 
 
-def compute_k(g, k0 = 0.1):
+def compute_k(g, k0 = 0.3e-12):
     """ Compute the radial conductances (k) of each segment of the MTG.
 
     Parameters
@@ -98,6 +98,39 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
     pylab.show()
 
     print 'Update figure ', yy.min(), yy.max()
+    return g
+
+def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0.):
+    """ Fit a 1D spline from (x, y) csv extracted data.
+
+    Retrieve the values it will be applied to from the prop_in of the MTG.
+    And evaluate the spline to compute the property 'prop_out'
+    """
+    x_name = csvdata.dtype.names[0]
+    y_name = csvdata.dtype.names[1]
+    x = list(csvdata[x_name])
+    y = list(csvdata[y_name])
+
+    spline = UnivariateSpline(x, y, k=k, s=s)
+    keys = g.property(prop_in).keys()
+
+    x_values = np.array(g.property(prop_in).values())
+    print x_values
+    y_values = spline(x_values)
+
+    g.properties()[prop_out] = dict(zip(keys,y_values))
+
+    xx = np.linspace(min(x_values),max(x_values),1000)
+    yy = spline(xx)
+
+    # plot the reference (x_values,y_values) data and the fitted spline
+    pylab.clf()
+    pylab.plot(x, y)
+    #pylab.plot(x_values, y_values)
+    pylab.plot(xx, yy)
+    pylab.show()
+
+    print 'Update figure ', xx.min(), yy.max()
     return g
 
 

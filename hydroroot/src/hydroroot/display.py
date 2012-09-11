@@ -24,7 +24,6 @@ def root_visitor(g, v, turtle):
         angle = angles[order]
         turtle.down(angle)
 
-
     turtle.setId(v)
     turtle.setWidth(radius)
     for c in n.children():
