@@ -100,7 +100,7 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
     print 'Update figure ', yy.min(), yy.max()
     return g
 
-def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0.):
+def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0., plot=False):
     """ Fit a 1D spline from (x, y) csv extracted data.
 
     Retrieve the values it will be applied to from the prop_in of the MTG.
@@ -115,7 +115,7 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0.):
     keys = g.property(prop_in).keys()
 
     x_values = np.array(g.property(prop_in).values())
-    print x_values
+    #print x_values
     y_values = spline(x_values)
 
     g.properties()[prop_out] = dict(zip(keys,y_values))
@@ -123,14 +123,16 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0.):
     xx = np.linspace(min(x_values),max(x_values),1000)
     yy = spline(xx)
 
-    # plot the reference (x_values,y_values) data and the fitted spline
-    pylab.clf()
-    pylab.plot(x, y)
-    #pylab.plot(x_values, y_values)
-    pylab.plot(xx, yy)
-    pylab.show()
 
-    print 'Update figure ', xx.min(), yy.max()
+    if plot:
+        # plot the reference (x_values,y_values) data and the fitted spline
+        pylab.clf()
+        pylab.plot(x, y, 'x')
+        #pylab.plot(x_values, y_values)
+        pylab.plot(xx, yy, '-')
+        pylab.show()
+
+        print 'Update figure ', xx.min(), yy.max()
     return g
 
 

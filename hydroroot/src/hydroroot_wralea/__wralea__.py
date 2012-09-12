@@ -56,6 +56,17 @@ ccrk=Factory(name='compute radial conductance',
             )
 __all__.append('ccrk')
 
+_fitlen=Factory(name='fit length',
+           nodemodule='hydro',
+           nodeclass='fit_length',
+            inputs=[dict(name='csvdata', interface='IFileStr'), 
+                   dict(name='length', interface='IStr', value='1.e-4'),
+                   dict(name='k', interface='IInt', value=1),
+                   dict(name='s', interface='IFloat', value=0.),
+                    ],
+            )
+__all__.append('_fitlen')
+
 _flux=Factory(name='flux',
            nodemodule='hydro',
            #nodemodule='hydroroot.flux',
@@ -121,10 +132,11 @@ fpfc=Factory(name='fit_property_from_csv',
            nodeclass='fit_property_from_csv',
            inputs = [dict(name='g'),
                    dict(name='csvdata'),
-                   dict(name='prop_in', interface='IStr', value='None'),
-                   dict(name='prop_out', interface='IStr', value='None'),
+                   dict(name='prop_in', interface='IStr'),
+                   dict(name='prop_out', interface='IStr'),
                    dict(name='smoothing degree', value='3'),
                    dict(name='smoothing factor', value='0.'),
+                   dict(name='plot', interface='IBool',value=True),
                    ],
             outputs = [dict(name='g')],
             )

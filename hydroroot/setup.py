@@ -86,7 +86,8 @@ setup(
     # Declare scripts and wralea as entry_points (extensions) of your package 
     entry_points = { 
         'wralea' : ['hydroroot = hydroroot_wralea',
-                    'hydroroot.demo = hydroroot_wralea.demo',],
+                    'hydroroot.demo = hydroroot_wralea.demo',
+                    'hydroroot.data= hydroroot_wralea.data',],
         },
     )
 

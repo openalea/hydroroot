@@ -9,10 +9,12 @@ from matplotlib.colors import Normalize, LogNorm
 
 from openalea.mtg import turtle as turt
 import openalea.plantgl.all as pgl
+from openalea.deploy.shared_data import shared_data
 
+import hydroroot
 from hydroroot.flux import *
 from hydroroot import radius, conductance, markov, display
-
+from hydroroot.read_file import readCSVFile
 
 
 def surface(g, length=1e-4):
@@ -23,13 +25,15 @@ def surface(g, length=1e-4):
             surf += 2 * pi * radius[vid] * length
     return surf
 
-def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.0005, length=1e-4):
+def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.3e-12, length=1e-4):
     k0 = float(k0)
     g = radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
+    g = radius.compute_length(g,length)
+    g = radius.compute_relative_position(g)
     surf = surface(g)
     print 'surf',surf
-    g = conductance.compute_k(g, k0,length)
-    g = conductance.compute_K(g,length=length)
+    g = conductance.compute_k(g, k0)
+    g = compute_conductance(g)
 
     k = g.property('k')
     K = g.property('K')
@@ -41,7 +45,13 @@ def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.0005,
     #assert all(v>0 for v in J_out.values()), J_out.values()
     return g
 
-def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.005, length=1e-4):
+def compute_conductance(g, fn='conductance_data.csv'):
+    fn = shared_data(hydroroot, fn, share_path='share')
+    data = readCSVFile(fn)
+    g = conductance.fit_property_from_csv(g, data, 'position', 'K', k=1)
+    return g
+
+def test_linear(n=1500, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.3e-12, length=1e-4):
     """ Test flux and water potential computation on a linear root.
 
     Units :
@@ -59,7 +69,7 @@ def test_linear(n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.005, leng
     return g, scene
 
 
-def test_tree(g = None, n=30, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.005, length=1e-4, prop_cmap='radius'):
+def test_tree(g = None, n=1500, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.3e-12, length=1e-4, prop_cmap='radius'):
     """ Test flux and water potential computation on a linear root. 
     
     Units :
@@ -71,7 +81,7 @@ def test_tree(g = None, n=30, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.005,
     # topology
     #n=40
     if g is None :
-        g = markov.markov_binary_tree(nb_vertices=n)
+        g = markov.markov_binary_tree(nb_vertices=n, seed=2)
     g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, length=length)
     scene = display.plot(g, prop_cmap=prop_cmap, has_radius=True)
     return g, scene
