@@ -15,10 +15,10 @@ def linear(n=5):
 
     return g
 
-def markov_binary_tree(g=None, vid=0, nb_vertices=300,
-                       branching_chance=0.1, branching_delay=50, 
+def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
+                       branching_variability=0.1, branching_delay=20,
                        length_law=None,
-                       nude_tip_length=200,  order_max=5, 
+                       nude_tip_length=200,  order_max=5,
                        seed=None,  **kwargs ):
     """
     Parameters
@@ -26,7 +26,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=300,
         - g : MTG
         - vid : id of the root of the MTG where the generating tree will be added
         - nb_vertices : number of element of the main axis
-        - branching_chance : probability of ramification at each point
+        - branching_stability : probability of ramification at exact mean branching position
         - branching_delay : reference distance between successive branching axis
         - length_law : spline given the length of lateral ramification
         - nude_tip_length : length at root tip with no ramification
@@ -36,25 +36,36 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=300,
     if g is None:
         g = MTG()
     if vid == 0:
-        vid = g.add_component(g.root, order=0)
+        vid = g.add_component(g.root, order=1)
 
     anchors = [] # list of branching points where lateral roots will be "grafted"
 
     if not seed is None:
         random.seed(seed)
 
-    def markov():   
+    def markov():
         """ simple random markov chain - unused now """
-        return 1 if random.random() < branching_chance else 0
+        return 1 if random.random() < branching_stability else 0
 
-    def delayed_markov(timer):    # random markov chain with threshold and a delay between possible ramification
-        if (timer == 0) :
-            return (1,branching_delay) if (random.random() < branching_chance) else (0,0)
+    def delayed_markov(timer):
+        """ markov chain with a delay between ramification """
+        if (timer <= 0) :
+            return (1,branching_delay)
         else :
             timer -= 1
             return 0,timer
 
-    def create_axis(nid, n, anchors=anchors):    
+    def random_delayed_markov(timer):
+        """ random markov chain with a delay between
+            possible ramification and uniform random variation
+            of branching position around mean position """
+        if (timer <= int(branching_variability*branching_delay)) :
+            return (1,branching_delay) if (random.random() < (1-branching_variability)) else (0,timer)
+        else :
+            timer -= 1
+            return 0,timer
+
+    def create_axis(nid, n, anchors=anchors):
         """ create a random axis of length n and record the id of the branching points in anchors """
         axis = [markov() for i in range(n)]
         for i in range(1,min(branching_delay,n)+1):
@@ -66,8 +77,8 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=300,
             if ramif:
                 anchors.append(nid)
 
-    def create_delayed_axis(nid, n, anchors=anchors):   
-        """ create an axis of length n using the delayed markov 
+    def create_delayed_axis(nid, n, anchors=anchors):
+        """ create an axis of length n using the delayed markov
             and record the id of the branching points in anchors
 
         :Parameters:
@@ -90,32 +101,78 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=300,
             if ramif:
                 anchors.append(nid)
 
+    def create_randomized_delayed_axis(nid, n, anchors=anchors):
+        """ create an axis of length n using the delayed markov
+            and randomized the id of the branching points in anchors
+            around the theoretical branching positions
+
+        :Parameters:
+            - nid: root node for the axis
+            - n : number of vertices for this axis
+            - anchors: future ramification points on this axis
+        """
+        axis = []
+        shuffled_axis = []
+        branch, time = delayed_markov(0)
+        for i in range(n-1):
+            branch, time = delayed_markov(time)
+            axis.append((branch, n-i))
+            shuffled_axis.append((branch,n-i))
+
+        for i in range(n-1):
+            # shift (1-branching_stability) branching points
+            # at max (1-branching_stability)*branching delay away from
+            # theoretical branching position
+            if (axis[i][0] == 1):   # read 'axis' only to avoid treating the same branching point after each shift
+                if 1 : #random.random() < branching_variability :
+                    var = int(round(branching_variability*branching_delay))
+                    shift = random.randint(-var,var)
+                    # shift occurs only if the target is not branched already or outside the axis
+                    if ((i+shift)>0) and ((i+shift)<n-1) and (shuffled_axis[i+shift][0]==0) :
+                        b, p = shuffled_axis[i]
+                        shuffled_axis[i] = (0, p)
+                        shuffled_axis[i+shift] = (1, p)
+
+        for ramif, position in shuffled_axis:
+            order = nid.order
+            nid = nid.add_child(order=order, edge_type='<')
+            nid.position_index = position
+            if ramif :
+                anchors.append(nid)
+
     # create_axis(g.node(vid), nb_vertices)  # deprecated
 
     # Create the first axis
-    create_delayed_axis(g.node(vid), nb_vertices)
+    create_randomized_delayed_axis(g.node(vid), nb_vertices)
 
     while anchors:   # while they are branching point left
         nid = anchors.pop(0)  # take next branching point
         position_index = nid.position_index # distance to the tip
         if nid.order < order_max:  # check if maximal branching order was reached
-            # Create the first node of the branching point
-            cid = nid.add_child(order=nid.order+1, edge_type='+')
+
             # Compute length of root downward of the branching point
+            # potential lateral root can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
             n = len(list(algo.descendants(g,nid._vid,RestrictedTo='SameAxis')))
-            # New lateral root can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
-            n = random.randint(1, max(n-nude_tip_length,1))
-            # Create the new axis
-            #create_axis(cid, n-1) # deprecated
+            #n = random.randint(1, max(n-nude_tip_length,1))
+            n = max(n-nude_tip_length,1)
             lateral_length = n-1
+
+            # if there is potential for having grown a lateral root at this position
             if length_law:
                 lateral_length = int(length_law(position_index))
-
+            # then create an axis of appropriate length
             if lateral_length:
-                create_delayed_axis(cid, lateral_length)
+                # branching_variability also apply to the length of LR
+                var = int(lateral_length*branching_variability)
+                lateral_length = random.randint(lateral_length-var, lateral_length+var)
+                # Create the first node of the branching point and the corresponding axis
+                cid = nid.add_child(order=nid.order+1, edge_type='+')
+                create_randomized_delayed_axis(cid, lateral_length)
 
     fat_mtg(g)
     return g
+
+
 
 
 

@@ -8,6 +8,7 @@ and the radius of each xylem pipe.
 """
 from openalea.mtg import *
 from openalea.mtg import algo
+from math import pi
 
 
 def cont_radius(g, r_base, r_tip):
@@ -94,6 +95,16 @@ def compute_length(g, length = 1.e-4):
     for vid in g.vertices(scale=g.max_scale()):
         g.node(vid).length = length
     return g
+
+def compute_surface(g):
+    surf = 0
+    radius = g.property('radius')
+    length = g.property('length')
+    for vid in g.vertices():
+        if radius.has_key(vid) and length.has_key(vid):
+            surf += 2 * pi * radius[vid] * length[vid]
+    print 'surface: ',surf
+    return surf
 
 def compute_relative_position(g):
     scale = g.max_scale()

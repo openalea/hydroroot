@@ -15,7 +15,7 @@ def fit_length(csvdata, length='1e-4', k=1, s=0.):
     x_name = csvdata.dtype.names[0]
     y_name = csvdata.dtype.names[1]
 
-    print length, x_name, y_name, csvdata[x_name], csvdata[y_name]
+    #print length, x_name, y_name, csvdata[x_name], csvdata[y_name]
     x = list(csvdata[x_name]/length)
     y = list(csvdata[y_name]/length)
 

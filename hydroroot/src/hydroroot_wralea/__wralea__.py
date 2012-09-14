@@ -112,6 +112,15 @@ cl=Factory(name='compute_length',
             )
 __all__.append('cl')
 
+cs=Factory(name='compute_surface',
+           nodemodule='hydro',
+           nodeclass='compute_surface',
+           inputs = [dict(name='g'),
+                   ],
+            outputs = [dict(name='surface')],
+            )
+__all__.append('cs')
+
 crp=Factory(name='compute_relative_position',
            nodemodule='hydro',
            nodeclass='compute_relative_position',

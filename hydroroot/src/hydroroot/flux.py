@@ -23,6 +23,7 @@
 
 from openalea.mtg import traversal
 
+
 class Flux(object):
     """ Compute the water potential and fluxes at each vertex of the MTG.
 
@@ -49,6 +50,7 @@ class Flux(object):
         self.Jv = Jv
         self.psi_e = psi_e
         self.psi_base = psi_base
+        self.length = g.property('length')
 
     def run(self):
         """ Compute the water potential and fluxes of each segments
@@ -66,6 +68,7 @@ class Flux(object):
         
         g = self.g; k = self.k; K = self.K
         Jv = self.Jv; psi_e = self.psi_e; psi_base = self.psi_base
+        length = self.length
 
         # Select the base of the root
         v_base = g.component_roots_at_scale(g.root, scale=g.max_scale()).next()
@@ -101,16 +104,16 @@ class Flux(object):
             else:
                 psi_out[v] = psi_in[parent]
                 #print 'psi_out',v,psi_out[v]
-                J_out[v] = ((J_out[parent] - j[parent]) * Keq[v]) / (sum( Keq[cid] for cid in g.children(parent)))
+                J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / (sum( Keq[cid] for cid in g.children(parent))))
                 #print 'j_out',v,J_out[v]
 
-            psi_in[v] = (J_out[v] / K[v]) + psi_out[v]
+            psi_in[v] = (J_out[v] / K[v]) * length[v] + psi_out[v]
             #print 'psi_in',v,psi_in[v]
             j[v] = (psi_e-psi_in[v]) * k[v]
             #print 'j',v,j[v]
 
 
-def flux(g, Jv=1e-10, psi_e=300000., psi_base=101325., k=None, K=None):
+def flux(g, Jv=1e-10, psi_e=400000., psi_base=101325., k=None, K=None):
     """ flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
