@@ -1,7 +1,6 @@
 import random
 import numpy as np
 
-from math import pi
 from matplotlib import pyplot, mpl
 from pylab import cm, colorbar
 from pylab import plot as pylab_plot
@@ -16,21 +15,12 @@ from hydroroot.flux import *
 from hydroroot import radius, conductance, markov, display
 from hydroroot.read_file import readCSVFile
 
-
-def surface(g, length=1e-4):
-    surf = 0
-    radius = g.property('radius')
-    for vid in g.vertices():
-        if radius.has_key(vid):
-            surf += 2 * pi * radius[vid] * length
-    return surf
-
-def compute_flux(g, n=300, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.3e-12, length=1e-4):
+def compute_flux(g, n=300, psi_e=400000., psi_base=101325., Jv=1e-10, k0=0.3e-12, length=1e-4):
     k0 = float(k0)
     g = radius.discont_radius(g, r_base=1.e-4, r_tip=5.e-5)
     g = radius.compute_length(g,length)
     g = radius.compute_relative_position(g)
-    surf = surface(g)
+    surf = radius.compute_surface(g)
     print 'surf',surf
     g = conductance.compute_k(g, k0)
     g = compute_conductance(g)
@@ -51,7 +41,7 @@ def compute_conductance(g, fn='conductance_data.csv'):
     g = conductance.fit_property_from_csv(g, data, 'position', 'K', k=1)
     return g
 
-def test_linear(n=1500, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.3e-12, length=1e-4):
+def test_linear(n=1500, psi_e=400000., psi_base=101325., Jv=1e-10, k0=0.3e-12, length=1e-4):
     """ Test flux and water potential computation on a linear root.
 
     Units :
@@ -69,9 +59,9 @@ def test_linear(n=1500, psi_e=300000., psi_base=101325., Jv=1e-10, k0=0.3e-12, l
     return g, scene
 
 
-def test_tree(g = None, n=1500, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.3e-12, length=1e-4, prop_cmap='radius'):
-    """ Test flux and water potential computation on a linear root. 
-    
+def test_tree(g = None, n=1500, lr=0.9,  psi_e=400000, psi_base=101325, Jv=1e-10, k0=0.3e-12, length=1e-4, prop_cmap='radius'):
+    """ Test flux and water potential computation on a linear root.
+
     Units :
     psi_e & psi_out in Pa
     Jv in m**3/s
@@ -81,8 +71,9 @@ def test_tree(g = None, n=1500, psi_e=300000, psi_base=101325, Jv=1e-10, k0=0.3e
     # topology
     #n=40
     if g is None :
-        g = markov.markov_binary_tree(nb_vertices=n, seed=2)
+        g = markov.markov_binary_tree(nb_vertices=n, branching_stability=lr, seed=2)
     g = compute_flux(g,n=n, psi_e=psi_e, psi_base=psi_base, Jv=Jv, k0=k0, length=length)
     scene = display.plot(g, prop_cmap=prop_cmap, has_radius=True)
     return g, scene
+
 
