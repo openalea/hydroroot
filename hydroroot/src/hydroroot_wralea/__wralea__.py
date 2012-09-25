@@ -30,6 +30,17 @@ r1=Factory(name='discont_radius',
             )
 __all__.append('r1')
 
+r2=Factory(name='ordered_radius',
+#nodemodule='hydroroot.radius',
+           nodemodule='hydro',
+           nodeclass='ordered_radius',
+           inputs=[dict(name='g'), 
+                   dict(name='ref_radius', interface='IStr', value='1e-4'),
+                   dict(name='order_decrease_factor', interface='IStr', value='0.75'), ],
+            )
+__all__.append('r2')
+
+
 lr=Factory(name='linear root',
            nodemodule='hydro',
            nodeclass='linear',

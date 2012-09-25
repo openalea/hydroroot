@@ -90,6 +90,44 @@ def discont_radius(g, r_base, r_tip):
 
     return g
 
+def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.75):
+    """ Compute the radius of each segment of a root system.
+
+    Set radius for elements of a mtg with decrease between each order.
+
+    Radius is discontinuous e.g. for a young/small lateral on an old root,
+    the yound root radius is very small initially compared to the old one.
+
+    ref_radius: reference radius of the primary root (in m)
+    order_decrease_factor: radius decrease factor applied when increasing order
+
+    """
+    ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
+
+    base = g.component_roots(g.root).next()
+    base = g.node(base)
+    base.radius = ref_r
+
+    _tips = dict((vid, g.order(vid)) for vid in g.vertices(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
+    tips = {}
+    for tip,order in _tips.iteritems():
+        tips.setdefault(order, []).append(tip)
+
+    max_order = max(tips)
+
+    # radius are applied from tips to bases and scaled according to root order
+    for order in range(max_order+1):
+        rad = ref_r*(d_factor**order)
+        for tip in tips[order]:
+            node = g.node(tip)
+            node.radius = rad
+            while node and node.parent() and node.edge_type() != '+':
+                node.parent().radius = node.radius
+                node = node.parent()
+
+    return g
+
+
 def compute_length(g, length = 1.e-4):
     length = float(length)
     for vid in g.vertices(scale=g.max_scale()):

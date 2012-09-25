@@ -36,7 +36,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
     if g is None:
         g = MTG()
     if vid == 0:
-        vid = g.add_component(g.root, order=1)
+        vid = g.add_component(g.root, order=0)
 
     anchors = [] # list of branching points where lateral roots will be "grafted"
 
