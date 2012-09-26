@@ -23,6 +23,7 @@
 
 from openalea.mtg import traversal
 
+CONSTANT = 1.e20
 
 class Flux(object):
     """ Compute the water potential and fluxes at each vertex of the MTG.
@@ -80,6 +81,13 @@ class Flux(object):
         g.add_property('j')
         g.add_property('J_out')
 
+        # Normalize k and K values
+        for vid in k:
+            k[vid] *= CONSTANT
+        for vid in K:
+            K[vid] *= CONSTANT
+        Jv *= CONSTANT
+
         # Conductance computation
         Keq = g.property('Keq')
         for v in traversal.post_order2(g, v_base):
@@ -111,6 +119,23 @@ class Flux(object):
             #print 'psi_in',v,psi_in[v]
             j[v] = (psi_e-psi_in[v]) * k[v]
             #print 'j',v,j[v]
+
+            if J_out[v] < j[v]:
+                print 'Vertex %d (Jout=%.4f, j=%.4f, psi_in=%.4f)'%(v,J_out[v]/CONSTANT, j[v]/CONSTANT,psi_in[v]/CONSTANT)
+
+        # UnNormalize k and K values
+#X         for vid in k:
+#X             k[vid] /= CONSTANT
+#X         for vid in K:
+#X             K[vid] /= CONSTANT
+#X         for vid in Keq:
+#X             Keq[vid] /= CONSTANT
+#X         for vid in j:
+#X             j[vid] /= CONSTANT
+#X         for vid in J_out:
+#X             J_out[vid] /= CONSTANT
+
+        #Jv *= CONSTANT
 
 
 def flux(g, Jv=1e-10, psi_e=400000., psi_base=101325., k=None, K=None):
