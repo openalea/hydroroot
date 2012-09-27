@@ -23,7 +23,7 @@
 
 from openalea.mtg import traversal
 
-CONSTANT = 1.e20
+CONSTANT = 1. #1.e20
 
 class Flux(object):
     """ Compute the water potential and fluxes at each vertex of the MTG.
@@ -37,9 +37,9 @@ class Flux(object):
             - `g` (MTG) - the root architecture
             - `k` (dict) - lateral conductance
             - `K` (dict) - axial conductance
-            - `Jv` (float) - water flux at the root base in m**3/s
-            - `psi_e` - hydric potential outside the roots (pressure chamber) in Pa
-            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in Pa
+            - `Jv` (float) - water flux at the root base in microL/s
+            - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
+            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
 
         :Example:
 
@@ -81,7 +81,11 @@ class Flux(object):
         g.add_property('j')
         g.add_property('J_out')
 
-        # Normalize k and K values
+        # Convert axial conductivities to axial conductances
+        for vid in K:
+            K[vid] /= length[vid]
+
+        # Apply scaling k and K values
         for vid in k:
             k[vid] *= CONSTANT
         for vid in K:
@@ -115,7 +119,7 @@ class Flux(object):
                 J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / (sum( Keq[cid] for cid in g.children(parent))))
                 #print 'j_out',v,J_out[v]
 
-            psi_in[v] = (J_out[v] / K[v]) * length[v] + psi_out[v]
+            psi_in[v] = (J_out[v] / K[v]) + psi_out[v]
             #print 'psi_in',v,psi_in[v]
             j[v] = (psi_e-psi_in[v]) * k[v]
             #print 'j',v,j[v]
@@ -138,14 +142,14 @@ class Flux(object):
         #Jv *= CONSTANT
 
 
-def flux(g, Jv=1e-10, psi_e=400000., psi_base=101325., k=None, K=None):
+def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, k=None, K=None):
     """ flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
             - `g` (MTG) - the root architecture
-            - `Jv` (float) - water flux at the root base in m**3/s
-            - `psi_e` - hydric potential outside the roots (pressure chamber) in Pa
-            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in Pa
+            - `Jv` (float) - water flux at the root base in microL/s
+            - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
+            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
 
 
         :Optional Parameters:

@@ -17,7 +17,7 @@ def poiseuille(radius, length, viscosity=1e-3):
     radius : float (m)
         radius of a xylem tube
 
-    length: float (m) 
+    length: float (m)
         length of a xylem element
 
     viscosity : float (Pa.s)
@@ -34,14 +34,14 @@ def poiseuille(radius, length, viscosity=1e-3):
     return pi*(radius**4) / ( 8 * viscosity * length)
 
 
-def compute_k(g, k0 = 0.3e-12):
+def compute_k(g, k0 = 300.):
     """ Compute the radial conductances (k) of each segment of the MTG.
 
     Parameters
     ==========
 
         - `g` - the RSA
-        - `k0` - the radial conductance for one element of surface
+        - `k0` - the radial conductance for one element of surface in microL/s.MPa.m**2
         - `length` - the length of a segment
 
     """

@@ -1,5 +1,5 @@
 
-# This file has been generated at Wed Sep 12 11:27:43 2012
+# This file has been generated at Thu Sep 27 10:29:31 2012
 
 from openalea.core import *
 
@@ -17,17 +17,17 @@ __institutes__ = None
 __icon__ = ''
 
 
-__all__ = ['_153570576', '_86868368']
+__all__ = ['_212207696', '_210849488']
 
 
-_153570576 = DataFactory(name='LR_length_data.csv',
+_212207696 = DataFactory(name='conductivity_data.csv',
                     description='',
                     editors=None,
                     includes=None,
                     )
 
 
-_86868368 = DataFactory(name='conductance_data.csv',
+_210849488 = DataFactory(name='LR_length_data.csv',
                     description='',
                     editors=None,
                     includes=None,
