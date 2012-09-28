@@ -95,7 +95,7 @@ class Flux(object):
         # Conductance computation
         Keq = g.property('Keq')
         for v in traversal.post_order2(g, v_base):
-            r = 1./(k[v] + sum(Keq[cid] for cid in g.children(v))) 
+            r = 1./(k[v] + sum(Keq[cid] for cid in g.children(v)))
             R = 1./K[v]
             Keq[v] = 1./(r+R)
 
@@ -106,23 +106,38 @@ class Flux(object):
         J_out = g.property('J_out')
 
         for v in traversal.pre_order2(g, v_base):
+        #compute psi according to Millman theorem, then compute radial flux
             parent = g.parent(v)
             if parent is None:
                 assert v == v_base
                 psi_out[v] = psi_base
-                #print 'psi_out',v,psi_out[v]
                 J_out[v] = Jv
-                #print 'j_out',v,J_out[v]
             else:
                 psi_out[v] = psi_in[parent]
-                #print 'psi_out',v,psi_out[v]
                 J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / (sum( Keq[cid] for cid in g.children(parent))))
-                #print 'j_out',v,J_out[v]
 
-            psi_in[v] = (J_out[v] / K[v]) + psi_out[v]
-            #print 'psi_in',v,psi_in[v]
-            j[v] = (psi_e-psi_in[v]) * k[v]
-            #print 'j',v,j[v]
+            psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + (sum( Keq[cid] for cid in g.children(parent))))) / (k[v] + K[v] + (sum( Keq[cid] for cid in g.children(parent))))
+            j[v] = (psi_e - psi_in[v]) * k[v]
+
+
+
+#        for v in traversal.pre_order2(g, v_base):
+#            parent = g.parent(v)
+#            if parent is None:
+#                assert v == v_base
+#                psi_out[v] = psi_base
+#                #print 'psi_out',v,psi_out[v]
+#                J_out[v] = Jv
+#                #print 'j_out',v,J_out[v]
+#            else:
+#                psi_out[v] = psi_in[parent]
+#                #print 'psi_out',v,psi_out[v]
+#                J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / (sum( Keq[cid] for cid in g.children(parent))))
+#                #print 'j_out',v,J_out[v]
+#            psi_in[v] = (J_out[v] / K[v]) + psi_out[v]
+#            #print 'psi_in',v,psi_in[v]
+#            j[v] = (psi_e-psi_in[v]) * k[v]
+#            #print 'j',v,j[v]
 
             if J_out[v] < j[v]:
                 print 'Vertex %d (Jout=%.4f, j=%.4f, psi_in=%.4f)'%(v,J_out[v]/CONSTANT, j[v]/CONSTANT,psi_in[v]/CONSTANT)
