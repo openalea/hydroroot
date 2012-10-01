@@ -142,7 +142,8 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 if children is None:
                     J_out[v] = j[v]
                 else:  # TODO CHECK THIS !!!
-                    J_out[v] = j[v] + sum( J_out[cid] for cid in g.children(v) )
+                    influx = j[v] + sum( J_out[cid] for cid in g.children(v) )
+                    J_out[v] = influx #(psi_in[v]-psi_out[v])*K[v]
 
             print "Water Flux Jv = ", J_out[v_base]
 
