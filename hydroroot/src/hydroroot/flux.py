@@ -25,12 +25,12 @@ from openalea.mtg import traversal
 
 CONSTANT = 1. #1.e20
 
-class Flux(object):
+class Flux(object):   # edit this to also allow for flux computation instead just redistribution
     """ Compute the water potential and fluxes at each vertex of the MTG.
 
     """
 
-    def __init__(self, g, Jv, psi_e, psi_base, k=None, K=None):
+    def __init__(self, g, Jv, psi_e, psi_base, invert_model=False, k=None, K=None):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -40,6 +40,7 @@ class Flux(object):
             - `Jv` (float) - water flux at the root base in microL/s
             - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
             - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
+            - `invert_model` - when false, distribute output flux within the root ; when true, compute the output flux for the given root and conditions
 
         :Example:
 
@@ -52,6 +53,7 @@ class Flux(object):
         self.psi_e = psi_e
         self.psi_base = psi_base
         self.length = g.property('length')
+        self.invert_model = invert_model
 
     def run(self):
         """ Compute the water potential and fluxes of each segments
@@ -69,7 +71,7 @@ class Flux(object):
         
         g = self.g; k = self.k; K = self.K
         Jv = self.Jv; psi_e = self.psi_e; psi_base = self.psi_base
-        length = self.length
+        length = self.length; invert_model = self.invert_model
 
         # Select the base of the root
         v_base = g.component_roots_at_scale(g.root, scale=g.max_scale()).next()
@@ -105,23 +107,48 @@ class Flux(object):
         j = g.property('j')
         J_out = g.property('J_out')
 
-        for v in traversal.pre_order2(g, v_base):
-        #compute psi according to Millman theorem, then compute radial flux
-            parent = g.parent(v)
-            if parent is None:
-                assert v == v_base
-                psi_out[v] = psi_base
-                J_out[v] = Jv
-            else:
-                psi_out[v] = psi_in[parent]
-                J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / (sum( Keq[cid] for cid in g.children(parent))))
+        if not(invert_model) : # distribute a given output into the root system
 
-            psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + (sum( Keq[cid] for cid in g.children(parent))))) / (k[v] + K[v] + (sum( Keq[cid] for cid in g.children(parent))))
-            j[v] = (psi_e - psi_in[v]) * k[v]
+            for v in traversal.pre_order2(g, v_base):
+            #compute psi according to Millman theorem, then compute radial flux
+                parent = g.parent(v)
+                if parent is None:
+                    assert v == v_base
+                    psi_out[v] = psi_base
+                    J_out[v] = Jv
+                else:
+                    psi_out[v] = psi_in[parent]
+                    J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / (sum( Keq[cid] for cid in g.children(parent))))
 
+                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + (sum( Keq[cid] for cid in g.children(parent))))) / (k[v] + K[v] + (sum( Keq[cid] for cid in g.children(parent))))
+                j[v] = (psi_e - psi_in[v]) * k[v]
+
+        else :  # compute the water output for the given root system and conditions
+
+            for v in traversal.pre_order2(g, v_base):
+            #compute psi according to Millman theorem from root base to root tips
+                parent = g.parent(v)
+                if parent is None:
+                    assert v == v_base
+                    psi_out[v] = psi_base
+                else:
+                    psi_out[v] = psi_in[parent]
+                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + (sum( Keq[cid] for cid in g.children(parent))))) / (k[v] + K[v] + (sum( Keq[cid] for cid in g.children(parent))))
+
+            for v in traversal.post_order2(g, v_base):
+            # compute water flux according to the psis from root tips to root base
+                j[v] = (psi_e - psi_in[v]) * k[v]
+                children = g.children(v)
+                if children is None:
+                    J_out[v] = j[v]
+                else:  # TODO CHECK THIS !!!
+                    J_out[v] = j[v] + sum( J_out[cid] for cid in g.children(v) )
+
+            print "Water Flux Jv = ", J_out[v_base]
 
 
 #        for v in traversal.pre_order2(g, v_base):
+#        # this version of the algorithm causes numerical issues - do not use
 #            parent = g.parent(v)
 #            if parent is None:
 #                assert v == v_base
@@ -139,8 +166,8 @@ class Flux(object):
 #            j[v] = (psi_e-psi_in[v]) * k[v]
 #            #print 'j',v,j[v]
 
-            if J_out[v] < j[v]:
-                print 'Vertex %d (Jout=%.4f, j=%.4f, psi_in=%.4f)'%(v,J_out[v]/CONSTANT, j[v]/CONSTANT,psi_in[v]/CONSTANT)
+#            if J_out[v] < j[v]:
+#                print 'Vertex %d (Jout=%.4f, j=%.4f, psi_in=%.4f)'%(v,J_out[v]/CONSTANT, j[v]/CONSTANT,psi_in[v]/CONSTANT)
 
         # UnNormalize k and K values
 #X         for vid in k:
@@ -157,7 +184,7 @@ class Flux(object):
         #Jv *= CONSTANT
 
 
-def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, k=None, K=None):
+def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=None):
     """ flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -165,6 +192,7 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, k=None, K=None):
             - `Jv` (float) - water flux at the root base in microL/s
             - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
             - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
+            - `invert_model` - when false, distribute output flux within the root ; when true, compute the output flux for the given root and conditions
 
 
         :Optional Parameters:
@@ -174,7 +202,7 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, k=None, K=None):
         :Example::
 
             my_flux = flux(g)
-    """    
-    f = Flux(g, Jv, psi_e, psi_base, k=k, K=K)
+    """
+    f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K)
     f.run()
     return f.g
