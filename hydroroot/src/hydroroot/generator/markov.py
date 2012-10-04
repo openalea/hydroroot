@@ -111,6 +111,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
             - n : number of vertices for this axis
             - anchors: future ramification points on this axis
         """
+        n = int(n)
         axis = []
         shuffled_axis = []
         branch, time = delayed_markov(0)
