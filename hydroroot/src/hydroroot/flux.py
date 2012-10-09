@@ -94,7 +94,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             K[vid] *= CONSTANT
         Jv *= CONSTANT
 
-        # Conductance computation
+        # Equivalent conductance computation
         Keq = g.property('Keq')
         for v in traversal.post_order2(g, v_base):
             r = 1./(k[v] + sum(Keq[cid] for cid in g.children(v)))
@@ -145,7 +145,12 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     influx = j[v] + sum( J_out[cid] for cid in g.children(v) )
                     J_out[v] = influx #(psi_in[v]-psi_out[v])*K[v]
 
-            print "Water Flux Jv = ", J_out[v_base]
+            Jv_global = Keq[v_base]*(psi_e-psi_base)
+
+            #print "Keq base = ", Keq[v_base]
+            #print "psi_e, psi_base = ", psi_e, psi_base
+            print "Local Computation Water Flux Jvl = ", J_out[v_base]
+            print "Global Computation Water Flux Jvg = ", Jv_global
 
 
 #        for v in traversal.pre_order2(g, v_base):
@@ -206,4 +211,5 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=
     """
     f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K)
     f.run()
+
     return f.g

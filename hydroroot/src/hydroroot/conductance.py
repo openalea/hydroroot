@@ -8,7 +8,7 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 import pylab
 
-def poiseuille(radius, length, viscosity=1e-3):
+def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
     """
     Compute a conductance of a xylem element based on their radius and length.
     
@@ -49,11 +49,12 @@ def compute_k(g, k0 = 300.):
     length = g.property('length')
     k = dict( (vid,radius[vid]*2*pi*length[vid]*k0) for vid in g.vertices(scale=g.max_scale()))
     g.properties()['k'] = k
+
     return g
 
 
-def compute_K(g, nb_xylem=5, radius_scale = 1/10.):
-    """ Compute the axial conductances (K) in a MTG according to Poiseuille law. 
+def compute_K(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATED
+    """ Compute the axial conductances (K) in a MTG according to Poiseuille law.
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
     and on the length of a root segment.
@@ -136,7 +137,7 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0., plot=False):
     return g
 
 
-def fit_K(g, s=0.):
+def fit_K(g, s=0.):   # DEPRECATED
     x = np.linspace(0.,1.,100)
     y = np.linspace(50, 500, 100)+100*np.random.random(100)-50
 

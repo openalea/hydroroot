@@ -90,7 +90,7 @@ def discont_radius(g, r_base, r_tip):
 
     return g
 
-def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.75):
+def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     """ Compute the radius of each segment of a root system.
 
     Set radius for elements of a mtg with fixed decrease between each order.
@@ -129,7 +129,7 @@ def compute_length(g, length = 1.e-4):
     """ Set the length of each vertex of the MTG
     """
     length = float(length)
-    for vid in g.vertices(scale=g.max_scale()):
+    for vid in g.vertices(scale=g.max_scale()):  
         g.node(vid).length = length
     return g
 
