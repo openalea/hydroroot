@@ -31,13 +31,70 @@ def flux(root_length=1500, branching_delay=20, elementary_k=300, psi_e=0.4, radi
     df.eval_as_expression(vtx_id=21) # force axial conductance computation
     df.eval_as_expression(vtx_id=7)  # flux computation
     g = df.node(7).output(0)
-    v_base = g.component_roots_at_scale(g.root, scale=g.max_scale()).next()
+    try:
+        v_base = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+    except:
+        v_base = g.component_roots_at_scale(g.root, scale=g.max_scale()).next()
+
     J_out = g.property('J_out')
     return J_out[v_base]
+
+def my_flux(d):
+    return flux(**d)
+
+###################################################################################
+# Sensitivity analysis
+
+from sensitivity import *
+
+repeat = 5
+factors = """
+root_length
+branching_delay
+elementary_k
+radius_reduction_factor
+""".split()
+
+intervals = {}
+intervals['root_length'] = (200, 1500)
+intervals['branching_delay'] = (15,50)
+intervals['elementary_k'] = (100, 500)
+intervals['radius_reduction_factor'] = (0.2, 0.8)
+
+binf = [intervals[f][0] for f in factors ]
+bsup = [intervals[f][1] for f in factors ]
+
+m, space = Morris(repeat,factors, binf, bsup)
+
+n = len(space['root_length'])
+
+params = [dict(zip(factors, (space[f][i] for f in factors))) for i in range(n)]
+
+y = []
+for i,p in enumerate(params):
+    print 'simulation ', i
+    f=my_flux(p)
+    y.append(f)
+
+
+modalities, mu ,sigma = Morris_IS(m,y)
+plotSens(mod)
+
+
 
 # Use as many processors as possible for computation
 cpu = multiprocessing.cpu_count()
 pool = multiprocessing.Pool(cpu)
+
+y = pool.map(my_flux,params)
+
+
+
+
+
+
+
+
 
 # Define the range of variation for tested parameter, compute the output for each value & show it as a curve
 x = range(200,1600,100)
