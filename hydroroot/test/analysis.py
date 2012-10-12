@@ -1,3 +1,5 @@
+# !!! script has to be run from hydroroot\test\ !!!
+
 import multiprocessing
 
 import numpy as np
@@ -47,7 +49,7 @@ def my_flux(d):
 
 from sensitivity import *
 
-repeat = 5
+repeat = 10
 factors = """
 root_length
 branching_delay
@@ -55,18 +57,23 @@ elementary_k
 radius_reduction_factor
 """.split()
 
+factors = """
+elementary_k
+radius_reduction_factor
+""".split()
+
 intervals = {}
-intervals['root_length'] = (200, 1500)
-intervals['branching_delay'] = (15,50)
-intervals['elementary_k'] = (100, 500)
-intervals['radius_reduction_factor'] = (0.2, 0.8)
+#intervals['root_length'] = (200, 1500)
+#intervals['branching_delay'] = (18,50)
+intervals['elementary_k'] = (0.1, 500)
+intervals['radius_reduction_factor'] = (0.1, 1.)
 
 binf = [intervals[f][0] for f in factors ]
 bsup = [intervals[f][1] for f in factors ]
 
 m, space = Morris(repeat,factors, binf, bsup)
 
-n = len(space['root_length'])
+n = len(space['elementary_k'])
 
 params = [dict(zip(factors, (space[f][i] for f in factors))) for i in range(n)]
 
