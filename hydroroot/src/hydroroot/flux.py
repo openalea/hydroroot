@@ -74,7 +74,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         length = self.length; invert_model = self.invert_model
 
         # Select the base of the root
-        v_base = g.component_roots_at_scale(g.root, scale=g.max_scale()).next()
+        v_base = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
 
         # Add properties
         g.add_property('Keq')

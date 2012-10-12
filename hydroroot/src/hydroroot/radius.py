@@ -21,11 +21,11 @@ def cont_radius(g, r_base, r_tip):
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
 
-    base = g.component_roots(g.root).next()
+    base = g.component_roots_iter(g.root).next()
     base = g.node(base)
     base.radius = r_base
 
-    _tips = dict((vid, g.order(vid)) for vid in g.vertices(scale = g.max_scale()) if g.is_leaf(vid))
+    _tips = dict((vid, g.order(vid)) for vid in g.vertices_iter(scale = g.max_scale()) if g.is_leaf(vid))
     tips = {}
     for tip,order in _tips.iteritems():
         tips.setdefault(order, []).append(tip)
@@ -61,11 +61,11 @@ def discont_radius(g, r_base, r_tip):
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
 
-    base = g.component_roots(g.root).next()
+    base = g.component_roots_iter(g.root).next()
     base = g.node(base)
     base.radius = r_base
 
-    _tips = dict((vid, g.order(vid)) for vid in g.vertices(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
+    _tips = dict((vid, g.order(vid)) for vid in g.vertices_iter(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
     tips = {}
     for tip,order in _tips.iteritems():
         tips.setdefault(order, []).append(tip)
@@ -101,11 +101,11 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     """
     ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
 
-    base = g.component_roots(g.root).next()
+    base = g.component_roots_iter(g.root).next()
     base = g.node(base)
     base.radius = ref_r
 
-    _tips = dict((vid, g.order(vid)) for vid in g.vertices(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
+    _tips = dict((vid, g.order(vid)) for vid in g.vertices_iter(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
     tips = {}
     for tip,order in _tips.iteritems():
         tips.setdefault(order, []).append(tip)
@@ -129,7 +129,7 @@ def compute_length(g, length = 1.e-4):
     """ Set the length of each vertex of the MTG
     """
     length = float(length)
-    for vid in g.vertices(scale=g.max_scale()):  
+    for vid in g.vertices_iter(scale=g.max_scale()):  
         g.node(vid).length = length
     return g
 
@@ -139,7 +139,7 @@ def compute_surface(g):
     surf = 0
     radius = g.property('radius')
     length = g.property('length')
-    for vid in g.vertices():
+    for vid in g.vertices_iter():
         if radius.has_key(vid) and length.has_key(vid):
             surf += 2 * pi * radius[vid] * length[vid]
     print 'surface: ',surf
@@ -153,7 +153,7 @@ def compute_relative_position(g):
     position = {}
     position_measure = {}
     axis_length = {}
-    root_id = g.component_roots_at_scale(g.root, scale=scale).next()
+    root_id = g.component_roots_at_scale_iter(g.root, scale=scale).next()
     for vid in traversal.post_order2(g, root_id):
         sons = algo.sons(g,vid,EdgeType='<')
         position[vid] = position[sons[0]]+1 if sons else 0

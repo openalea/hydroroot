@@ -78,7 +78,7 @@ for i,p in enumerate(params):
 
 
 modalities, mu ,sigma = Morris_IS(m,y)
-plotSens(mod)
+plotSens(modalities)
 
 
 
