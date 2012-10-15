@@ -53,6 +53,12 @@ mbt=Factory(name='markov binary tree',
             )
 __all__.append('mbt')
 
+st=Factory(name='scramble axis',
+           nodemodule='hydro',
+           nodeclass='scramble_axis',
+            )
+__all__.append('st')
+
 cck=Factory(name='compute axial conductance',
            nodemodule='hydro',
            #nodemodule='hydroroot.conductance',

@@ -142,8 +142,8 @@ def compute_surface(g):
     for vid in g.vertices_iter():
         if radius.has_key(vid) and length.has_key(vid):
             surf += 2 * pi * radius[vid] * length[vid]
-    print 'surface: ',surf
-    return surf
+    print 'surface (sq. meters): ',surf
+    return g
 
 def compute_relative_position(g):
     """ Compute the position of each segment relative to the axis bearing it.

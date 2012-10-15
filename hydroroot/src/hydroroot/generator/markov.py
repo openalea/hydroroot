@@ -2,6 +2,8 @@ import random
 
 from openalea.mtg import *
 from openalea.mtg import algo
+from openalea.mtg import traversal
+from random import choice
 
 def linear(n=5):
     """ 
@@ -151,30 +153,48 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
         position_index = nid.position_index # distance to the tip
         if nid.order < order_max:  # check if maximal branching order was reached
 
-            # Compute length of root downward of the branching point
-            # potential lateral root can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
-            n = len(list(algo.descendants(g,nid._vid,RestrictedTo='SameAxis')))
-            #n = random.randint(1, max(n-nude_tip_length,1))
-            n = max(n-nude_tip_length,1)
-            lateral_length = n-1
-
-            # if there is potential for having grown a lateral root at this position
+            # if there is a length law, use it to compute lateral root length at this position
             if length_law:
                 lateral_length = int(length_law(position_index))
-            # then create an axis of appropriate length
-            if lateral_length:
+            else : # standard lateral root length - can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
+                n = len(list(algo.descendants(g,nid._vid,RestrictedTo='SameAxis')))
+                #n = random.randint(1, max(n-nude_tip_length,1))
+                n = max(n-nude_tip_length,1)
+                lateral_length = n-1
+
+            # create axis of appropriate length
+            if lateral_length > 0:
                 # branching_variability also apply to the length of LR
                 var = int(lateral_length*branching_variability)
-                lateral_length = random.randint(lateral_length-var, lateral_length+var)
-                # Create the first node of the branching point and the corresponding axis
+                lateral_length = random.randint(max(1,lateral_length-var), lateral_length+var)
+                # Create the first  node of the branching point and the corresponding axis
                 cid = nid.add_child(order=nid.order+1, edge_type='+')
+                #print "pid length", nid, lateral_length
                 create_randomized_delayed_axis(cid, lateral_length)
 
     fat_mtg(g)
     return g
 
 
+def scramble_axis(g=None, scramble=False):
+    """ For each subtree of a MTG, change its root node to another node of the same axis.
+    """
+    if scramble:
+        v_base = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+        scrambling = {}
+        scrambled = []
+        for v in traversal.pre_order2(g, v_base):
+            axis = list(algo.axis(g,v))    # list of all node in the same axis as v
+            for c in g.children(v):
+                if g.edge_type(c)=='+' :
+                    scrambling[c] = random.choice(axis)  # record new position for each subtree
 
-
+        for v in traversal.post_order2(g,v_base):
+            if v in scrambling.keys() and v not in scrambled:
+                sub = g.sub_tree(v, copy=True)        # get subtree
+                g.remove_tree(v)                      # prune it from old position
+                newbranch = g.add_child_tree(scrambling[v], sub)  # insert subtree at previously determined position
+                scrambled.append(newbranch[0])        # keep track of shifted tree id
+    return g
 
 
