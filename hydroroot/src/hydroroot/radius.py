@@ -99,13 +99,33 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     order_decrease_factor: radius decrease factor applied when increasing order
 
     """
+    max_scale = g.max_scale()
     ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
 
     base = g.component_roots_iter(g.root).next()
+    orders = algo.orders(g,scale=max_scale)
+    max_order = max(orders)
+
+    
+    radius_order = {}
+    for order in range(max_order+1):
+        radius_order[order] = ref_r*(d_factor**order)
+
+    g_radius = g.properties()['radius'] = {}
+    for vid, order in orders.iteritems():
+        g_radius[vid] = radius_order[order]
+    
+
+    """
     base = g.node(base)
     base.radius = ref_r
 
-    _tips = dict((vid, g.order(vid)) for vid in g.vertices_iter(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
+    def has_successor(vid):
+        return any(v for v in g.children(vid) if g.edge_type(v) =='<')
+
+    orders = algo.orders(g,scale=max_scale)
+    _tips = dict((vid, orders[vid]) for vid in g.vertices_iter(scale=max_scale) if not has_successor(vid))
+
     tips = {}
     for tip,order in _tips.iteritems():
         tips.setdefault(order, []).append(tip)
@@ -121,7 +141,7 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
             while node and node.parent() and node.edge_type() != '+':
                 node.parent().radius = node.radius
                 node = node.parent()
-
+    """
     return g
 
 
@@ -153,11 +173,13 @@ def compute_relative_position(g):
     position = {}
     position_measure = {}
     axis_length = {}
+    length = g.property('length')
     root_id = g.component_roots_at_scale_iter(g.root, scale=scale).next()
     for vid in traversal.post_order2(g, root_id):
-        sons = algo.sons(g,vid,EdgeType='<')
+        #sons = algo.sons(g,vid,EdgeType='<')
+        sons = [cid for cid in g.children(vid) if g.edge_type(vid) == '<'] 
         position[vid] = position[sons[0]]+1 if sons else 0
-        position_measure[vid] = position[vid]*g.node(vid).length
+        position_measure[vid] = position[vid]*length[vid]
         if g.edge_type(vid) == '+' or g.parent(vid) is None:
             axis_length[vid] = position[vid]
 
