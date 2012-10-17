@@ -179,15 +179,17 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 def scramble_axis(g=None, scramble=False):
     """ For each subtree of a MTG, change its root node to another node of the same axis.
     """
+    max_scale = g.max_scale()
     if scramble:
-        v_base = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+        v_base = g.component_roots_at_scale_iter(g.root, scale=max_scale).next()
         scrambling = {}
         scrambled = []
-        for v in traversal.pre_order2(g, v_base):
-            axis = list(algo.axis(g,v))    # list of all node in the same axis as v
-            for c in g.children(v):
-                if g.edge_type(c)=='+' :
-                    scrambling[c] = random.choice(axis)  # record new position for each subtree
+
+        ramifs = (v for v in g.vertices_iter(scale=max_scale) if g.edge_type(v) == '+')
+
+        for v in ramifs:
+            axis = g.Axis(g.parent(v))    # list of all node in the same axis as v
+            scrambling[v] = random.choice(axis)  # record new position for each subtree
 
         for v in traversal.post_order2(g,v_base):
             if v in scrambling.keys() and v not in scrambled:
