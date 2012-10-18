@@ -157,9 +157,10 @@ def compute_surface(g):
     """ Compute the total surface of the MTG (in square meters)
     """
     surf = 0
+    max_scale = g.max_scale()
     radius = g.property('radius')
     length = g.property('length')
-    for vid in g.vertices_iter():
+    for vid in g.vertices_iter(scale = max_scale):
         if radius.has_key(vid) and length.has_key(vid):
             surf += 2 * pi * radius[vid] * length[vid]
     print 'surface (sq. meters): ',surf
