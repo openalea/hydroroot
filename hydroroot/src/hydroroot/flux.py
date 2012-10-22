@@ -88,11 +88,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             K[vid] /= length[vid]
 
         # Apply scaling k and K values
-        for vid in k:
-            k[vid] *= CONSTANT
-        for vid in K:
-            K[vid] *= CONSTANT
-        Jv *= CONSTANT
+        #for vid in k:
+        #    k[vid] *= CONSTANT
+        #for vid in K:
+        #    K[vid] *= CONSTANT
+        #Jv *= CONSTANT
 
         # Equivalent conductance computation
         Keq = g.property('Keq')
@@ -112,9 +112,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem, then compute radial flux
                 parent = g.parent(v)
-                children = g.children(parent)
+                brothers = g.children_iter(parent)
+                children = g.children_iter(v)
 
-                Keq_kids = sum( Keq[cid] for cid in children)
+                Keq_brothers = sum( Keq[cid] for cid in brothers)
+                Keq_children = sum( Keq[cid] for cid in children)
 
                 if parent is None:
                     assert v == v_base
@@ -122,9 +124,9 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     J_out[v] = Jv
                 else:
                     psi_out[v] = psi_in[parent]
-                    J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / Keq_kids)
+                    J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / Keq_brothers )
 
-                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_kids)) / (k[v] + K[v] + Keq_kids)
+                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 j[v] = (psi_e - psi_in[v]) * k[v]
 
         else :  # compute the water output for the given root system and conditions
@@ -132,14 +134,14 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem from root base to root tips
                 parent = g.parent(v)
-                children = g.children(parent)
+                children = g.children_iter(v)
                 if parent is None:
                     assert v == v_base
                     psi_out[v] = psi_base
                 else:
                     psi_out[v] = psi_in[parent]
-                Keq_kids = sum( Keq[cid] for cid in children)
-                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_kids)) / (k[v] + K[v] + Keq_kids)
+                Keq_children = sum( Keq[cid] for cid in children)
+                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
 
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
