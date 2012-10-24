@@ -145,6 +145,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
     # create_axis(g.node(vid), nb_vertices)  # deprecated
 
+    print 'entering MTG building'
     # Create the first axis
     create_randomized_delayed_axis(g.node(vid), nb_vertices)
 
@@ -173,30 +174,33 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 create_randomized_delayed_axis(cid, lateral_length)
 
     fat_mtg(g)
+    print 'exiting MTG building'
     return g
 
 
-def scramble_axis(g=None, scramble=False):
+def shuffle_axis(g=None, shuffle=False):
     """ For each subtree of a MTG, change its root node to another node of the same axis.
     """
     max_scale = g.max_scale()
-    if scramble:
+    if shuffle:
+        print 'entering axis shuffling'
         v_base = g.component_roots_at_scale_iter(g.root, scale=max_scale).next()
-        scrambling = {}
-        scrambled = []
+        shuffling = {}
+        shuffled = []
 
         ramifs = (v for v in g.vertices_iter(scale=max_scale) if g.edge_type(v) == '+')
 
         for v in ramifs:
             axis = g.Axis(g.parent(v))    # list of all node in the same axis as v
-            scrambling[v] = random.choice(axis)  # record new position for each subtree
+            shuffling[v] = random.choice(axis)  # record new position for each subtree
 
         for v in traversal.post_order2(g,v_base):
-            if v in scrambling.keys() and v not in scrambled:
+            if v in shuffling.keys() and v not in shuffled:
                 sub = g.sub_tree(v, copy=True)        # get subtree
                 g.remove_tree(v)                      # prune it from old position
-                newbranch = g.add_child_tree(scrambling[v], sub)  # insert subtree at previously determined position
-                scrambled.append(newbranch[0])        # keep track of shifted tree id
+                newbranch = g.add_child_tree(shuffling[v], sub)  # insert subtree at previously determined position
+                shuffled.append(newbranch[0])        # keep track of shifted tree id
+        print 'exiting axis shuffling'
     return g
 
 

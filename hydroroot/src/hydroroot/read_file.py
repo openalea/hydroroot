@@ -11,9 +11,4 @@ def readCSVFile(filename):
     `data`    -    record array of (x, y) values, column headers recorded in dtype
     """
     data = np.recfromcsv(filename,delimiter=';')
-    #fobj = file(filename, 'r')
-    #readerObj = csv.reader(fobj, delimiter = '\t')
-    #mainList = [list(row) for row in readerObj]
-    #angles = [[int(angle) for angle in row if angle != "" ] for row in mainList]
-    #fobj.close()
     return data

@@ -53,11 +53,11 @@ mbt=Factory(name='markov binary tree',
             )
 __all__.append('mbt')
 
-st=Factory(name='scramble axis',
+sa=Factory(name='shuffle axis',
            nodemodule='hydro',
-           nodeclass='scramble_axis',
+           nodeclass='shuffle_axis',
             )
-__all__.append('st')
+__all__.append('sa')
 
 cck=Factory(name='compute axial conductance',
            nodemodule='hydro',
@@ -163,6 +163,7 @@ fpfc=Factory(name='fit_property_from_csv',
                    dict(name='smoothing degree', value='3'),
                    dict(name='smoothing factor', value='0.'),
                    dict(name='plot', interface='IBool',value=True),
+                   dict(name='direct_input'),
                    ],
             outputs = [dict(name='g')],
             )

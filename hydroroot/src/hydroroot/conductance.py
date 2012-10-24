@@ -45,11 +45,12 @@ def compute_k(g, k0 = 300.):
         - `length` - the length of a segment
 
     """
+    print 'entering radial k fitting'
     radius = g.property('radius')
     length = g.property('length')
     k = dict( (vid,radius[vid]*2*pi*length[vid]*k0) for vid in g.vertices(scale=g.max_scale()))
     g.properties()['k'] = k
-
+    print 'exiting radial k fitting'
     return g
 
 
@@ -101,29 +102,34 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
     print 'Update figure ', yy.min(), yy.max()
     return g
 
-def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0., plot=False):
-    """ Fit a 1D spline from (x, y) csv extracted data.
+def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False, direct_input = None):
+    """ Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
 
     Retrieve the values it will be applied to from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
+
+    Toggle plot option to visualize the spline fit
     """
-    x_name = csvdata.dtype.names[0]
-    y_name = csvdata.dtype.names[1]
-    x = list(csvdata[x_name])
-    y = list(csvdata[y_name])
+    print 'entering K fitting'    
+
+    if direct_input is None :
+        x_name = csvdata.dtype.names[0]
+        y_name = csvdata.dtype.names[1]
+        x = list(csvdata[x_name])
+        y = list(csvdata[y_name])
+    else :
+        x,y = [],[]
+        for key in sorted(direct_input.keys()):   # dictionnary key are not ordered by default
+            x.append(key)
+            y.append(direct_input[key])
 
     spline = UnivariateSpline(x, y, k=k, s=s)
     keys = g.property(prop_in).keys()
-
     x_values = np.array(g.property(prop_in).values())
-    #print x_values
     y_values = spline(x_values)
-
     g.properties()[prop_out] = dict(zip(keys,y_values))
-
     xx = np.linspace(min(x_values),max(x_values),1000)
     yy = spline(xx)
-
 
     if plot:
         # plot the reference (x_values,y_values) data and the fitted spline
@@ -134,6 +140,9 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=3, s=0., plot=False):
         pylab.show()
 
         print 'Update figure ', xx.min(), yy.max()
+
+    print 'exiting K fitting'
+
     return g
 
 

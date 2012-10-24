@@ -99,14 +99,15 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     order_decrease_factor: radius decrease factor applied when increasing order
 
     """
+    print 'entering MTG radius setting'
     max_scale = g.max_scale()
     ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
 
     base = g.component_roots_iter(g.root).next()
+
     orders = algo.orders(g,scale=max_scale)
     max_order = max(orders)
 
-    
     radius_order = {}
     for order in range(max_order+1):
         radius_order[order] = ref_r*(d_factor**order)
@@ -114,9 +115,16 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     g_radius = g.properties()['radius'] = {}
     for vid, order in orders.iteritems():
         g_radius[vid] = radius_order[order]
-    
+
+    print 'exiting MTG radius setting'
+    return g
 
     """
+    max_scale = g.max_scale()
+    ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
+
+    base = g.component_roots_iter(g.root).next()
+
     base = g.node(base)
     base.radius = ref_r
 
@@ -141,21 +149,24 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
             while node and node.parent() and node.edge_type() != '+':
                 node.parent().radius = node.radius
                 node = node.parent()
-    """
-    return g
 
+    return g
+    """
 
 def compute_length(g, length = 1.e-4):
     """ Set the length of each vertex of the MTG
     """
+    print 'entering MTG length setting'
     length = float(length)
-    for vid in g.vertices_iter(scale=g.max_scale()):  
+    for vid in g.vertices_iter(scale=g.max_scale()):
         g.node(vid).length = length
+    print 'exiting MTG length setting'
     return g
 
 def compute_surface(g):
     """ Compute the total surface of the MTG (in square meters)
     """
+    print 'entering surface computation'
     surf = 0
     max_scale = g.max_scale()
     radius = g.property('radius')
@@ -164,12 +175,14 @@ def compute_surface(g):
         if radius.has_key(vid) and length.has_key(vid):
             surf += 2 * pi * radius[vid] * length[vid]
     print 'surface (sq. meters): ',surf
+    print 'entering surface computation'
     return g
 
 def compute_relative_position(g):
     """ Compute the position of each segment relative to the axis bearing it.
     Add the properties "position" and "relative_position" to the MTG.
     """
+    print 'entering MTG node positionning computation'
     scale = g.max_scale()
     position = {}
     position_measure = {}
@@ -178,7 +191,7 @@ def compute_relative_position(g):
     root_id = g.component_roots_at_scale_iter(g.root, scale=scale).next()
     for vid in traversal.post_order2(g, root_id):
         #sons = algo.sons(g,vid,EdgeType='<')
-        sons = [cid for cid in g.children(vid) if g.edge_type(vid) == '<'] 
+        sons = [cid for cid in g.children(vid) if g.edge_type(vid) == '<']
         position[vid] = position[sons[0]]+1 if sons else 0
         position_measure[vid] = position[vid]*length[vid]
         if g.edge_type(vid) == '+' or g.parent(vid) is None:
@@ -192,6 +205,6 @@ def compute_relative_position(g):
 
     g.properties()['position'] = position_measure
     g.properties()['relative_position'] = relative_position
-
+    print 'exiting MTG node positionning computation'
     return g
 

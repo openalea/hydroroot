@@ -23,14 +23,13 @@
 
 from openalea.mtg import traversal
 
-CONSTANT = 1. #1.e20
 
 class Flux(object):   # edit this to also allow for flux computation instead just redistribution
     """ Compute the water potential and fluxes at each vertex of the MTG.
 
     """
 
-    def __init__(self, g, Jv, psi_e, psi_base, invert_model=False, k=None, K=None):
+    def __init__(self, g, Jv, psi_e, psi_base, invert_model=False, k=None, K=None, CONSTANT=1.):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -46,6 +45,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
             flux = Flux(g, ...)
         """
+        self.CONSTANT = CONSTANT  # used for sensitivity analysis
         self.g = g
         self.k = k if k else g.property('k')
         self.K = K if K else g.property('K')
@@ -69,7 +69,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 - Finally, the water flux and potential are computed in pre order (parent then children).
         """
         
-        g = self.g; k = self.k; K = self.K
+        g = self.g; k = self.k; K = self.K ; CONSTANT = self.CONSTANT
         Jv = self.Jv; psi_e = self.psi_e; psi_base = self.psi_base
         length = self.length; invert_model = self.invert_model
 
@@ -86,6 +86,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         # Convert axial conductivities to axial conductances
         for vid in K:
             K[vid] /= length[vid]
+            K[vid] *= CONSTANT
 
         # Apply scaling k and K values
         #for vid in k:
@@ -96,10 +97,12 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
         # Equivalent conductance computation
         Keq = g.property('Keq')
+        print 'entering Keq computation'
         for v in traversal.post_order2(g, v_base):
             r = 1./(k[v] + sum(Keq[cid] for cid in g.children_iter(v)))
             R = 1./K[v]
             Keq[v] = 1./(r+R)
+        print 'exiting Keq computation'
 
         # Water flux and water potential computation
         psi_out = g.property('psi_out')
@@ -108,6 +111,8 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         J_out = g.property('J_out')
 
         if not(invert_model) : # distribute a given output into the root system
+
+            print 'entering Jv distribution'
 
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem, then compute radial flux
@@ -129,8 +134,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 j[v] = (psi_e - psi_in[v]) * k[v]
 
+            print 'exiting Jv distribution'
+
         else :  # compute the water output for the given root system and conditions
 
+            print 'entering Psi computation'
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem from root base to root tips
                 parent = g.parent(v)
@@ -140,13 +148,15 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     psi_out[v] = psi_base
                 else:
                     psi_out[v] = psi_in[parent]
-                Keq_children = sum( Keq[cid] for cid in children)
+                Keq_children = sum( Keq[cid] for cid in children )
                 psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+            print 'exiting Psi computation'
 
+            print 'entering Jv computation'
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
                 j[v] = (psi_e - psi_in[v]) * k[v]
-                children = g.children(v)
+                children = g.children_iter(v)
                 if children is None:
                     J_out[v] = j[v]
                 else:  # TODO CHECK THIS !!!
@@ -155,7 +165,9 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
             Jv_global = Keq[v_base]*(psi_e-psi_base)
 
-            #print "Keq base = ", Keq[v_base]
+            print 'exiting Jv computation'
+
+            print "Keq base = ", Keq[v_base]
             #print "psi_e, psi_base = ", psi_e, psi_base
             print "Local Computation Water Flux Jvl = ", J_out[v_base]
             print "Global Computation Water Flux Jvg = ", Jv_global
@@ -198,7 +210,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         #Jv *= CONSTANT
 
 
-def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=None):
+def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=None, CONSTANT=1.):
     """ flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -217,7 +229,7 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=
 
             my_flux = flux(g)
     """
-    f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K)
+    f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K, CONSTANT=CONSTANT)
     f.run()
 
     return f.g
