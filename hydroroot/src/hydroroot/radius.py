@@ -178,6 +178,25 @@ def compute_surface(g):
     print 'entering surface computation'
     return g
 
+def compute_volume(g):
+    """ Compute the total volume of the MTG (in square meters)
+    If there is a varying volume the equation is rather:
+    .. math::
+
+        V = \frac{\pi h}{3}(R_1^2+R_2^2+R_1 R_2)
+    """
+    print 'entering volume computation'
+    volume = 0.
+    max_scale = g.max_scale()
+    radius = g.property('radius')
+    length = g.property('length')
+    for vid in g.vertices_iter(scale = max_scale):
+        if radius.has_key(vid) and length.has_key(vid):
+            volume += pi * (radius[vid]**2) * length[vid]
+    print 'volume (cube meters): ',volume
+    print 'entering surface computation'
+    return g
+
 def compute_relative_position(g):
     """ Compute the position of each segment relative to the axis bearing it.
     Add the properties "position" and "relative_position" to the MTG.
