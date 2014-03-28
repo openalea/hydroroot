@@ -134,9 +134,18 @@ cs=Factory(name='compute_surface',
            nodeclass='compute_surface',
            inputs = [dict(name='g'),
                    ],
-            outputs = [dict(name='surface')],
+            outputs = [dict(name='g')],
             )
 __all__.append('cs')
+
+cv=Factory(name='compute_volume',
+           nodemodule='hydro',
+           nodeclass='compute_volume',
+           inputs = [dict(name='g'),
+                   ],
+            outputs = [dict(name='g@')],
+            )
+__all__.append('cv')
 
 crp=Factory(name='compute_relative_position',
            nodemodule='hydro',

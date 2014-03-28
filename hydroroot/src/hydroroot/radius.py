@@ -175,7 +175,7 @@ def compute_surface(g):
         if radius.has_key(vid) and length.has_key(vid):
             surf += 2 * pi * radius[vid] * length[vid]
     print 'surface (sq. meters): ',surf
-    print 'entering surface computation'
+    print 'leaving surface computation'
     return g
 
 def compute_volume(g):
@@ -194,7 +194,7 @@ def compute_volume(g):
         if radius.has_key(vid) and length.has_key(vid):
             volume += pi * (radius[vid]**2) * length[vid]
     print 'volume (cube meters): ',volume
-    print 'entering surface computation'
+    print 'leaving volume computation'
     return g
 
 def compute_relative_position(g):
