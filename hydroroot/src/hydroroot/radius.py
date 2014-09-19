@@ -176,7 +176,7 @@ def compute_surface(g):
             surf += 2 * pi * radius[vid] * length[vid]
     print 'surface (sq. meters): ',surf
     print 'leaving surface computation'
-    return g
+    return g, surf
 
 def compute_volume(g):
     """ Compute the total volume of the MTG (in square meters)
@@ -195,7 +195,7 @@ def compute_volume(g):
             volume += pi * (radius[vid]**2) * length[vid]
     print 'volume (cube meters): ',volume
     print 'leaving volume computation'
-    return g
+    return g, volume
 
 def compute_relative_position(g):
     """ Compute the position of each segment relative to the axis bearing it.

@@ -112,6 +112,10 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
     """
     print 'entering K fitting'    
 
+    from .read_file import readCSVFile
+    if isinstance(csvdata, str):
+        csvdata = readCSVFile(csvdata)
+
     if direct_input is None :
         x_name = csvdata.dtype.names[0]
         y_name = csvdata.dtype.names[1]
