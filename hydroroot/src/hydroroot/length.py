@@ -3,6 +3,7 @@ from scipy.interpolate import UnivariateSpline
 
 from .read_file import readCSVFile
 
+
 def fit_length(csvdata, length='1e-4', k=1, s=0.):
     """ Fit a 1D spline from (x, y) csv extracted data.
 
@@ -15,12 +16,13 @@ def fit_length(csvdata, length='1e-4', k=1, s=0.):
     x_name = csvdata.dtype.names[0]
     y_name = csvdata.dtype.names[1]
 
-    #print length, x_name, y_name, csvdata[x_name], csvdata[y_name]
-    x = list(csvdata[x_name]/length)
-    y = list(csvdata[y_name]/length)
+    return fit_law(csvdata[x_name], csvdata[y_name], scale=length, k=k, s=s)
+
+
+def fit_law(x, y, scale=0, k=1, s=0.):
+    if scale:
+        x = list(np.array(x) / scale)
+        y = list(np.array(y) / scale)
 
     spline = UnivariateSpline(x, y, k=k, s=s)
     return spline
-
-
-

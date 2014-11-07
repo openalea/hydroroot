@@ -134,7 +134,7 @@ cs=Factory(name='compute_surface',
            nodeclass='compute_surface',
            inputs = [dict(name='g'),
                    ],
-            outputs = [dict(name='g')],
+            outputs = [dict(name='g'), dict(name='surface')],
             )
 __all__.append('cs')
 
@@ -143,7 +143,7 @@ cv=Factory(name='compute_volume',
            nodeclass='compute_volume',
            inputs = [dict(name='g'),
                    ],
-            outputs = [dict(name='g@')],
+            outputs = [dict(name='g'), dict(name='volume')],
             )
 __all__.append('cv')
 
