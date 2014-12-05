@@ -3,7 +3,8 @@ import random
 from openalea.mtg import *
 from openalea.mtg import algo
 from openalea.mtg import traversal
-from random import choice
+#from random import choice
+
 
 def linear(n=5):
     """ 
@@ -12,16 +13,17 @@ def linear(n=5):
     g = MTG()
     root = g.root
     vid = g.add_component(root, order=0)
-    for i in range(n-1):
+    for i in range(n - 1):
         vid = g.add_child(vid, edge_type='<', order=0)
 
     return g
 
+
 def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                        branching_variability=0.1, branching_delay=20,
                        length_law=None,
-                       nude_tip_length=200,  order_max=5,
-                       seed=None,  **kwargs ):
+                       nude_tip_length=200, order_max=5,
+                       seed=None,  **kwargs):
     """
     Parameters
     ----------
@@ -145,7 +147,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
     # create_axis(g.node(vid), nb_vertices)  # deprecated
 
-    print 'entering MTG building'
+    #print 'entering MTG building'
     # Create the first axis
     create_randomized_delayed_axis(g.node(vid), nb_vertices)
 
@@ -174,7 +176,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 create_randomized_delayed_axis(cid, lateral_length)
 
     fat_mtg(g)
-    print 'exiting MTG building'
+    #print 'exiting MTG building'
     return g
 
 
@@ -183,7 +185,7 @@ def shuffle_axis(g=None, shuffle=False):
     """
     max_scale = g.max_scale()
     if shuffle:
-        print 'entering axis shuffling'
+        #print 'entering axis shuffling'
         v_base = g.component_roots_at_scale_iter(g.root, scale=max_scale).next()
         shuffling = {}
         shuffled = []
@@ -200,7 +202,7 @@ def shuffle_axis(g=None, shuffle=False):
                 g.remove_tree(v)                      # prune it from old position
                 newbranch = g.add_child_tree(shuffling[v], sub)  # insert subtree at previously determined position
                 shuffled.append(newbranch[0])        # keep track of shifted tree id
-        print 'exiting axis shuffling'
+        #print 'exiting axis shuffling'
     return g
 
 

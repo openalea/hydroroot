@@ -106,7 +106,7 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
     pylab.plot(xx, yy)
     pylab.show()
 
-    print 'Update figure ', yy.min(), yy.max()
+    #print 'Update figure ', yy.min(), yy.max()
     return g
 
 
@@ -136,7 +136,7 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
 
     Toggle plot option to visualize the spline fit
     """
-    print 'entering K fitting'    
+    #print 'entering K fitting'    
 
     from .read_file import readCSVFile
     if isinstance(csvdata, str):

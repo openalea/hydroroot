@@ -97,12 +97,12 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
         # Equivalent conductance computation
         Keq = g.property('Keq')
-        print 'entering Keq computation'
+        #print 'entering Keq computation'
         for v in traversal.post_order2(g, v_base):
             r = 1./(k[v] + sum(Keq[cid] for cid in g.children_iter(v)))
             R = 1./K[v]
             Keq[v] = 1./(r+R)
-        print 'exiting Keq computation'
+        #print 'exiting Keq computation'
 
         # Water flux and water potential computation
         psi_out = g.property('psi_out')
@@ -112,7 +112,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
         if not(invert_model) : # distribute a given output into the root system
 
-            print 'entering Jv distribution'
+            #print 'entering Jv distribution'
 
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem, then compute radial flux
@@ -134,11 +134,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 j[v] = (psi_e - psi_in[v]) * k[v]
 
-            print 'exiting Jv distribution'
+            #print 'exiting Jv distribution'
 
         else :  # compute the water output for the given root system and conditions
 
-            print 'entering Psi computation'
+            #print 'entering Psi computation'
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem from root base to root tips
                 parent = g.parent(v)
@@ -150,9 +150,9 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     psi_out[v] = psi_in[parent]
                 Keq_children = sum( Keq[cid] for cid in children )
                 psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
-            print 'exiting Psi computation'
+            #print 'exiting Psi computation'
 
-            print 'entering Jv computation'
+            #print 'entering Jv computation'
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
                 j[v] = (psi_e - psi_in[v]) * k[v]
@@ -165,12 +165,12 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
             Jv_global = Keq[v_base]*(psi_e-psi_base)
 
-            print 'exiting Jv computation'
+            #print 'exiting Jv computation'
 
-            print "Keq base = ", Keq[v_base]
+            #print "Keq base = ", Keq[v_base]
             #print "psi_e, psi_base = ", psi_e, psi_base
-            print "Local Computation Water Flux Jvl = ", J_out[v_base]
-            print "Global Computation Water Flux Jvg = ", Jv_global
+            #print "Local Computation Water Flux Jvl = ", J_out[v_base]
+            #print "Global Computation Water Flux Jvg = ", Jv_global
 
 
 #        for v in traversal.pre_order2(g, v_base):
