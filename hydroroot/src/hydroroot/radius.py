@@ -179,7 +179,7 @@ def compute_surface(g):
     return g, surf
 
 def compute_volume(g):
-    """ Compute the total volume of the MTG (in square meters)
+    """ Compute the total volume of the MTG (in cubic meters)
     If there is a varying volume the equation is rather:
     .. math::
 
