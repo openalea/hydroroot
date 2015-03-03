@@ -35,7 +35,7 @@ def root_visitor(g, v, turtle):
     # define the color property
     #n.color = random.random()
 
-def plot(g, has_radius=False, r_base=1., r_tip=0.25, visitor=root_visitor, prop_cmap='radius', cmap='jet',lognorm=True):
+def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5, visitor=root_visitor, prop_cmap='radius', cmap='jet',lognorm=True):
     """
     Exemple:
 
@@ -84,5 +84,6 @@ def my_colorbar(values, cmap, norm):
     fig = pyplot.figure(figsize=(8,3))
     ax = fig.add_axes([0.05, 0.65, 0.9, 0.15])
     cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap, norm=norm, values=values)
+
     
 

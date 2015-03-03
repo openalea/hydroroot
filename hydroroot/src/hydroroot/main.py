@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 
+from warnings import warn
 import numpy as np
 from hydroroot.length import fit_law
 from hydroroot import radius, markov, flux, conductance
 
 
 def hydroroot(
-    n=1500,
+    primary_length=0.15,
     delta=2.e-3,
     beta=0.25,
     order_max=5,
@@ -21,8 +22,8 @@ def hydroroot(
     psi_base = 0.1,
     length_data=None,
     axial_conductivity_data=None,
-    radial_conductivity_data=None ):
-
+    radial_conductivity_data=None,
+    n=None):
     """ Simulate a root system and compute global conductance and flux.
 
     Parameters
@@ -53,8 +54,14 @@ def hydroroot(
     nb_nude_vertices = int(nude_length / segment_length)
     branching_delay = int(delta / segment_length)
 
+    if n is None:
+        nb_vertices = int(primary_length / segment_length)
+    else:
+        nb_vertices = n
+        warn("Use primary_length instead")
+
     g = markov.markov_binary_tree(
-        nb_vertices=n,
+        nb_vertices=nb_vertices,
         branching_variability=beta,
         branching_delay=branching_delay,
         length_law=length_law,
@@ -76,7 +83,6 @@ def hydroroot(
     g, volume = radius.compute_volume(g)
 
     # Compute the flux
-    # TODO: Use radial conducatnce law when available 
     
     g = conductance.fit_property_from_spline(g, radial_conductivity_law, 'position', 'k0')
     g = conductance.compute_k(g, k0='k0')
