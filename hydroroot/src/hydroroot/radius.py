@@ -55,7 +55,7 @@ def discont_radius(g, r_base, r_tip):
     from the length of the longest axis and its base and tip radius.
     
     Radius can be discontinuous e.g. for a young/small lateral on an old root,
-    the yound root radius is very small initially compared to the old one.
+    the young root radius is very small initially compared to the old one.
     """
     r_base, r_tip = float(r_base), float(r_tip)
 

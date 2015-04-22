@@ -38,6 +38,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             - `K` (dict) - axial conductance
             - `Jv` (float) - water flux at the root base in microL/s
             - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
+                if None, then consider that the value has been defined on each vertex.
             - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
             - `invert_model` - when false, distribute output flux within the root ; when true, compute the output flux for the given root and conditions
 
@@ -50,10 +51,12 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         self.k = k if k else g.property('k')
         self.K = K if K else g.property('K')
         self.Jv = Jv
-        self.psi_e = psi_e
+        self.psi_e = psi_e if psi_e else g.property('psi_e')
         self.psi_base = psi_base
         self.length = g.property('length')
         self.invert_model = invert_model
+
+        self.HAS_SOIL = psi_e is None
 
     def run(self):
         """ Compute the water potential and fluxes of each segments
@@ -131,8 +134,14 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     psi_out[v] = psi_in[parent]
                     J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / Keq_brothers )
 
-                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
-                j[v] = (psi_e - psi_in[v]) * k[v]
+                if not self.HAS_SOIL:
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    j[v] = (psi_e - psi_in[v]) * k[v]
+                else:
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    j[v] = (psi_e[v] - psi_in[v]) * k[v]
+
+
 
             #print 'exiting Jv distribution'
 
@@ -149,13 +158,20 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 else:
                     psi_out[v] = psi_in[parent]
                 Keq_children = sum( Keq[cid] for cid in children )
-                psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                if not self.HAS_SOIL:
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                else:
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+
             #print 'exiting Psi computation'
 
             #print 'entering Jv computation'
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
-                j[v] = (psi_e - psi_in[v]) * k[v]
+                if not self.HAS_SOIL:
+                    j[v] = (psi_e - psi_in[v]) * k[v]
+                else:
+                    j[v] = (psi_e[v] - psi_in[v]) * k[v]
                 children = g.children_iter(v)
                 if children is None:
                     J_out[v] = j[v]
@@ -163,7 +179,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     influx = j[v] + sum( J_out[cid] for cid in children )
                     J_out[v] = influx #(psi_in[v]-psi_out[v])*K[v]
 
-            Jv_global = Keq[v_base]*(psi_e-psi_base)
+            if not self.HAS_SOIL:
+                Jv_global = Keq[v_base] * (psi_e - psi_base)
+            else:
+                Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
+
 
             #print 'exiting Jv computation'
 
