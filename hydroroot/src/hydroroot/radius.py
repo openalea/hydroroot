@@ -11,6 +11,9 @@ from openalea.mtg import algo
 from math import pi
 
 
+
+
+
 def cont_radius(g, r_base, r_tip):
     """ Compute the radius of each segment of a root system.
 
@@ -212,7 +215,7 @@ def compute_relative_position(g):
         #sons = algo.sons(g,vid,EdgeType='<')
         sons = [cid for cid in g.children(vid) if g.edge_type(vid) == '<']
         position[vid] = position[sons[0]]+1 if sons else 0
-        position_measure[vid] = position[vid]*length[vid]
+        position_measure[vid] = position[vid]*1.e-2
         if g.edge_type(vid) == '+' or g.parent(vid) is None:
             axis_length[vid] = position[vid]
 

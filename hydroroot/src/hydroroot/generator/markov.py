@@ -151,9 +151,12 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
     # Create the first axis
     create_randomized_delayed_axis(g.node(vid), nb_vertices)
 
+
+
     while anchors:   # while they are branching point left
         nid = anchors.pop(0)  # take next branching point
         position_index = nid.position_index # distance to the tip
+        print position_index
         if nid.order < order_max:  # check if maximal branching order was reached
 
             # if there is a length law, use it to compute lateral root length at this position

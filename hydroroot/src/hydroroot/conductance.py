@@ -9,6 +9,37 @@ from scipy.interpolate import UnivariateSpline
 import pylab
 
 
+
+def compute_K_from_laws(g):
+    K={}
+    segment_length = 1e-4
+    seminal_axial_conductivity_law = lambda x: 2135.05*x + 21338.63
+    crown_axial_conductivity_law = lambda x: 9228.45*x + 42600.14
+    lateral_axial_conductivity_law= lambda x: 2951.65*x + 2720.09
+
+    positions= g.property('position')
+    orders = g.property('order')
+
+    for vid in g.vertices_iter(g.max_scale()):
+            if g.label(vid)=='Crown':
+                K[vid] = crown_axial_conductivity_law(positions[vid])
+            elif g.label(vid) == 'Seminal' :
+                if orders[vid] == 0:
+                    K[vid] = seminal_axial_conductivity_law(positions[vid])
+                else:
+                    K[vid] = lateral_axial_conductivity_law(positions[vid])
+            else:
+                K[vid] = crown_axial_conductivity_law(positions[vid])
+
+    g.properties()['K'] = K
+
+    return g
+
+
+
+
+
+
 def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
     """
     Compute a conductance of a xylem element based on their radius and length.
@@ -50,13 +81,14 @@ def compute_k(g, k0 = 300.):
 
     radius = g.property('radius')
     length = g.property('length')
+    kr={}
     if k0 == 'k0':
         k0 = g.property('k0')
-        k = dict((vid, radius[vid] * 2 * pi * length[vid] * k0[vid]) for vid in g.vertices(scale=g.max_scale()))
+        kr = dict((vid, radius[vid] * 2 * pi * length[vid] * k0[vid]) for vid in g.vertices(scale=g.max_scale()))
     else:
-        k = dict((vid, radius[vid] * 2 * pi * length[vid] * k0) for vid in g.vertices(scale=g.max_scale()))
+        kr = dict((vid, radius[vid] * 2 * pi * length[vid] * k0) for vid in g.vertices(scale=g.max_scale()))
 
-    g.properties()['k'] = k
+    g.properties()['k'] = kr
     #print 'exiting radial k fitting'
     return g
 
