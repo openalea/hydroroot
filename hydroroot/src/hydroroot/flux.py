@@ -387,6 +387,9 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=
         :Optional Parameters:
             - `k` (dict) - lateral conductance
             - `K` (dict) - axial conductance
+            - `shunt` (bool) : use the RadialShunt Flux (True) or the classical one (False)
+            - `a` : relative factor to the main radial path conductivity.
+            - `b` : relative factor to the shortcut path conductivity.
 
         :Example::
 
