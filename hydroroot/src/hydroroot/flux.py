@@ -345,10 +345,10 @@ class RadialShuntFlux(Flux):
 
                 # TODO
                 if not self.HAS_SOIL:
-                    psi_in[v] = (K[v] * psi_out[v] + psi_e * (-a * k[v] * beta[v] + Keq_children) / (a * k[v] + K[v] + Keq_children - a * k[v] * alpha[v])
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e * (-a * k[v] * beta[v] + Keq_children)) / (a * k[v] + K[v] + Keq_children - a * k[v] * alpha[v])
                     #psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 else:
-                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (-a * k[v] * beta[v] + Keq_children) / (a * k[v] + K[v] + Keq_children - a * k[v] * alpha[v])
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (-a * k[v] * beta[v] + Keq_children)) / (a * k[v] + K[v] + Keq_children - a * k[v] * alpha[v])
                     # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
 
             #print 'exiting Psi computation'
