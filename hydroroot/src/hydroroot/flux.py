@@ -164,7 +164,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
             #print 'exiting Psi computation'
 
-            #print 'entering Jv computation'
+            print 'entering Jv computation'
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
                 if not self.HAS_SOIL:
@@ -177,11 +177,13 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 else:  # TODO CHECK THIS !!!
                     influx = j[v] + sum( J_out[cid] for cid in children )
                     J_out[v] = influx #(psi_in[v]-psi_out[v])*K[v]
+                #print J_out
 
             if not self.HAS_SOIL:
                 Jv_global = Keq[v_base] * (psi_e - psi_base)
             else:
                 Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
+            print Jv_global
 
 
 class RadialShuntFlux(Flux):
