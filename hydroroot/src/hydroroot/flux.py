@@ -103,7 +103,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         Keq = g.property('Keq')
         #print 'entering Keq computation'
         for v in traversal.post_order2(g, v_base):
-            r = 1./(k[v] + sum(Keq[cid] for cid in g.children_iter(v)))
+            r = 1./(k[v] + sum(Keq[cid] for cid in g.children(v)))
             R = 1./K[v]
             Keq[v] = 1./(r+R)
         #print 'exiting Keq computation'
@@ -183,7 +183,10 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 Jv_global = Keq[v_base] * (psi_e - psi_base)
             else:
                 Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
-            print Jv_global
+
+            print "Local Computation Water Flux Jvl = ", J_out[v_base]
+            print "Global Computation Water Flux Jvg = ", Jv_global
+
 
 
 class RadialShuntFlux(Flux):

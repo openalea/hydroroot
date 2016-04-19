@@ -17,7 +17,7 @@ from math import pi
 def cont_radius(g, r_base, r_tip):
     """ Compute the radius of each segment of a root system.
 
-    Set radius for elements of a mtg with an increase rate computed from 
+    Set radius for elements of a mtg with an increase rate computed from
     given base and tip radius in a continuous way.
     """
     r_base, r_tip = float(r_base), float(r_tip)
@@ -56,7 +56,7 @@ def discont_radius(g, r_base, r_tip):
 
     Set radius for elements of a mtg with an increase rate computed
     from the length of the longest axis and its base and tip radius.
-    
+
     Radius can be discontinuous e.g. for a young/small lateral on an old root,
     the young root radius is very small initially compared to the old one.
     """
@@ -213,9 +213,9 @@ def compute_relative_position(g):
     root_id = g.component_roots_at_scale_iter(g.root, scale=scale).next()
     for vid in traversal.post_order2(g, root_id):
         #sons = algo.sons(g,vid,EdgeType='<')
-        sons = [cid for cid in g.children(vid) if g.edge_type(vid) == '<']
+        sons = [cid for cid in g.children(vid) if g.edge_type(cid) == '<']
         position[vid] = position[sons[0]]+1 if sons else 0
-        position_measure[vid] = position[vid]*1.e-2
+        position_measure[vid] = position[vid] * length[vid]
         if g.edge_type(vid) == '+' or g.parent(vid) is None:
             axis_length[vid] = position[vid]
 

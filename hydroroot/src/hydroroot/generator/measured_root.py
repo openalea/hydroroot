@@ -4,6 +4,7 @@ from openalea.mtg import MTG, fat_mtg
 from openalea.mtg.traversal import post_order2
 from openalea.mtg import algo
 
+SUPERIOR_ORDER = True
 
 def mtg_builder(
     primary_length,
@@ -46,14 +47,19 @@ def mtg_builder(
         if length_lateral[i] > 0.:
             ramifs.append((length_lateral[i], vid))
 
-    for length_ramif, rid in ramifs:
+    for length_ramif, cid in ramifs:
         len_tip = length_ramif
-        cid = rid
+        # print 'length ', len_tip
+        _root_id = cid
         parent_base = g.node(cid).base_length
         prev_len = 0.
+        count = 0
         while len_tip - prev_len >0.:
+            #print count
+            count+= 1
             prev_len += segment_length
-            cid = g.add_child(cid, edge_type='+', label='S', base_length=prev_len+parent_base,
+            edget = '+' if cid == _root_id else '<'
+            cid = g.add_child(cid, edge_type=edget, label='S', base_length=prev_len+parent_base,
                             length=segment_length, order=1)
 
     ########################################################
@@ -133,6 +139,7 @@ def mtg_builder(
             - anchors: future ramification points on this axis
         """
         n = len(list(algo.descendants(g,vid,RestrictedTo='SameAxis')))
+        #print 'N: ', n
         nid = g.node(vid)
         assert nid.order == 1
 
@@ -162,38 +169,41 @@ def mtg_builder(
             if ramif :
                 anchors.append(nid)
 
-    # Update the ramification of order 1
-    for v in g:
-        if g.edge_type(v) == '+':
-            update_randomized_delayed_axis(v)
+    if SUPERIOR_ORDER:
+        # Update the ramification of order 1
+        for v in g:
+            if g.edge_type(v) == '+':
+                update_randomized_delayed_axis(v)
 
+        #print 'ANCHORS ', anchors
+        while anchors:   # while they are branching point left
+            nid = anchors.pop(0)  # take next branching point
+            position_index = nid.position_index # distance to the tip
+            #print position_index
+            if nid.order < order_max:  # check if maximal branching order was reached
 
-    while anchors:   # while they are branching point left
-        nid = anchors.pop(0)  # take next branching point
-        position_index = nid.position_index # distance to the tip
-        #print position_index
-        if nid.order < order_max:  # check if maximal branching order was reached
+                # if there is a length law, use it to compute lateral root length at this position
+                if length_law:
+                    lateral_length = int(length_law(position_index))
+                else : # standard lateral root length - can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
+                    n = len(list(algo.descendants(g,nid._vid,RestrictedTo='SameAxis')))
+                    #n = random.randint(1, max(n-nude_tip_length,1))
+                    n = max(n-nude_tip_length,1)
+                    lateral_length = n-1
 
-            # if there is a length law, use it to compute lateral root length at this position
-            if length_law:
-                lateral_length = int(length_law(position_index))
-            else : # standard lateral root length - can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
-                n = len(list(algo.descendants(g,nid._vid,RestrictedTo='SameAxis')))
-                #n = random.randint(1, max(n-nude_tip_length,1))
-                n = max(n-nude_tip_length,1)
-                lateral_length = n-1
-
-            # create axis of appropriate length
-            if lateral_length > 0:
-                # branching_variability also apply to the length of LR
-                var = int(lateral_length*branching_variability)
-                lateral_length = random.randint(max(1,lateral_length-var), lateral_length+var)
-                # Create the first  node of the branching point and the corresponding axis
-                cid = nid.add_child(order=nid.order+1, edge_type='+')
-                #print "pid length", nid, lateral_length
-                create_randomized_delayed_axis(cid, lateral_length)
+                # create axis of appropriate length
+                if lateral_length > 0:
+                    # branching_variability also apply to the length of LR
+                    var = int(lateral_length*branching_variability)
+                    lateral_length = random.randint(max(1,lateral_length-var), lateral_length+var)
+                    # Create the first  node of the branching point and the corresponding axis
+                    cid = nid.add_child(order=nid.order+1, edge_type='+')
+                    #print "pid length", nid, lateral_length
+                    create_randomized_delayed_axis(cid, lateral_length)
 
     g = fat_mtg(g)
+
+    print 'max_order', max(g.property('order').values())
     return g
 
 
