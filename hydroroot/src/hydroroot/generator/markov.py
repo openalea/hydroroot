@@ -30,7 +30,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
         - g : MTG
         - vid : id of the root of the MTG where the generating tree will be added
         - nb_vertices : number of element of the main axis
-        - branching_stability : probability of ramification at exact mean branching position
+        - branching_variability : probability of ramification at exact mean branching position
         - branching_delay : reference distance between successive branching axis
         - length_law : spline given the length of lateral ramification
         - nude_tip_length : length at root tip with no ramification
@@ -49,7 +49,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
     def markov():
         """ simple random markov chain - unused now """
-        return 1 if random.random() < branching_stability else 0
+        return 1 if random.random() < branching_variability else 0
 
     def delayed_markov(timer):
         """ markov chain with a delay between ramification """
@@ -125,8 +125,8 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
             shuffled_axis.append((branch,n-i))
 
         for i in range(n-1):
-            # shift (1-branching_stability) branching points
-            # at max (1-branching_stability)*branching delay away from
+            # shift (1-branching_variability) branching points
+            # at max (1-branching_variability)*branching delay away from
             # theoretical branching position
             if (axis[i][0] == 1):   # read 'axis' only to avoid treating the same branching point after each shift
                 if 1 : #random.random() < branching_variability :

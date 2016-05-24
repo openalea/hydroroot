@@ -67,7 +67,7 @@ def read_data(data=data):
 
 def nb_root(g, l):
     length= {}
-    root = 1
+    root = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
     dl = 1.e-4
 
     if 'mylength' in g.property_names():
@@ -78,6 +78,7 @@ def nb_root(g, l):
             length[v] = length[pid]+dl if pid else dl
         g.properties()['mylength'] = length
 
+    length = g.property('mylength')
     count = 0
     for v in g:
         pid = g.parent(v)
@@ -86,16 +87,19 @@ def nb_root(g, l):
     return count
 
 
+def pdata(plant_id):
+    data = [share/'plants0216'/'length%d.csv'%plant_id]
+    return read_data(data)
 
 
 
 pd = read_data(data)
 
 
-primary_length = pd.length.max()
-primary_length_data = pd.length.tolist()
+#primary_length = pd.length.max()
+#primary_length_data = pd.length.tolist()
 
-lateral_length_data = pd.LR_length.tolist()
+#lateral_length_data = pd.LR_length.tolist()
 
 delta = 0.002
 beta = 0.25 # 25 %
@@ -105,7 +109,7 @@ nude_length = 0.02
 seed = 2
 
 ref_radius = 1e-4 # in m
-order_decrease_factor = 0.7
+order_decrease_factor = 1.
 
 # parameters
 k0 = 300
@@ -128,9 +132,10 @@ def axial(scale=1):
     y = [a*scale for a in y]
     return x, y
 
-length_data = [0., 0.03, 0.05, 0.16], [0., 0., 0.01, 0.13]
+length_data = ([0., 0.025, 0.0375, 0.05, 0.0625, 0.075, 0.0875, 0.1, 0.1125, 0.125],
+[0., 0.001465, 0.003725, 0.01336, 0.02051, 0.023, 0.0215, 0.0399, 0.06238, 0.0945])
 
-def run_simulation(pd, axfold, radfold):
+def run_simulation(pd, axfold, radfold, order_max=3):
     # Generate plant
     primary_length = pd.length.max()
     primary_length_data = pd.length.tolist()
@@ -148,12 +153,12 @@ def run_simulation(pd, axfold, radfold):
     ref_radius = ref_radius,
     order_decrease_factor = order_decrease_factor,
     k0 = k0,
-    Jv = Jv,
+    #Jv = Jv,
     psi_e = psi_e,
     psi_base=psi_base,
     length_data=length_data,
     axial_conductivity_data=axial(axfold),
-    radial_conductivity_data=radial(300., radfold),
+    radial_conductivity_data=radial(k0, radfold),
     primary_length_data=primary_length_data,
     lateral_length_data=lateral_length_data,
     )
@@ -163,10 +168,10 @@ def run_simulation(pd, axfold, radfold):
     intercepts = [nb_root(g, x) for x in dist]
 
 
-    return primary_length, Jv_global, intercepts[0]
+    return g, primary_length, Jv_global, intercepts[0]
 
 
-#length, jv, intercepts = run_simulation(pd, axfold=1, radfold=1)
+# g, length, jv, intercepts = run_simulation(pd, axfold=1, radfold=1)
 #print 'length, jv, intercepts', length, jv, intercepts
 
 
@@ -194,15 +199,17 @@ def save(name='bench.txt'):
     df = pandas.DataFrame(results, columns=['plant', 'length', 'axfold', 'radfold', 'Jv', 'intercept'])
     df.to_csv(name, index=False)
 
-count = 0
-for i in range(1):
-    for plant_data in (pd,):
-        init()
 
-        for axfold in (1., 2., 3., 5.):
-            for radfold in (1., 2., 3., 5.):
-                print 'run simu'
-                length, jv, intercept = run_simulation(plant_data, axfold, radfold)
-                add(plant_id, length, axfold, radfold, jv, intercept)
-        save('bench%d.txt'%plant_id)
+count = 0
+for i in (1, 2, 4, 5, 7, 8):
+    plant_data = pdata(i)
+        #init()
+    for axfold in (1., ):
+        for radfold in (1., ):
+            print 'run simu'
+            g, length, jv, intercept = run_simulation(plant_data, axfold, radfold)
+            print length, jv, intercept
+                #add(plant_id, length, axfold, radfold, jv, intercept)
+#    save('bench%d.txt'%plant_id)
+
 
