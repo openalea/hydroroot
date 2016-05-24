@@ -10,8 +10,12 @@ def data():
 
     return length, axial, radial
 
-def closed(delta, eps=1e-14):
-    assert(abs(delta) < eps)
+def closed(delta, eps=1e-14, txt=''):
+    if not txt:
+        assert abs(delta) < eps
+    else:
+        assert abs(delta) < eps, txt
+
 
 def check_flux(g, Jv_global):
 
@@ -34,6 +38,45 @@ def check_Keq_monotony(g):
 
         assert -1e-16 <= keq_prev - Keq[trunk[i]] , 'Failure : vertex %d, value: %f' %(trunk[i], Keq[trunk[i]] < keq_prev)
         keq_prev = Keq[trunk[i]]
+
+def check_radial_flow_conservation(g):
+    """j = ki *(psi_e -psi_in)
+
+    """
+    psi_in = g.property('psi_in')
+    psi_e = 0.4
+    k = g.property('k')
+    j = g.property('j')
+
+    for vid in j:
+        ji = j[vid]
+        ki = k[vid]
+        psi_i = psi_in[vid]
+
+        delta = ji - ki*(psi_e-psi_i)
+
+        closed(delta, "For vertex %d, radial flow is not propoerly calculated."%vid)
+
+def check_vertex_flow_conservation(g):
+    """j = ki *(psi_e -psi_in)
+
+    """
+    J_out = g.property('J_out')
+    j = g.property('j')
+
+    for vid in j:
+
+        J = J_out[vid]
+        J_c = 0.
+        for cid in g.children(vid):
+            J_c += J_out[cid]
+
+        ji = j[vid]
+        delta = J - (ji + J_c)
+
+        closed(delta, "For vertex %d, Millmans law is not satisfied."%vid)
+
+
 
 def test_flux1():
     length, axial, radial = data()
@@ -66,6 +109,10 @@ def test_flux1():
 
     # Test if Keq increase on the Trunk
     #check_Keq_monotony(g)
+
+    check_radial_flow_conservation(g)
+    check_vertex_flow_conservation(g)
+
     return g, surface, volume, Keq, Jv_global
 
 
