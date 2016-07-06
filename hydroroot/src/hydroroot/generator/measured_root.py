@@ -38,6 +38,7 @@ def mtg_builder(
     prev_len = 0.
     ramifs = []
 
+    # Create the primary axis
     for i, len_base in enumerate(length_base):
         while len_base-prev_len > 0:
             prev_len += segment_length
@@ -47,6 +48,7 @@ def mtg_builder(
         if length_lateral[i] > 0.:
             ramifs.append((length_lateral[i], vid))
 
+    # Create lateral axis
     for length_ramif, cid in ramifs:
         len_tip = length_ramif
         # print 'length ', len_tip
@@ -115,6 +117,7 @@ def mtg_builder(
                 if 1 : #random.random() < branching_variability :
                     var = int(round(branching_variability*branching_delay))
                     shift = random.randint(-var,var)
+                    print 'shift ', shift, i
                     # shift occurs only if the target is not branched already or outside the axis
                     if ((i+shift)>0) and ((i+shift)<n-1) and (shuffled_axis[i+shift][0]==0) :
                         b, p = shuffled_axis[i]
@@ -138,8 +141,9 @@ def mtg_builder(
             - n : number of vertices for this axis
             - anchors: future ramification points on this axis
         """
-        n = len(list(algo.descendants(g,vid,RestrictedTo='SameAxis')))
-        #print 'N: ', n
+        _axis = list(algo.descendants(g,vid,RestrictedTo='SameAxis'))
+        n = len(_axis)
+        print 'AXIS ', _axis
         nid = g.node(vid)
         assert nid.order == 1
 
@@ -165,19 +169,26 @@ def mtg_builder(
                         shuffled_axis[i] = (0, p)
                         shuffled_axis[i+shift] = (1, p)
 
-        for ramif, position in shuffled_axis:
+        for index, (ramif, position) in enumerate(shuffled_axis):
             if ramif :
+
+                aid = _axis[index+1]
+                nid = g.node(aid)
                 anchors.append(nid)
 
     if SUPERIOR_ORDER:
         # Update the ramification of order 1
         for v in g:
             if g.edge_type(v) == '+':
+                print 'ORDER: ', v, g.order(v)
                 update_randomized_delayed_axis(v)
 
-        #print 'ANCHORS ', anchors
+        print 'ANCHORS ', anchors
+
         while anchors:   # while they are branching point left
             nid = anchors.pop(0)  # take next branching point
+            if nid.order == 2:
+                print nid, nid.position_index
             position_index = nid.position_index # distance to the tip
             #print position_index
             if nid.order < order_max:  # check if maximal branching order was reached
@@ -203,6 +214,7 @@ def mtg_builder(
 
     g = fat_mtg(g)
 
+    print 'branching_delay ', branching_delay
     print 'max_order', max(g.property('order').values())
     return g
 
