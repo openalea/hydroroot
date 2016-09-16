@@ -19,10 +19,11 @@ def fit_length(csvdata, length='1e-4', k=1, s=0.):
     return fit_law(csvdata[x_name], csvdata[y_name], scale=length, k=k, s=s)
 
 
-def fit_law(x, y, scale=0, k=1, s=0.):
+def fit_law(x, y, scale=0., k=1, s=0.):
     if scale:
         x = list(np.array(x) / scale)
         y = list(np.array(y) / scale)
 
+        print "DEBUG: ", scale, x, y
     spline = UnivariateSpline(x, y, k=k, s=s)
     return spline

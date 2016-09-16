@@ -47,6 +47,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
     if not seed is None:
         random.seed(seed)
 
+    decrease = [ (1.-order/100.) for order in range(1, order_max+1)]
     def markov():
         """ simple random markov chain - unused now """
         return 1 if random.random() < branching_variability else 0
@@ -157,6 +158,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
         nid = anchors.pop(0)  # take next branching point
         position_index = nid.position_index # distance to the tip
         #print position_index
+        current_order = nid.order
         if nid.order < order_max:  # check if maximal branching order was reached
 
             # if there is a length law, use it to compute lateral root length at this position
@@ -168,14 +170,29 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 n = max(n-nude_tip_length,1)
                 lateral_length = n-1
 
+            real_lateral_length = lateral_length
             # create axis of appropriate length
             if lateral_length > 0:
                 # branching_variability also apply to the length of LR
                 var = int(lateral_length*branching_variability)
                 lateral_length = random.randint(max(1,lateral_length-var), lateral_length+var)
+
+                # Censure variability
+                if lateral_length > nb_vertices*decrease[current_order]:
+                    if real_lateral_length <= nb_vertices*decrease[current_order]:
+                        lateral_length = real_lateral_length
+                    else:
+                        print("WARNING: lateral length is too large ", lateral_length)
+                        lateral_length = nb_vertices*decrease[current_order]
+
+
+
                 # Create the first  node of the branching point and the corresponding axis
                 cid = nid.add_child(order=nid.order+1, edge_type='+')
                 #print "pid length", nid, lateral_length
+
+                print "Var, Lateral length: ", var, lateral_length
+
                 create_randomized_delayed_axis(cid, lateral_length)
 
     fat_mtg(g)
