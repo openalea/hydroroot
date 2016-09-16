@@ -118,3 +118,41 @@ def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):
         pylab.legend()
 
     return (X, Y_min), (X, Y_max), (X,YY)
+
+
+def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, plot=False):
+    """ Return a length law from [0,1] to absolute length.
+
+    Algorithm:
+      - First, discretize the X values in different intervals of size `size`.
+      - Compute the histogram from the set of points include in each interval.
+      - Return a function that compute a value in a given histogram
+    """
+
+    x = np.array(x) * scale_x
+    y = np.array(y) * scale_y
+    x = x.tolist()
+    y = y.tolist()
+
+    X, values = discretize(x, y, size)
+
+
+    def return_law(position):
+        for i, x_min in enumerate(X):
+            if position <= x_min:
+                break
+        index = max(i-1, 0)
+        points = values[index]
+        n = len(points)
+
+        if n == 0:
+            return 0.
+
+        index_value = random.randint(0,n-1)
+        length = points[index_value]
+
+        return length
+
+    return return_law
+
+
