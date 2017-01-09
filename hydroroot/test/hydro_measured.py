@@ -252,7 +252,10 @@ def plot(g):
     Viewer.display(_plot(g))
 
 
+
 if __name__ == '__main__':
+
+    # g, surface, volume, Keq, Jv_global=hydro_measured.run('data/hydroroot-5.txt')
     files = shared_data(hydroroot, share_path='share', pattern='hydroroot_measured*.txt')
     fn = files[0]
 
