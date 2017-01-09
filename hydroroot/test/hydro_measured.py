@@ -237,9 +237,23 @@ def run(fn):
 
     return g, surface, volume, Keq, Jv_global
 
+def plot(g):
+    from IPython import get_ipython
+
+    ipython = get_ipython()
+    if ipython:
+        ipython.magic('gui qt')
+
+    from openalea.plantgl.all import Viewer
+    from hydroroot.display import plot as _plot
+
+
+
+    Viewer.display(_plot(g))
+
+
 if __name__ == '__main__':
     files = shared_data(hydroroot, share_path='share', pattern='hydroroot_measured*.txt')
     fn = files[0]
 
-    df = read_data(fn)
-    g = reconstruct(df)
+    g, surface, volume, Keq, Jv_global= run(fn)
