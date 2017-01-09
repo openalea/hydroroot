@@ -62,20 +62,17 @@ def reconstruct(df, segment_length=1e-4):
     for i in length_base:
         len_base = df_order.iloc[i].db
         code='1'
-        #print 'len_base: ', len_base
         while len_base-prev_len > 0:
             prev_len += segment_length
             vid = g.add_child(vid, edge_type='<', label='S', base_length=prev_len, length=segment_length, order=0, code=code)
         vid = g.add_child(vid, edge_type='<', label='S', base_length=len_base, length=segment_length, order=0)
         prev_len = len_base
         len_lateral = df_order.iloc[i].lr
-        #print 'len_lateral: ', len_lateral
         if len_lateral > 0.:
             count += 1
             p = tuple([1, count])
             ramifs.setdefault(p, []).append((vid, len_lateral))
 
-    #print ramifs
     new_ramifs = {}
     len_base = 0
 
@@ -84,7 +81,6 @@ def reconstruct(df, segment_length=1e-4):
         order = '-'.join(map(str,path))
         df_order = df[df.order==order]
         length_base = df_order.index
-        #print order, df_order
         code = order
         len_base = lr
 
@@ -98,11 +94,8 @@ def reconstruct(df, segment_length=1e-4):
                 edge_type = '+' if _root_id == vid else '<'
                 vid = g.add_child(vid, edge_type=edge_type, label='S', base_length=parent_base+prev_len, length=segment_length, order=1, code=code)
         else:
-            # TODO
             for i in length_base:
-                print 'i in length_base ', i
                 len_base = df_order.db[i]
-                print 'len_base: ', len_base, lr
                 edge_type = '+' if _root_id == vid else '<'
                 while len_base-prev_len > 0:
                     prev_len += segment_length
@@ -111,7 +104,6 @@ def reconstruct(df, segment_length=1e-4):
                 vid = g.add_child(vid, edge_type='<', label='S', base_length=parent_base+len_base+segment_length, length=segment_length, order=1, code=code)
                 prev_len = len_base
                 len_lateral = df_order.lr[i]
-                print 'len_lateral: ', len_lateral
                 if len_lateral > 0.:
                     count += 1
                     p = tuple([2, count])
@@ -119,7 +111,6 @@ def reconstruct(df, segment_length=1e-4):
 
     ramifs, new_ramifs = new_ramifs, {}
     len_base = 0
-    print ramifs
     Order = 2
     # Copy & Paste
     for path in ramifs:
@@ -141,11 +132,8 @@ def reconstruct(df, segment_length=1e-4):
                 edge_type = '+' if _root_id == vid else '<'
                 vid = g.add_child(vid, edge_type=edge_type, label='S', base_length=parent_base+prev_len, length=segment_length, order=Order, code=code)
         else:
-            # TODO
             for i in length_base:
-                print 'i in length_base ', i
                 len_base = df_order.db[i]
-                print 'len_base: ', len_base, lr
                 edge_type = '+' if _root_id == vid else '<'
                 while len_base-prev_len > 0:
                     prev_len += segment_length
@@ -154,7 +142,6 @@ def reconstruct(df, segment_length=1e-4):
                 vid = g.add_child(vid, edge_type='<', label='S', base_length=parent_base+len_base+segment_length, length=segment_length, order=Order, code=code)
                 prev_len = len_base
                 len_lateral = df_order.lr[i]
-                print 'len_lateral: ', len_lateral
                 if len_lateral > 0.:
                     count += 1
                     p = tuple([2, count])
