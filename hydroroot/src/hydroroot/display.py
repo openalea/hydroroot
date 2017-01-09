@@ -14,30 +14,40 @@ import openalea.plantgl.all as pgl
 
 from .radius import discont_radius
 
-def root_visitor(g, v, turtle):
-    angles = [90,45]+[30]*5
-    n = g.node(v)
-    radius = n.radius*1.e4
-    order = n.order
-    length = n.length*1.e4
+def get_root_visitor(prune=None):
+    def root_visitor(g, v, turtle, prune=prune):
+        mylength = {}
+        if prune and ('mylength' in g.properties()):
+            mylength = g.property('mylength')
+        angles = [90,45]+[30]*5
+        n = g.node(v)
+        radius = n.radius*1.e4
+        order = n.order
+        length = n.length*1.e4
 
-    if g.edge_type(v) == '+':
-        angle = angles[order]
-        turtle.down(angle)
+        if prune:
+            if mylength.get(v,0.)>prune:
+                return
 
-    turtle.setId(v)
-    turtle.setWidth(radius)
-    for c in n.children():
-        if c.edge_type() == '+':
-            turtle.rollL(130)
-    #turtle.setColor(order+1)
-    turtle.F(length)
+        if g.edge_type(v) == '+':
+            angle = angles[order]
+            turtle.down(angle)
 
-    # define the color property
-    #n.color = random.random()
+        turtle.setId(v)
+        turtle.setWidth(radius)
+        for c in n.children():
+            if c.edge_type() == '+':
+                turtle.rollL(130)
+        #turtle.setColor(order+1)
+        turtle.F(length)
 
+        # define the color property
+        #n.color = random.random()
+    return root_visitor
 
-def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5, visitor=root_visitor, prop_cmap='radius', cmap='jet',lognorm=True):
+def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
+         visitor=None, prop_cmap='radius', cmap='jet',lognorm=True,
+         prune=None):
     """
     Exemple:
 
@@ -46,15 +56,17 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5, visitor=root_visitor, pr
         >>> shapes = dict( (x.getId(), x.geometry) for x in s)
         >>> Viewer.display(s)
     """
+    if visitor is None:
+        visitor = get_root_visitor(prune=prune)
 
     r_base, r_tip = float(r_base), float(r_tip)
-    
+
     if not has_radius:
         discont_radius(g,r_base=r_base, r_tip=r_tip)
 
     turtle = turt.PglTurtle()
     turtle.down(180)
-    scene = turt.TurtleFrame(g, visitor=root_visitor, turtle=turtle, gc=False)
+    scene = turt.TurtleFrame(g, visitor=visitor, turtle=turtle, gc=False)
 
     # Compute color from radius
     color.colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
@@ -63,7 +75,8 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5, visitor=root_visitor, pr
 
     colors = g.property('color')
     for vid in colors:
-        shapes[vid].appearance = pgl.Material(colors[vid])
+        if vid in shapes:
+            shapes[vid].appearance = pgl.Material(colors[vid])
     scene = pgl.Scene(shapes.values())
     return scene
 
@@ -74,7 +87,7 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True):
     values = np.array(prop.values())
     #m, M = int(values.min()), int(values.max())
     _cmap = cm.get_cmap(cmap)
-    norm = Normalize() if not lognorm else LogNorm() 
+    norm = Normalize() if not lognorm else LogNorm()
     values = norm(values)
     #my_colorbar(values, _cmap, norm)
 

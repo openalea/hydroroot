@@ -47,6 +47,8 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
     if not seed is None:
         random.seed(seed)
 
+    several_laws=True if isinstance(length_law, list) else False
+
     decrease = [ (1.-order/100.) for order in range(1, order_max+1)]
     def markov():
         """ simple random markov chain - unused now """
@@ -163,7 +165,11 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
             # if there is a length law, use it to compute lateral root length at this position
             if length_law:
-                lateral_length = int(length_law(position_index))
+                if several_laws:
+                    current_law = length_law[0] if current_order == 0 else length_law[1]
+                    lateral_length = int(current_law(position_index))
+                else:
+                    lateral_length = int(length_law(position_index))
             else : # standard lateral root length - can't be longer than the bearing axis remaining branching length (remaining length - nude tip length)
                 n = len(list(algo.descendants(g,nid._vid,RestrictedTo='SameAxis')))
                 #n = random.randint(1, max(n-nude_tip_length,1))
@@ -190,8 +196,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 # Create the first  node of the branching point and the corresponding axis
                 cid = nid.add_child(order=nid.order+1, edge_type='+')
                 #print "pid length", nid, lateral_length
-
-                print "Var, Lateral length: ", var, lateral_length
+                #print "Var, Lateral length: ", var, lateral_length
 
                 create_randomized_delayed_axis(cid, lateral_length)
 
