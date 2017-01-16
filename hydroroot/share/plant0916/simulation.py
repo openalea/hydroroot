@@ -1,14 +1,22 @@
 ###############################################################################
+#
 # Authors: C. Pradal, Y. Boursiac
 # Date : 14/10/2016
+#
 ###############################################################################
-VERSION = 2
+
+######
+# Imports
+
+# VERSION = 2
 
 from random import _hexlify, _urandom
-from openalea.deploy.shared_data import shared_data
+
+import numpy as np
 import pandas
 import pylab
-import numpy as np
+
+from openalea.deploy.shared_data import shared_data
 from openalea.plantgl.all import Viewer
 
 import hydroroot
@@ -28,11 +36,15 @@ from hydroroot.analysis import intercept
 share = shared_data(hydroroot, share_path='share/plant0916')
 data = share.glob('length*.csv')
 
+# column names
 names = _names = ('LR_length_mm', 'relative_distance_to_tip')
 
+# data frame
 df = None
 
+# contains 2 dataframe : order1 and order2
 length_data = []
+# order1 & order2
 for d in data:
     pd = pandas.read_csv(d, sep=';', header=1,
                      names=names)
@@ -48,9 +60,10 @@ def length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4):
     x = pd.relative_distance_to_tip.tolist()
     y = pd.LR_length_mm.tolist()
 
+    # size of the windows: 5%
     size = 5.*scale_x
     #pylab.clf()
-    _length_law = histo_relative_law(x, y, size=size, scale_x = scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False)
+    _length_law = histo_relative_law(x, y, size=size, scale_x=scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False)
     return _length_law
 
 ###############################################################################
@@ -127,12 +140,10 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
         warn("Use primary_length instead")
 
     length_max_secondary = length_data[0].LR_length_mm.max()*1e-3 # in m
-    if VERSION == 1:
-        law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length)
-        law_order2 = length_law(length_data[1], scale_x=length_max_secondary/100., scale=segment_length)
-    else:
-        law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length)
-        law_order2 = length_law(length_data[0], scale_x=length_max_secondary/100., scale=segment_length)
+
+    # Just use the same order1 law
+    law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length)
+    law_order2 = length_law(length_data[0], scale_x=length_max_secondary/100., scale=segment_length)
 
 
     g = markov.markov_binary_tree(
@@ -152,10 +163,12 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
     g = radius.compute_length(g, segment_length)
     g = radius.compute_relative_position(g)
 
+    # _length is the total length of the RSA (sum of the length of all the segments)
     _length = g.nb_vertices(scale=1)*segment_length
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
+    # Compute the intercept at 4.5 cm
     i1, = intercept(g, [0.045])
 
     # compute axial & radial
@@ -166,7 +179,7 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
                                        psi_e=psi_e,
                                        psi_base=psi_base,
                                        axial_conductivity_data=axial(axfold),
-                                       radial_conductivity_data=radial(400., radfold))
+                                       radial_conductivity_data=radial(k0, radfold))
     return g, axfold, radfold, _length, surface, Jv_global, i1, _seed
 
 
@@ -180,6 +193,7 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
 
 ###############################################################################
 # RUN IT!!!!!
+# Startegies for saving intermediate output of the model
 ###############################################################################
 
 import datetime
@@ -187,15 +201,15 @@ import datetime
 results = {}
 def init():
     global results
-    results['index']=[]
-    results['primary_length']=[]
-    results['axfold']=[]
-    results['radfold']=[]
-    results['length']=[]
-    results['surface']=[]
-    results['Jv']=[]
-    results['i0']=[]
-    results['seed']=[]
+    results['index'] = []
+    results['primary_length'] = []
+    results['axfold'] = []
+    results['radfold'] = []
+    results['length'] = []
+    results['surface'] = []
+    results['Jv'] = []
+    results['i0'] = []
+    results['seed'] = []
 
 
 def add(index, primary_length, axfold, radfold, length, surface, Jv, i0, seed):
@@ -222,14 +236,17 @@ def main():
     count = 0
     init()
 
+    # values are from 10 to 15 cm
     length_values = np.arange(10, 15.5, 0.5).tolist()
-    #length_values = (15.,)
+
+    # run 200 times the model
     for nb_time in range(200):
         for length in length_values:
             count += 1
 
+            # convert to meters
             length = length/100.
-            g, axfold, radfold, _length, surface, Jv, i1, seed= my_run(primary_length=length)
+            g, axfold, radfold, _length, surface, Jv, i1, seed = my_run(primary_length=length)
 
             add(count, length, axfold, radfold, _length, surface, Jv, i1, seed)
             print 'Simu, ', count
