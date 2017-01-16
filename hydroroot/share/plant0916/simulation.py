@@ -253,6 +253,30 @@ def main():
 
     save()
 
+
+def reproduce(fn='input_seeds.txt'):
+    rep_names = ('primary_length', 'seed')
+    filename = share/fn
+    rep_pd = pandas.read_csv(filename, sep=';', header=1,
+                             names=rep_names)
+
+    r_length = rep_pd.primary_length.tolist()
+    r_seed = rep_pd.seed.tolist()
+
+    number_of_runs = len(r_length)
+
+    init()
+
+    for i in range(number_of_runs):
+        length = r_length[i]
+        seed = r_seed[i]
+        print "length, seed ", length, seed
+        g, axfold, radfold, _length, surface, Jv, i1, seed = my_run(primary_length=length, seed=seed)
+
+        add(i, length, axfold, radfold, _length, surface, Jv, i1, seed)
+
+    save('reproduce_bench_%s'%TYPE)
+
 # 2. Save them for analysis
 # 3. Compute k0 such that, Jv(k0/10) = 1/3 Jv(k0)
 
@@ -271,4 +295,5 @@ def main():
 #         print 'Simu, ', count
 #         count += 1
 
-main()
+#main()
+reproduce()
