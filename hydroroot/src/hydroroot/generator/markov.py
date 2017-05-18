@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from openalea.mtg import *
 from openalea.mtg import algo
@@ -46,6 +47,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
     if not seed is None:
         random.seed(seed)
+        np.random.seed(seed)
 
     several_laws=True if isinstance(length_law, list) else False
 

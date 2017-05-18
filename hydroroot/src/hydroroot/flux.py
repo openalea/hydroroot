@@ -1,4 +1,3 @@
-
 # -*- python -*-
 #
 #       HydroRoot
@@ -17,20 +16,24 @@
 #       OpenAlea WebSite : http://openalea.gforge.inria.fr
 #
 ################################################################################
-
+"""
+Flux computation.
 """
 
-"""
 
 from openalea.mtg import traversal
 
 
 class Flux(object):   # edit this to also allow for flux computation instead just redistribution
-    """ Compute the water potential and fluxes at each vertex of the MTG.
+    """Compute the water potential and fluxes at each vertex of the MTG.
 
     """
 
-    def __init__(self, g, Jv, psi_e, psi_base, invert_model=False, k=None, K=None, CONSTANT=1.):
+    def __init__(self, g,
+                 Jv, psi_e, psi_base,
+                 invert_model=False,
+                 k=None, K=None, CONSTANT=1.,
+                 cut_and_flow=False):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -41,8 +44,9 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
                 if None, then consider that the value has been defined on each vertex.
             - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
-            - `invert_model` - when false, distribute output flux within the root ; when true, compute the output flux for the given root and conditions
-
+            - `invert_model` - when false, distribute output flux within the root ; when true, compute the output flux
+                for the given root and conditions.
+            - `cut_and_flow` (bool) - Use specific model to compute conductance at tips with cut & flow.
         :Example:
 
             flux = Flux(g, ...)
@@ -58,6 +62,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         self.invert_model = invert_model
 
         self.HAS_SOIL = psi_e is None
+        self.CUT_AND_FLOW = cut_and_flow
 
     def run(self):
         """ Compute the water potential and fluxes of each segments
@@ -103,9 +108,14 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         Keq = g.property('Keq')
         #print 'entering Keq computation'
         for v in traversal.post_order2(g, v_base):
-            r = 1./(k[v] + sum(Keq[cid] for cid in g.children(v)))
-            R = 1./K[v]
-            Keq[v] = 1./(r+R)
+            kids = g.children(v)
+            if (not self.CUT_AND_FLOW) or kids:
+                r = 1./(k[v] + sum(Keq[cid] for cid in kids))
+                R = 1./K[v]
+                Keq[v] = 1./(r+R)
+            else:
+                assert self.CUT_AND_FLOW and (len(kids)==0)
+                Keq[v] = K[v]
         #print 'exiting Keq computation'
 
         # Water flux and water potential computation
@@ -378,7 +388,10 @@ class RadialShuntFlux(Flux):
                 Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
 
 
-def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=None, CONSTANT=1., shunt=False, a=1., b=0.):
+def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
+         invert_model=False, k=None, K=None, CONSTANT=1.,
+         shunt=False, a=1., b=0.,
+         cut_and_flow=False):
     """ flux computes water potential and fluxes at each vertex of the MTG `g`.
 
         :Parameters:
@@ -401,10 +414,63 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325, invert_model=False, k=None, K=
             my_flux = flux(g)
     """
     if not shunt:
-        f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K, CONSTANT=CONSTANT)
+        f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K, CONSTANT=CONSTANT, cut_and_flow=cut_and_flow)
     else:
         f = RadialShuntFlux(a, b, g=g, Jv=Jv, psi_e=psi_e, psi_base=psi_base, invert_model=invert_model, k=k, K=K, CONSTANT=CONSTANT)
 
     f.run()
 
     return f.g
+
+def segments_at_length(g, l, root=1, dl=1e-4):
+    """Returns all the segments intercepted at a given length.
+
+    Parameters
+    ==========
+        - g: MTG
+        - l: length
+
+    Returns
+    =======
+        - number of segment
+    """
+    length = {}
+
+    if 'mylength' in g.property_names():
+        length = g.property('mylength')
+    else:
+        for v in traversal.pre_order2(g, root):
+            pid = g.parent(v)
+            length[v] = length[pid] + dl if pid else dl
+        g.properties()['mylength'] = length
+
+    vids = []
+    for v in g:
+        pid = g.parent(v)
+        if pid and (length[pid] <= l <= length[v]):
+            vids.append(v)
+    return vids
+
+
+def cut(g, cut_length):
+    """Cut the architeture at a given length `cut_length`.
+
+        :Parameters:
+            - `g` (MTG) - the root architecture
+            - `cut_length` (float, m) - length at which the architecture is cut from collar.
+
+        :Returns:
+            - `g`(MTG) - the architecture after the cut process. This is a copy.
+
+        :Example::
+
+            g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architectire of 11 cm (primary length).
+    """
+    vids = segments_at_length(g, cut_length)
+
+    g_cut = g.copy()
+    for v in vids:
+        g_cut.remove_tree(v)
+
+    return g_cut
+

@@ -46,7 +46,7 @@ def get_root_visitor(prune=None):
     return root_visitor
 
 def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
-         visitor=None, prop_cmap='radius', cmap='jet',lognorm=True,
+         visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
          prune=None):
     """
     Exemple:

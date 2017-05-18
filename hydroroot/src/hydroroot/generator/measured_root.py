@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from openalea.mtg import MTG, fat_mtg
 from openalea.mtg.traversal import post_order2
@@ -81,6 +82,7 @@ def mtg_builder(
 
     if not seed is None:
         random.seed(seed)
+        np.random.seed(seed)
 
     def delayed_markov(timer):
         """ markov chain with a delay between ramification """
