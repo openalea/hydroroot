@@ -1,4 +1,5 @@
 from hydroroot.main import hydroroot as hydro
+from hydroroot import flux
 
 
 def data():
@@ -115,4 +116,45 @@ def test_flux1():
 
     return g, surface, volume, Keq, Jv_global
 
+
+def test_cut():
+    length, axial, radial = data()
+    g, surface, volume, Keq, Jv_global = hydro(primary_length=0.09,
+                                               order_decrease_factor=0.7,
+                                               length_data=length,
+                                               axial_conductivity_data=axial,
+                                               radial_conductivity_data=radial,
+                                               seed=2)
+
+    g_cut = flux.cut(g, 0.04)
+    check_length(g_cut, 0.04, segment_length=1e-4)
+
+def test_cut_and_flow():
+    length, axial, radial = data()
+    g, surface, volume, Keq, Jv_global = hydro(primary_length=0.09,
+                                               order_decrease_factor=0.7,
+                                               length_data=length,
+                                               axial_conductivity_data=axial,
+                                               radial_conductivity_data=radial,
+                                               seed=2)
+
+    g_cut = flux.cut(g, 0.04)
+    check_length(g_cut, 0.04, segment_length=1e-4)
+
+    g_cut = flux.flux(g_cut, cut_and_flow=True, invert_model=True)
+    v_base = 1
+    psi_e = 0.4
+    psi_base = 0.101325
+    Keqs = g_cut.property('Keq')
+    Jv_cut = Keqs[v_base] * (psi_e - psi_base)
+
+    print Jv_cut
+    assert Jv_cut > Jv_global
+
+def check_length(g, length, segment_length):
+    axis = g.Axis(1)
+    n = len(axis)
+    _length = n*segment_length
+
+    assert abs(_length-length) <= segment_length
 

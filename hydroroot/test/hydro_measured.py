@@ -198,14 +198,14 @@ def my_flux(g,
     return g, surface, volume, Keq, Jv_global
 
 def run(fn):
-    ref_radius = 1e-4 # in m
+    ref_radius = 6.e-5 # in m
     order_decrease_factor = 1.
 
     # parameters
-    k0 = 400.
+    k0 = 50.
     Jv = 0.1
     psi_e = 0.4
-    psi_base = 0.
+    psi_base = 0.101325
 
     # laws
     acol = axial_conductivity_data = (
@@ -222,7 +222,7 @@ def run(fn):
         y = [a*scale for a in y]
         return x, y
 
-    rcol = radial_conductivity_data = radial(300)
+    rcol = radial_conductivity_data = radial(k0)
 
     axfold=1
     radfold=1
@@ -237,7 +237,7 @@ def run(fn):
 
     return g, surface, volume, Keq, Jv_global
 
-def plot(g):
+def plot(g, **kwds):
     from IPython import get_ipython
 
     ipython = get_ipython()
@@ -249,14 +249,14 @@ def plot(g):
 
 
 
-    Viewer.display(_plot(g))
+    Viewer.display(_plot(g, **kwds))
 
 
 
 if __name__ == '__main__':
 
-    # g, surface, volume, Keq, Jv_global=hydro_measured.run('data/hydroroot-5.txt')
-    files = shared_data(hydroroot, share_path='share', pattern='hydroroot_measured*.txt')
-    fn = files[0]
+    g, surface, volume, Keq, Jv_global=run('data/hydroroot-8v1.txt')
+    #files = shared_data(hydroroot, share_path='share', pattern='hydroroot_measured*.txt')
+    #fn = files[-1]
 
-    g, surface, volume, Keq, Jv_global= run(fn)
+    #g, surface, volume, Keq, Jv_global= run(fn)
