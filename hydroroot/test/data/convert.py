@@ -5,6 +5,11 @@ def convert_line(line):
 
 
 def convert(fn1):
+    """ Convert files from windows to be readable.
+
+    >>> from convert import convert
+    >>> convert('170426-full-archi-ch3G2b.txt')
+    """
     f = open(fn1)
     lines = [convert_line(l) for l in f.readlines()]
     content = '\n'.join(lines)+'\n'
