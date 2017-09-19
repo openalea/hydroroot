@@ -84,10 +84,12 @@ ref_radius = 1e-4 # in m
 order_decrease_factor = 0.7
 
 # parameters
-k0 = 400.
+#k0 = 400.
+k0 = 37.
+
 Jv = 0.1
 psi_e = 0.4
-psi_base = 0.
+psi_base = .101325
 
 # laws
 acol = axial_conductivity_data = (
@@ -118,9 +120,16 @@ def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(long(_hexlify(_urandom(2500)), 16)%100000000)
 
-def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radius*2,  order_decrease_factor=0.8):
+def my_run(primary_length, k0=k0,
+           axfold=1., radfold=1.,
+           seed=None,
+           ref_radius=ref_radius*2,
+           order_decrease_factor=0.7,
+           delta=delta,
+           nude_length=nude_length):
     """ Simulate Arabidopsis architecture
 
+    Add parameters like delta
     """
     n=None
 
@@ -143,7 +152,7 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
 
     # Just use the same order1 law
     law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length)
-    law_order2 = length_law(length_data[0], scale_x=length_max_secondary/100., scale=segment_length)
+    law_order2 = length_law(length_data[1], scale_x=length_max_secondary/100., scale=segment_length)
 
 
     g = markov.markov_binary_tree(
@@ -169,7 +178,8 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
     g, volume = radius.compute_volume(g)
 
     # Compute the intercept at 4.5 cm
-    i1, = intercept(g, [0.045])
+    # TODO : np.arange(3, 11, 1)*1e-2
+    i3,i4,i6,i8 = intercept(g, [0.03, 0.045, 0.06, 0.08])
 
     # compute axial & radial
     g, Keq, Jv_global = hydroroot_flow(g,
@@ -180,7 +190,7 @@ def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radi
                                        psi_base=psi_base,
                                        axial_conductivity_data=axial(axfold),
                                        radial_conductivity_data=radial(k0, radfold))
-    return g, axfold, radfold, _length, surface, Jv_global, i1, _seed
+    return g, axfold, radfold, _length, surface, Jv_global, i3,i4,i6,i8, _seed
 
 
 # for i in range(3):
@@ -203,34 +213,47 @@ def init():
     global results
     results['index'] = []
     results['primary_length'] = []
+    results['k0'] = []
     results['axfold'] = []
     results['radfold'] = []
     results['length'] = []
     results['surface'] = []
     results['Jv'] = []
-    results['i0'] = []
+    results['i3'] = []
+    results['i4'] = []
+    results['i6'] = []
+    results['i8'] = []
+    results['delta'] = []
+    results['nude_length'] = []
     results['seed'] = []
 
 
-def add(index, primary_length, axfold, radfold, length, surface, Jv, i0, seed):
+def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, surface, Jv, i3, i4, i6, i8, seed):
     global results
     results['index'].append(index)
     results['primary_length'].append(primary_length)
+    results['k0'].append(k0)
     results['axfold'].append(axfold)
     results['radfold'].append(radfold)
+    results['delta'].append(delta)
+    results['nude_length'].append(nude_length)
     results['length'].append(length)
     results['surface'].append(surface)
     results['Jv'].append(Jv)
-    results['i0'].append(i0)
+    results['i3'].append(i3)
+    results['i4'].append(i4)
+    results['i6'].append(i6)
+    results['i8'].append(i8)
     results['seed'].append(seed)
 
 
 def save(name='bench_%s'%TYPE, xls=False):
     now = datetime.datetime.now()
     date = now.strftime("%Y_%m_%d_%H-%M")
-    df = pandas.DataFrame(results, columns=['index', 'primary_length', 'axfold', 'radfold', 'length', 'surface', 'Jv', 'i0', 'seed'])
+    df = pandas.DataFrame(results, columns=['index', 'primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'length', 'surface',
+                                            'Jv', 'i3', 'i4','i6','i8', 'seed'])
     if not xls:
-        name = name+'_%s.txt'%date
+        name = name+'_%s.csv'%date
         df.to_csv(name, index=False)
     else:
         name = name+'_%s.xlsx'%date
@@ -242,31 +265,57 @@ def main():
     init()
 
     # values are from 10 to 15 cm
-    length_values = np.arange(10, 15.5, 0.5).tolist()
-    length_values = (13.,)
-    N = 2
+    length_values = np.arange(10, 17, 1.).tolist()
+    deltas = np.arange(1.e-3, 2.5e-3, 1e-4).tolist()
+    nudes = np.arange(0.009, 0.038, 3.e-3 ).tolist()
+
+    axfolds = [1./16, 1./8, 1./4, 1./2, 1., 2., 3., 4., 5.]
+    k0 = 50
+    radfolds = [1./4, 1/2., 1., 2., 4., 8.]
+
+    axfolds = [1.]
+    radfolds = [1.]
+    #length_values = (13.,)
+    N = 20
     # run 200 times the model
+
+    # predict the number of simulation run
+    nb_steps = N * len(length_values) * len(deltas) * len(axfolds) * len(radfolds) * len(nudes)
+    print 'Simulation runs: ', nb_steps
+    print '#############################'
+
     for nb_time in range(N):
         for length in length_values:
-            count += 1
+            for delta in deltas:
+                for axfold in axfolds:
+                    for radfold in radfolds:
+                        for nude_length in nudes:
+                            count += 1
 
-            # convert to meters
-            length = length/100.
-            g, axfold, radfold, _length, surface, Jv, i1, seed = my_run(primary_length=length)
+                            # convert to meters
+                            plength = length/100.
+                            g, axfold, radfold, _length, surface, Jv, i3,i4,i6,i8, seed = my_run(primary_length=plength,
+                                k0=k0, axfold=axfold, radfold=radfold, delta=delta, nude_length=nude_length)
 
-            add(count, length, axfold, radfold, _length, surface, Jv, i1, seed)
-            print 'Simu, ', count
+                            add(count, plength, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
+                                i3,i4,i6,i8, seed)
+                            print 'Simu, ', count
 
-    save(xls=True)
+    save(xls=False)
 
 
 def reproduce(fn='input_seeds.txt'):
-    rep_names = ('primary_length', 'seed')
+    rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
     filename = share/fn
     rep_pd = pandas.read_csv(filename, sep=';', header=0,
                              names=rep_names)
 
     r_length = rep_pd.primary_length.tolist()
+    r_k0 = rep_pd.k0.tolist()
+    r_axfold = rep_pd.axfold.tolist()
+    r_radfold = rep_pd.radfold.tolist()
+    r_delta = rep_pd.delta.tolist()
+    r_nude = rep_pd.nude_length.tolist()
     r_seed = rep_pd.seed.tolist()
 
     number_of_runs = len(r_length)
@@ -275,11 +324,24 @@ def reproduce(fn='input_seeds.txt'):
 
     for i in range(number_of_runs):
         length = r_length[i]
+        k0 = r_k0[i]
+        axfold = r_axfold[i]
+        radfold = r_radfold[i]
+        delta = r_delta[i]
+        nude_length = r_nude[i]
         seed = r_seed[i]
         print "length, seed ", length, seed
-        g, axfold, radfold, _length, surface, Jv, i1, seed = my_run(primary_length=length, seed=seed)
+        g, axfold, radfold, _length, surface, Jv, i3, i4, i6, i8, seed = my_run(primary_length=length,
+                                                                    k0=k0,
+                                                                    axfold=axfold,
+                                                                    radfold=radfold,
+                                                                    delta=delta,
+                                                                    nude_length=nude_length,
+                                                                    seed=seed)
 
-        add(i, length, axfold, radfold, _length, surface, Jv, i1, seed)
+
+        add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
+            i3,i4,i6,i8, seed)
 
     save('reproduce_bench_%s'%TYPE)
 
@@ -301,5 +363,5 @@ def reproduce(fn='input_seeds.txt'):
 #         print 'Simu, ', count
 #         count += 1
 
-#main()
-reproduce()
+main()
+#reproduce()
