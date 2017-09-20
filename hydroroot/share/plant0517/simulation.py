@@ -85,7 +85,7 @@ order_decrease_factor = 0.7
 
 # parameters
 #k0 = 400.
-k0 = 37.
+k0 = 92.
 
 Jv = 0.1
 psi_e = 0.4
@@ -96,7 +96,7 @@ acol = axial_conductivity_data = (
     [0., 0.03,  0.06, 0.09, 0.12, 0.15, 0.18],
     [2.9e-4, 34.8e-4, 147.4e-4, 200.3e-4,292.6e-4,262.5e-4,511.1e-4]
 )
-def radial(v=300, scale=1):
+def radial(v=92, scale=1):
     xr = [0., 0.015, 0.03, 0.045, 0.06, 0.075, 0.09, 0.105, 0.135, 0.15, 0.16]
     yr = [v*scale]*len(xr)
     return xr, yr
@@ -106,7 +106,7 @@ def axial(scale=1):
     y = [a*scale for a in y]
     return x, y
 
-rcol = radial_conductivity_data = radial(300)
+rcol = radial_conductivity_data = radial(92)
 
 axfold=1
 radfold=1
@@ -177,9 +177,9 @@ def my_run(primary_length, k0=k0,
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
-    # Compute the intercept at 4.5 cm
+    # Compute the intercept at 1,2,3,4.5,6 and 8 cm
     # TODO : np.arange(3, 11, 1)*1e-2
-    i3,i4,i6,i8 = intercept(g, [0.03, 0.045, 0.06, 0.08])
+    i1,i2,i3,i4,i6,i8 = intercept(g, [0.01, 0.02, 0.03, 0.045, 0.06, 0.08])
 
     # compute axial & radial
     g, Keq, Jv_global = hydroroot_flow(g,
@@ -190,7 +190,7 @@ def my_run(primary_length, k0=k0,
                                        psi_base=psi_base,
                                        axial_conductivity_data=axial(axfold),
                                        radial_conductivity_data=radial(k0, radfold))
-    return g, axfold, radfold, _length, surface, Jv_global, i3,i4,i6,i8, _seed
+    return g, axfold, radfold, _length, surface, Jv_global, i1,i2,i3,i4,i6,i8, _seed
 
 
 # for i in range(3):
@@ -219,6 +219,8 @@ def init():
     results['length'] = []
     results['surface'] = []
     results['Jv'] = []
+    results['i1'] = []
+    results['i2'] = []
     results['i3'] = []
     results['i4'] = []
     results['i6'] = []
@@ -228,7 +230,7 @@ def init():
     results['seed'] = []
 
 
-def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, surface, Jv, i3, i4, i6, i8, seed):
+def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, surface, Jv, i1,i2,i3, i4, i6, i8, seed):
     global results
     results['index'].append(index)
     results['primary_length'].append(primary_length)
@@ -240,6 +242,8 @@ def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, 
     results['length'].append(length)
     results['surface'].append(surface)
     results['Jv'].append(Jv)
+    results['i1'].append(i1)
+    results['i2'].append(i2)
     results['i3'].append(i3)
     results['i4'].append(i4)
     results['i6'].append(i6)
@@ -251,7 +255,7 @@ def save(name='bench_%s'%TYPE, xls=False):
     now = datetime.datetime.now()
     date = now.strftime("%Y_%m_%d_%H-%M")
     df = pandas.DataFrame(results, columns=['index', 'primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'length', 'surface',
-                                            'Jv', 'i3', 'i4','i6','i8', 'seed'])
+                                            'Jv', 'i1','i2','i3', 'i4','i6','i8', 'seed'])
     if not xls:
         name = name+'_%s.csv'%date
         df.to_csv(name, index=False)
@@ -270,7 +274,7 @@ def main():
     nudes = np.arange(0.009, 0.038, 3.e-3 ).tolist()
 
     axfolds = [1./16, 1./8, 1./4, 1./2, 1., 2., 3., 4., 5.]
-    k0 = 50
+    k0 = 92
     radfolds = [1./4, 1/2., 1., 2., 4., 8.]
 
     axfolds = [1.]
@@ -298,15 +302,15 @@ def main():
                                 k0=k0, axfold=axfold, radfold=radfold, delta=delta, nude_length=nude_length)
 
                             add(count, plength, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
-                                i3,i4,i6,i8, seed)
+                                i1,i2,i3,i4,i6,i8, seed)
                             print 'Simu, ', count
 
     save(xls=False)
 
 
-def reproduce(fn='input_seeds.txt'):
+def reproduce(fn='170920_input_seeds.txt'):
     rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
-    filename = share/fn
+    filename = fn
     rep_pd = pandas.read_csv(filename, sep=';', header=0,
                              names=rep_names)
 
@@ -331,7 +335,7 @@ def reproduce(fn='input_seeds.txt'):
         nude_length = r_nude[i]
         seed = r_seed[i]
         print "length, seed ", length, seed
-        g, axfold, radfold, _length, surface, Jv, i3, i4, i6, i8, seed = my_run(primary_length=length,
+        g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed = my_run(primary_length=length,
                                                                     k0=k0,
                                                                     axfold=axfold,
                                                                     radfold=radfold,
@@ -340,7 +344,7 @@ def reproduce(fn='input_seeds.txt'):
                                                                     seed=seed)
 
 
-        add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
+        add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv, i1, i2,
             i3,i4,i6,i8, seed)
 
     save('reproduce_bench_%s'%TYPE)
@@ -363,5 +367,5 @@ def reproduce(fn='input_seeds.txt'):
 #         print 'Simu, ', count
 #         count += 1
 
-main()
-#reproduce()
+#main()
+reproduce()
