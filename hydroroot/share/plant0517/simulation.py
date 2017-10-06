@@ -80,7 +80,7 @@ segment_length = 1e-4
 nude_length = 0.02
 #seed = 2
 
-ref_radius = 1e-4 # in m
+ref_radius = 7e-5 # in m
 order_decrease_factor = 0.7
 
 # parameters
@@ -111,6 +111,19 @@ rcol = radial_conductivity_data = radial(92)
 axfold=1
 radfold=1
 
+def plot(g, **kwds):
+
+    from IPython import get_ipython
+
+    # ipython = get_ipython()
+    ipython = None
+    if ipython:
+        ipython.magic('gui qt')
+
+    from openalea.plantgl.all import Viewer
+    from hydroroot.display import plot as _plot
+
+    Viewer.display(_plot(g, **kwds))
 
 ###############################################################################
 # Main simulation function
@@ -123,7 +136,7 @@ def my_seed():
 def my_run(primary_length, k0=k0,
            axfold=1., radfold=1.,
            seed=None,
-           ref_radius=ref_radius*2,
+           ref_radius=ref_radius,
            order_decrease_factor=0.7,
            delta=delta,
            nude_length=nude_length):
@@ -308,7 +321,7 @@ def main():
     save(xls=False)
 
 
-def reproduce(fn='170920_input_seeds.txt'):
+def reproduce(fn='171002_input_seeds_individuals.txt'):
     rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
     filename = fn
     rep_pd = pandas.read_csv(filename, sep=';', header=0,
@@ -333,7 +346,7 @@ def reproduce(fn='170920_input_seeds.txt'):
         radfold = r_radfold[i]
         delta = r_delta[i]
         nude_length = r_nude[i]
-        seed = r_seed[i]
+        seed = int(r_seed[i])
         print "length, seed ", length, seed
         g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed = my_run(primary_length=length,
                                                                     k0=k0,
@@ -346,8 +359,12 @@ def reproduce(fn='170920_input_seeds.txt'):
 
         add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv, i1, i2,
             i3,i4,i6,i8, seed)
+        #plot(g)
+        #raw_input("Press Enter to continue...")
 
     save('reproduce_bench_%s'%TYPE)
+
+
 
 # 2. Save them for analysis
 # 3. Compute k0 such that, Jv(k0/10) = 1/3 Jv(k0)
