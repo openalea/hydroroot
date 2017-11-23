@@ -63,7 +63,7 @@ def length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4):
     # size of the windows: 5%
     size = 5.*scale_x
     #pylab.clf()
-    _length_law = histo_relative_law(x, y, size=size, scale_x=scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False)
+    _length_law = histo_relative_law(x, y, size=size, scale_x=scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False, uniform=True)
     return _length_law
 
 ###############################################################################
@@ -129,6 +129,8 @@ def plot(g, **kwds):
 # Main simulation function
 ###############################################################################
 
+ONE_LAW=True
+
 def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(long(_hexlify(_urandom(2500)), 16)%100000000)
@@ -172,7 +174,7 @@ def my_run(primary_length, k0=k0,
             nb_vertices=nb_vertices,
             branching_variability=beta,
             branching_delay=branching_delay,
-            length_law=[law_order1, law_order2],
+            length_law=[law_order1, law_order2] if not ONE_LAW else law_order1,
             nude_tip_length=nb_nude_vertices,
             order_max=order_max,
             seed=_seed)
@@ -385,4 +387,4 @@ def reproduce(fn='171002_input_seeds_individuals.txt'):
 #         count += 1
 
 #main()
-reproduce()
+#reproduce()

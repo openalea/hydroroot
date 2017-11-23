@@ -120,7 +120,7 @@ def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):
     return (X, Y_min), (X, Y_max), (X,YY)
 
 
-def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, plot=False):
+def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, plot=False, uniform=False):
     """ Return a length law from [0,1] to absolute length.
 
     Algorithm:
@@ -148,8 +148,13 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
         if n == 0:
             return 0.
 
-        index_value = random.randint(0,n-1)
-        length = points[index_value]
+        if not uniform:
+            index_value = random.randint(0,n-1)
+            length = points[index_value]
+        else:
+            min_y = min(points)
+            max_y = max(points)
+            length = min_y + (max_y-min_y)*random.random()
 
         return length/scale
 

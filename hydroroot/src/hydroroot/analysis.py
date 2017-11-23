@@ -5,9 +5,10 @@ Define a set of methods to ease the analysis and simulation.
 import pandas
 # from hydroroot.main import hydroroot
 from openalea.mtg.traversal import pre_order2
+from openalea.mtg.algo import orders
 
 
-def nb_roots(g, l, root=1, dl=1e-4):
+def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
     """Compute the number of segment intercepted at a given length.
 
     Parameters
@@ -29,17 +30,29 @@ def nb_roots(g, l, root=1, dl=1e-4):
             length[v] = length[pid] + dl if pid else dl
         g.properties()['mylength'] = length
 
+    order = None
+    if max_order is not None:
+        if 'order' in g.property_names():
+            order = g.property('order')
+        else:
+            order = orders(g, scale=g.max_scale())
+
     count = 0
     for v in g:
+
+        if order and order.get(v) >= max_order:
+            continue
+
         pid = g.parent(v)
         if pid and (length[pid] <= l <= length[v]):
             count += 1
     return count
 
 
-def intercept(g, dists):
+def intercept(g, dists, max_order=None):
     """Compute intercepts at a given length from collet."""
-    intercepts = [nb_roots(g, x) for x in dists]
+
+    intercepts = [nb_roots(g, x, max_order=max_order) for x in dists]
     return intercepts
 
 

@@ -51,7 +51,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
     several_laws=True if isinstance(length_law, list) else False
 
-    decrease = [ (1.-order/100.) for order in range(1, order_max+1)]
+    decrease = [ (1.-order/100.) for order in range(1, int(order_max)+1)]
     def markov():
         """ simple random markov chain - unused now """
         return 1 if random.random() < branching_variability else 0
@@ -77,7 +77,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
     def create_axis(nid, n, anchors=anchors):
         """ create a random axis of length n and record the id of the branching points in anchors """
         axis = [markov() for i in range(n)]
-        for i in range(1,min(branching_delay,n)+1):
+        for i in range(1,int(min(branching_delay,n))+1):
             axis[-i] = 0
 
         for ramif in axis:
