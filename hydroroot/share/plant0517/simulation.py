@@ -284,7 +284,7 @@ def main():
     init()
 
     # values are from 10 to 15 cm
-    length_values = np.arange(10, 17, 1.).tolist()
+    length_values = np.arange(10, 16, 1.).tolist()
     deltas = np.arange(1.e-3, 2.5e-3, 1e-4).tolist()
     nudes = np.arange(0.009, 0.038, 3.e-3 ).tolist()
 
@@ -295,7 +295,7 @@ def main():
     axfolds = [1.]
     radfolds = [1.]
     #length_values = (13.,)
-    N = 20
+    N = 1
     # run 200 times the model
 
     # predict the number of simulation run
@@ -313,7 +313,7 @@ def main():
 
                             # convert to meters
                             plength = length/100.
-                            g, axfold, radfold, _length, surface, Jv, i3,i4,i6,i8, seed = my_run(primary_length=plength,
+                            g, axfold, radfold, _length, surface, Jv, i1, i2, i3,i4,i6,i8, seed = my_run(primary_length=plength,
                                 k0=k0, axfold=axfold, radfold=radfold, delta=delta, nude_length=nude_length)
 
                             add(count, plength, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
