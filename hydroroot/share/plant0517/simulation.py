@@ -284,7 +284,7 @@ def main():
     init()
 
     # values are from 10 to 15 cm
-    length_values = np.arange(10, 16, 1.).tolist()
+    length_values = np.arange(10, 14, .5).tolist()
     deltas = np.arange(1.e-3, 2.5e-3, 1e-4).tolist()
     nudes = np.arange(0.009, 0.038, 3.e-3 ).tolist()
 
@@ -386,5 +386,5 @@ def reproduce(fn='171002_input_seeds_individuals.txt'):
 #         print 'Simu, ', count
 #         count += 1
 
-#main()
+main()
 #reproduce()
