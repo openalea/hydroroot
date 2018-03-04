@@ -53,7 +53,7 @@ for d in data:
     length_data.append(pd)
 
 
-def length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4):
+def length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4, uniform=True):
     """
     scale
     """
@@ -63,7 +63,7 @@ def length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4):
     # size of the windows: 5%
     size = 5.*scale_x
     #pylab.clf()
-    _length_law = histo_relative_law(x, y, size=size, scale_x=scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False, uniform=True)
+    _length_law = histo_relative_law(x, y, size=size, scale_x=scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False, uniform=uniform)
     return _length_law
 
 ###############################################################################
@@ -129,7 +129,8 @@ def plot(g, **kwds):
 # Main simulation function
 ###############################################################################
 
-ONE_LAW=True
+ONE_LAW=False
+EXPOVARIATE = True
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
@@ -167,8 +168,10 @@ def my_run(primary_length, k0=k0,
 
     # Just use the same order1 law
     law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length)
-    law_order2 = length_law(length_data[1], scale_x=length_max_secondary/100., scale=segment_length)
-
+    if EXPOVARIATE:
+        law_order2 = length_law(length_data[1], scale_x=length_max_secondary/100., scale=segment_length, uniform='expo')
+    else:
+        law_order2 = length_law(length_data[1], scale_x=length_max_secondary/100., scale=segment_length)
 
     g = markov.markov_binary_tree(
             nb_vertices=nb_vertices,
@@ -284,7 +287,7 @@ def main():
     init()
 
     # values are from 10 to 15 cm
-    length_values = np.arange(10, 14, .5).tolist()
+    length_values = np.arange(10, 15, .5).tolist()
     deltas = np.arange(1.e-3, 2.5e-3, 1e-4).tolist()
     nudes = np.arange(0.009, 0.038, 3.e-3 ).tolist()
 
@@ -302,6 +305,10 @@ def main():
     nb_steps = N * len(length_values) * len(deltas) * len(axfolds) * len(radfolds) * len(nudes)
     print 'Simulation runs: ', nb_steps
     print '#############################'
+
+    #to comment
+    #return
+
 
     for nb_time in range(N):
         for length in length_values:

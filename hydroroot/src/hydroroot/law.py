@@ -136,6 +136,7 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
 
     X, values = discretize(x, y, size)
 
+    means = [np.mean(ys) for ys in values]
 
     def return_law(position, scale=scale):
         for i, x_min in enumerate(X):
@@ -148,7 +149,10 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
         if n == 0:
             return 0.
 
-        if not uniform:
+        if uniform=='expo':
+            v = means[index]
+            length = random.expovariate(1. / v) if v > 0 else 0.
+        elif not uniform:
             index_value = random.randint(0,n-1)
             length = points[index_value]
         else:
