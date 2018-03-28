@@ -333,7 +333,7 @@ def main():
 def reproduce(fn='171002_input_seeds_individuals.txt'):
     rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
     filename = fn
-    rep_pd = pandas.read_csv(filename, sep=',', header=0,
+    rep_pd = pandas.read_csv(filename, sep=';', header=0,
                              names=rep_names)
 
     r_length = rep_pd.primary_length.tolist()
