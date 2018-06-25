@@ -287,7 +287,7 @@ def main():
     init()
 
     # values are from 10 to 15 cm
-    length_values = np.arange(10, 15, .5).tolist()
+    length_values = [9.5,15.]#np.arange(15.5, 18.5, .5).tolist()
     deltas = np.arange(1.e-3, 2.5e-3, 1e-4).tolist()
     nudes = np.arange(0.009, 0.038, 3.e-3 ).tolist()
 
@@ -298,7 +298,7 @@ def main():
     axfolds = [1.]
     radfolds = [1.]
     #length_values = (13.,)
-    N = 1
+    N = 5
     # run 200 times the model
 
     # predict the number of simulation run
@@ -330,7 +330,7 @@ def main():
     save(xls=False)
 
 
-def reproduce(fn='171002_input_seeds_individuals.txt'):
+def reproduce(fn='181204testreproduce.txt'):
     rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
     filename = fn
     rep_pd = pandas.read_csv(filename, sep=';', header=0,
@@ -374,6 +374,54 @@ def reproduce(fn='171002_input_seeds_individuals.txt'):
     save('reproduce_bench_%s'%TYPE)
 
 
+def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
+    rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
+    filename = fn
+    rep_pd = pandas.read_csv(filename, sep=';', header=0,
+                             names=rep_names)
+
+    r_length = rep_pd.primary_length.tolist()
+    #r_k0 = rep_pd.k0.tolist()
+    r_axfold = rep_pd.axfold.tolist()
+    r_radfold = rep_pd.radfold.tolist()
+    r_delta = rep_pd.delta.tolist()
+    r_nude = rep_pd.nude_length.tolist()
+    r_seed = rep_pd.seed.tolist()
+    k0values= [10.,50.,90.,130.,170.,210.,250.,290.] #np.arange(10, 301, 20 ).tolist() 
+    axfoldvalues=[1./10, 1./5, 6./10,1.,1.4,1.8,2.2,2.6] #np.arange(0.1, 2.6, 0.1).tolist()
+
+    number_of_runs = len(r_length)
+    nb_steps = len(r_length)*len(k0values)*len(axfoldvalues)
+    print 'Simulation runs: ', nb_steps
+    print '#############################'
+    
+    init()
+
+    for i in range(number_of_runs):
+        length = r_length[i]
+        for k0 in k0values:
+            for axfold in axfoldvalues:
+                #axfold = r_axfold[i]
+                radfold = r_radfold[i]
+                delta = r_delta[i]
+                nude_length = r_nude[i]
+                seed = int(r_seed[i])
+                print "length, seed ", length, seed
+                g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed = my_run(primary_length=length,
+                                                                        k0=k0,
+                                                                        axfold=axfold,
+                                                                        radfold=radfold,
+                                                                        delta=delta,
+                                                                        nude_length=nude_length,
+                                                                        seed=seed)
+
+
+                add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv, i1, i2,
+                i3,i4,i6,i8, seed)
+        #plot(g)
+        #raw_input("Press Enter to continue...")
+
+    save('reproducekvariable_bench_%s'%TYPE)
 
 # 2. Save them for analysis
 # 3. Compute k0 such that, Jv(k0/10) = 1/3 Jv(k0)
@@ -395,3 +443,4 @@ def reproduce(fn='171002_input_seeds_individuals.txt'):
 
 #main()
 #reproduce()
+reproducekvariable()
