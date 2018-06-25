@@ -20,8 +20,8 @@ from openalea.deploy.shared_data import shared_data
 from openalea.plantgl.all import Viewer
 
 import hydroroot
-from hydroroot import display
-from hydroroot.law import histo_relative_law
+from hydroroot import display, length
+from hydroroot.law import histo_relative_law, reference_relative_law
 from hydroroot import radius, markov, flux, conductance, measured_root
 from hydroroot.main import hydroroot_flow
 from hydroroot.analysis import intercept
@@ -63,7 +63,29 @@ def length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4, uniform=True):
     # size of the windows: 5%
     size = 5.*scale_x
     #pylab.clf()
-    _length_law = histo_relative_law(x, y, size=size, scale_x=scale_x, scale_y=1.e-3*scale_y, scale=scale, plot=False, uniform=uniform)
+    _length_law = histo_relative_law(x, y,
+                                     size=size,
+                                     scale_x=scale_x,
+                                     scale_y=1.e-3*scale_y,
+                                     scale=scale,
+                                     plot=False,
+                                     uniform=uniform)
+    return _length_law
+
+def ref_length_law(pd, scale_x=1/100., scale_y=1., scale=1e-4, uniform=True):
+    """
+    scale
+    """
+    x = pd.relative_distance_to_tip.tolist()
+    y = pd.LR_length_mm.tolist()
+
+    # size of the windows: 5%
+    size = 5.*scale_x
+    #pylab.clf()
+    _length_law = reference_relative_law(x, y,
+                                     size=size,
+                                     scale_x=scale_x,
+                                     scale_y=1.e-3*scale_y)
     return _length_law
 
 ###############################################################################
@@ -167,7 +189,7 @@ def my_run(primary_length, k0=k0,
     length_max_secondary = length_data[0].LR_length_mm.max()*1e-3 # in m
 
     # Just use the same order1 law
-    law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length)
+    law_order1 = length_law(length_data[0], scale_x=primary_length/100., scale=segment_length, uniform='expo')
     if EXPOVARIATE:
         law_order2 = length_law(length_data[1], scale_x=length_max_secondary/100., scale=segment_length, uniform='expo')
     else:
@@ -199,6 +221,13 @@ def my_run(primary_length, k0=k0,
     # TODO : np.arange(3, 11, 1)*1e-2
     i1,i2,i3,i4,i6,i8 = intercept(g, [0.01, 0.02, 0.03, 0.045, 0.06, 0.08])
 
+    # compute difference of length laws
+    X, Y = flux.ramification_length_law(g,root=1, dl=segment_length)
+    length_law_mtg = length.fit_law(X, Y, ext=2)
+    ref_law = ref_length_law(length_data[0], scale_x=1./100.)
+
+    integral_diff = length.diff(length_law_mtg, ref_law)
+
     # compute axial & radial
     g, Keq, Jv_global = hydroroot_flow(g,
                                        segment_length=1.e-4,
@@ -208,7 +237,7 @@ def my_run(primary_length, k0=k0,
                                        psi_base=psi_base,
                                        axial_conductivity_data=axial(axfold),
                                        radial_conductivity_data=radial(k0, radfold))
-    return g, axfold, radfold, _length, surface, Jv_global, i1,i2,i3,i4,i6,i8, _seed
+    return g, axfold, radfold, _length, surface, Jv_global, i1,i2,i3,i4,i6,i8, _seed, integral_diff
 
 
 # for i in range(3):
@@ -246,9 +275,10 @@ def init():
     results['delta'] = []
     results['nude_length'] = []
     results['seed'] = []
+    results['diff_length_law'] = []
 
 
-def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, surface, Jv, i1,i2,i3, i4, i6, i8, seed):
+def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, surface, Jv, i1,i2,i3, i4, i6, i8, seed, diff_law):
     global results
     results['index'].append(index)
     results['primary_length'].append(primary_length)
@@ -267,13 +297,14 @@ def add(index, primary_length, k0, axfold, radfold, delta, nude_length, length, 
     results['i6'].append(i6)
     results['i8'].append(i8)
     results['seed'].append(seed)
+    results['diff_length_law'].append(diff_law)
 
 
 def save(name='bench_%s'%TYPE, xls=False):
     now = datetime.datetime.now()
     date = now.strftime("%Y_%m_%d_%H-%M")
     df = pandas.DataFrame(results, columns=['index', 'primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'length', 'surface',
-                                            'Jv', 'i1','i2','i3', 'i4','i6','i8', 'seed'])
+                                            'Jv', 'i1','i2','i3', 'i4','i6','i8', 'seed','diff_length_law'])
     if not xls:
         name = name+'_%s.csv'%date
         df.to_csv(name, index=False)
@@ -320,18 +351,19 @@ def main():
 
                             # convert to meters
                             plength = length/100.
-                            g, axfold, radfold, _length, surface, Jv, i1, i2, i3,i4,i6,i8, seed = my_run(primary_length=plength,
+                            g, axfold, radfold, _length, surface, Jv, i1, i2, i3,i4,i6,i8, seed,diff_law = my_run(primary_length=plength,
                                 k0=k0, axfold=axfold, radfold=radfold, delta=delta, nude_length=nude_length)
 
                             add(count, plength, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
-                                i1,i2,i3,i4,i6,i8, seed)
+                                i1,i2,i3,i4,i6,i8, seed, diff_law)
                             print 'Simu, ', count
+                            print "DIFF LAW: ", diff_law
 
     save(xls=False)
 
 
 def reproduce(fn='181204testreproduce.txt'):
-    rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed')
+    rep_names = ('primary_length', 'k0', 'axfold', 'radfold', 'delta', 'nude_length', 'seed', 'diff_length_law')
     filename = fn
     rep_pd = pandas.read_csv(filename, sep=';', header=0,
                              names=rep_names)
@@ -357,7 +389,7 @@ def reproduce(fn='181204testreproduce.txt'):
         nude_length = r_nude[i]
         seed = int(r_seed[i])
         print "length, seed ", length, seed
-        g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed = my_run(primary_length=length,
+        g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed, diff_law = my_run(primary_length=length,
                                                                     k0=k0,
                                                                     axfold=axfold,
                                                                     radfold=radfold,
@@ -367,7 +399,7 @@ def reproduce(fn='181204testreproduce.txt'):
 
 
         add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv, i1, i2,
-            i3,i4,i6,i8, seed)
+            i3,i4,i6,i8, seed, diff_law)
         #plot(g)
         #raw_input("Press Enter to continue...")
 
@@ -387,14 +419,14 @@ def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
     r_delta = rep_pd.delta.tolist()
     r_nude = rep_pd.nude_length.tolist()
     r_seed = rep_pd.seed.tolist()
-    k0values= [10.,50.,90.,130.,170.,210.,250.,290.] #np.arange(10, 301, 20 ).tolist() 
+    k0values= [10.,50.,90.,130.,170.,210.,250.,290.] #np.arange(10, 301, 20 ).tolist()
     axfoldvalues=[1./10, 1./5, 6./10,1.,1.4,1.8,2.2,2.6] #np.arange(0.1, 2.6, 0.1).tolist()
 
     number_of_runs = len(r_length)
     nb_steps = len(r_length)*len(k0values)*len(axfoldvalues)
     print 'Simulation runs: ', nb_steps
     print '#############################'
-    
+
     init()
 
     for i in range(number_of_runs):
@@ -407,7 +439,7 @@ def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
                 nude_length = r_nude[i]
                 seed = int(r_seed[i])
                 print "length, seed ", length, seed
-                g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed = my_run(primary_length=length,
+                g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed, diff_law = my_run(primary_length=length,
                                                                         k0=k0,
                                                                         axfold=axfold,
                                                                         radfold=radfold,
@@ -417,7 +449,7 @@ def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
 
 
                 add(i, length, k0, axfold, radfold, delta, nude_length, _length, surface, Jv, i1, i2,
-                i3,i4,i6,i8, seed)
+                i3,i4,i6,i8, seed, diff_law)
         #plot(g)
         #raw_input("Press Enter to continue...")
 
@@ -441,6 +473,6 @@ def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
 #         print 'Simu, ', count
 #         count += 1
 
-#main()
+main()
 #reproduce()
-reproducekvariable()
+#reproducekvariable()

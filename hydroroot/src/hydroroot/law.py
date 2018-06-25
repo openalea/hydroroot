@@ -164,4 +164,24 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
 
     return return_law
 
+def reference_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3):
+    """ Return a length law from [0,1] to absolute length.
+
+    Algorithm:
+      - First, discretize the X values in different intervals of size `size`.
+      - Compute the histogram from the set of points include in each interval.
+      - Return a function that compute a value in a given histogram
+    """
+
+    x = np.array(x) * scale_x
+    y = np.array(y) * scale_y
+    x = x.tolist()
+    y = y.tolist()
+
+    X, values = discretize(x, y, size)
+
+    means = [np.mean(ys) for ys in values]
+
+    return length.fit_law(X, means, ext=2)
+
 

@@ -22,7 +22,7 @@ Flux computation.
 
 
 from openalea.mtg import traversal
-
+import numpy as np
 
 class Flux(object):   # edit this to also allow for flux computation instead just redistribution
     """Compute the water potential and fluxes at each vertex of the MTG.
@@ -474,3 +474,39 @@ def cut(g, cut_length):
 
     return g_cut
 
+
+def ramification_length_law(g, root=1, dl=1e-4):
+    """Returns the length of the ramified axes along the main axis.
+
+    X is the distance to tip along the main axis
+    Y is the length of the ramification
+    """
+    length = {}
+
+    if 'back_length' in g.property_names():
+        length = g.property('back_length')
+    else:
+        for v in traversal.post_order2(g, root):
+            sids = g.Sons(v, EdgeType='<')
+            length[v] = length[sids[0]] + dl if sids else dl
+        g.properties()['back_length'] = length
+
+
+    axis1 = g.Axis(root)
+
+    ramif_length = []
+    total_length = length[root]
+    for v in axis1[:-1]:
+        if g.nb_children(v) > 1:
+            ramification_ids = g.Sons(v, EdgeType='+')
+            for rid in ramification_ids:
+                ramif_length.append((length[v], length[rid]))
+    ramif_length = list(reversed(ramif_length))
+
+    X, Y = zip(*ramif_length)
+    X = np.array(X)
+
+    X /= total_length
+    Y = np.array(Y)
+
+    return X, Y

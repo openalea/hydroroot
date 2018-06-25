@@ -1,6 +1,6 @@
 # Tests of the simulated architecture
 
-from hydroroot import markov, radius, length
+from hydroroot import markov, radius, length, flux
 
 length_data = [0., 0.03, 0.05, 0.16], [0., 0., 0.01, 0.13]
 
@@ -60,3 +60,24 @@ def test_markov_with_length_law(n=600, beta=0.298):
     order = {0: 600, 1: 1188}
     check_mtg(g, order)
     return g
+
+
+#def test_extract length_law(n=600, beta=0.298):
+def length_law():
+    from hydroroot import markov, radius, length, flux
+
+    length_data = [0., 0.03, 0.05, 0.16], [0., 0., 0.01, 0.13]
+    n=1600; beta=0.298
+    segment_length = 1e-4
+    # test_law
+    segment_length = segment_length
+    xl, yl = length_data
+    law = length.fit_law(xl, yl, scale=segment_length)
+
+    g = markov.markov_binary_tree(nb_vertices=n, branching_variability=beta,
+                                  length_law=law)
+
+    X, Y = flux.ramification_length_law(g,root=1, dl=segment_length)
+    length_law = length.fit_law(X, Y, ext=2)
+
+    return length_law, X, Y
