@@ -1,55 +1,73 @@
-====== VPlants.HydroRoot ======
+OpenAlea.HydroRoot 
+==================
 
-**Authors** : XXX
+Software
+~~~~~~~~~~~~
 
-**Institutes** : INRIA / CIRAD 
+Authors
+-------
+  * Christophe Pradal
+  * Yann Boursiac
+  * Mikael Lucas
+  * Fabrice Bauget
+  * Christophe Godin
+  * Christophe Maurel
 
-**Status** : Python package 
+Institutes  
+----------
+CIRAD / INRA / inria
 
-**License** : Cecill-C
+Status
+------
+Python package 
 
-**URL** : http://openalea.gforge.inria.fr
+License
+-------
+CecILL-C
 
-===== About =====
+**URL** : http://openalea.rtfd.io
 
-=== Description ===
+About
+~~~~~~
 
-VPlants.HydroRoot is a XXX
+Description
+-----------
 
-
-
-=== Content ===
-
-The VPlants.HydroRoot package contains :
+OpenAlea.HydroRoot is a XXX
 
 
-===== Installation =====
+Content
+-------
 
-=== Download ===
+The OpenAlea.HydroRoot package contains a root architecture simulation model coupled with an hydraulic solver. 
 
-Go to http://gforge.inria.fr/frs/?group_id=79
+
+Installation
+------------
+
+Conda Installation
+++++++++++++++++++
+
+::
+    conda create -n hydroroot -c conda-forge -c openalea openalea.hydroroot
+
 
 === Requirements ===
 
-* Scons >= 0.96.93
-* SconsX
-* OpenAlea.Deploy
-* Boost.Python
+    * openalea.mtg
+    * openalea.plantgl
+    * openalea.visualea
+    * pandas
+    * numpy
 
 
-=== Installation ===
+Usage
++++++
+
+.. bash::
+    hydroroot -i param.yml 
 
 
-=== Utilisation ===
-
-
-<code>
-python setup.py install
-</code>
-
-
-
-===== Documentation =====
-
-http://openalea.gforge.inria.fr/doc/vplants/hydroroot/doc/_build/html/contents.html
-
+Documentation
+~~~~~~~~~~~~~
+https://hydroroot.rtfd.io
