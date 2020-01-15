@@ -79,7 +79,9 @@ def hydroroot_flow(
     radial_conductivity_data=None,
 ):
     xa, ya = axial_conductivity_data
-    ya = list(np.array(ya) * (segment_length / 1.e-4))
+    # commented line below, BUG correction, the global flux was diverging when decreasing segment_length
+    # ya was not supposed to be multiplied by (segment_length / 1.e-4)
+    # ya = list(np.array(ya) * (segment_length / 1.e-4))
     axial_conductivity_law = fit_law(xa, ya)
 
     xr, yr = radial_conductivity_data
@@ -153,7 +155,9 @@ def hydroroot(
                                        n=n,
                                        )
     xa, ya = axial_conductivity_data
-    ya = list(np.array(ya) * (segment_length / 1.e-4))
+    # commented line below, BUG correction, the global flux was diverging when decreasing segment_length
+    # ya was not supposed to be multiplied by (segment_length / 1.e-4)
+    # ya = list(np.array(ya) * (segment_length / 1.e-4))
     axial_conductivity_law = fit_law(xa, ya)
 
     xr, yr = radial_conductivity_data
@@ -219,7 +223,9 @@ def hydroroot_from_data(
     length_law = fit_law(xl, yl, scale=segment_length)
 
     xa, ya = axial_conductivity_data
-    ya = list(np.array(ya) * (segment_length / 1.e-4))
+    # commented line below, BUG correction, the global flux was diverging when decreasing segment_length
+    # ya was not supposed to be multiplied by (segment_length / 1.e-4)
+    # ya = list(np.array(ya) * (segment_length / 1.e-4))
     axial_conductivity_law = fit_law(xa, ya)
 
     xr, yr = radial_conductivity_data
