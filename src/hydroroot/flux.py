@@ -22,6 +22,7 @@ Flux computation.
 
 
 from openalea.mtg import traversal
+from openalea.mtg.traversal import *
 import numpy as np
 
 class Flux(object):   # edit this to also allow for flux computation instead just redistribution
@@ -93,9 +94,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         g.add_property('J_out')
 
         # Convert axial conductivities to axial conductances
-        for vid in K:
-            K[vid] /= length[vid]
-            K[vid] *= CONSTANT
+        # Fabrice 2020-01-17: commented lines below because a MTG property must not changed see conductance.compute_K
+        #                   and here K is a shadow copy of g.property('K') then g.property('K') is modified below
+        # for vid in K:
+        #     K[vid] /= length[vid]
+        #     K[vid] *= CONSTANT
 
         # Apply scaling k and K values
         #for vid in k:
@@ -177,12 +180,18 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             print 'entering Jv computation'
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
+            # modif Fabrice 2020-01-17: if CUT_AND_FLOW then the input conductance at the tip is the axial one
+                kin = K[v] if self.CUT_AND_FLOW and len(g.children(v)) == 0 else k[v]
                 if not self.HAS_SOIL:
-                    j[v] = (psi_e - psi_in[v]) * k[v]
+                    # j[v] = (psi_e - psi_in[v]) * k[v]
+                    j[v] = (psi_e - psi_in[v]) * kin
                 else:
-                    j[v] = (psi_e[v] - psi_in[v]) * k[v]
+                    # j[v] = (psi_e[v] - psi_in[v]) * k[v]
+                    j[v] = (psi_e[v] - psi_in[v]) * kin
+            # End modif Fabrice 2020-01-17
                 children = g.children_iter(v)
-                if children is None:
+                # if children is None: #Fabrice 2020-01-17: wrong syntax never None even if there are no children use len instead
+                if len(g.children(v)) == 0:
                     J_out[v] = j[v]
                 else:  # TODO CHECK THIS !!!
                     influx = j[v] + sum( J_out[cid] for cid in children )
@@ -269,9 +278,11 @@ class RadialShuntFlux(Flux):
         g.add_property('beta')
 
         # Convert axial conductivities to axial conductances
-        for vid in K:
-            K[vid] /= length[vid]
-            K[vid] *= CONSTANT
+        # Fabrice 2020-01-17: commented lines below because a MTG property must not changed see conductance.compute_K
+        #                   and here K is a shadow copy of g.property('K') then g.property('K') is modified below
+        # for vid in K:
+        #     K[vid] /= length[vid]
+        #     K[vid] *= CONSTANT
 
         # Equivalent conductance computation
         Keq = g.property('Keq')
@@ -452,25 +463,32 @@ def segments_at_length(g, l, root=1, dl=1e-4):
     return vids
 
 
-def cut(g, cut_length):
-    """Cut the architeture at a given length `cut_length`.
+def cut(g, cut_length, segment_length):
+    # Added Fabrice 2020-01-17: segment_length in parameters list
+    """Cut the architecture at a given length `cut_length`.
 
         :Parameters:
             - `g` (MTG) - the root architecture
             - `cut_length` (float, m) - length at which the architecture is cut from collar.
+            - 'segment_length' (float, mm) - length of the vertices
 
         :Returns:
             - `g`(MTG) - the architecture after the cut process. This is a copy.
 
         :Example::
 
-            g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architectire of 11 cm (primary length).
+            g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).
     """
-    vids = segments_at_length(g, cut_length)
+    # vids = segments_at_length(g, cut_length)
+    vids = segments_at_length(g, cut_length, dl = segment_length)
 
     g_cut = g.copy()
     for v in vids:
-        g_cut.remove_tree(v)
+        # g_cut.remove_tree(v)
+        # the for loop below is a copy of openalea.mtg.Tree.remove_tree but use post_order2 instead of post_order
+        #    to avoid "RuntimeError: maximum recursion depth exceeded"
+        for vtx_id in list(post_order2(g, v)):
+            g_cut.remove_vertex(vtx_id)
 
     return g_cut
 

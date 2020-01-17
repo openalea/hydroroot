@@ -126,7 +126,7 @@ def test_cut():
                                                radial_conductivity_data=radial,
                                                seed=2)
 
-    g_cut = flux.cut(g, 0.04)
+    g_cut = flux.cut(g, 0.04, segment_length=1e-4) # g_cut = flux.cut(g, 0.04)
     check_length(g_cut, 0.04, segment_length=1e-4)
 
 def test_cut_and_flow():
@@ -138,7 +138,7 @@ def test_cut_and_flow():
                                                radial_conductivity_data=radial,
                                                seed=2)
 
-    g_cut = flux.cut(g, 0.04)
+    g_cut = flux.cut(g, 0.04, segment_length=1e-4) #g_cut = flux.cut(g, 0.04)
     check_length(g_cut, 0.04, segment_length=1e-4)
 
     g_cut = flux.flux(g_cut, cut_and_flow=True, invert_model=True)
