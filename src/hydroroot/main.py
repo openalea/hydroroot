@@ -88,7 +88,7 @@ def hydroroot_flow(
     radial_conductivity_law = fit_law(xr, yr)
 
     # Compute K using axial conductance data
-    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K')
+    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
     g = conductance.compute_K(g) # Fabrice 2020-01-17: calculation of K in dimension [L^3 P^(-1) T^(-1)]
     # Compute the flux
 
@@ -164,7 +164,7 @@ def hydroroot(
     radial_conductivity_law = fit_law(xr, yr)
 
     # Compute K using axial conductance data
-    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K')
+    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
     g = conductance.compute_K(g)  # Fabrice 2020-01-17: calculation of K in dimension [L^3 P^(-1) T^(-1)]
     # Compute the flux
 
@@ -256,7 +256,7 @@ def hydroroot_from_data(
     g = radius.compute_relative_position(g)
 
     # Compute K using axial conductance data
-    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K')
+    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
     g = conductance.compute_K(g)  # Fabrice 2020-01-17: calculation of K in dimension [L^3 P^(-1) T^(-1)]
 
     g, surface = radius.compute_surface(g)

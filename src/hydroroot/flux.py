@@ -181,7 +181,8 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
             # modif Fabrice 2020-01-17: if CUT_AND_FLOW then the input conductance at the tip is the axial one
-                kin = K[v] if self.CUT_AND_FLOW and len(g.children(v)) == 0 else k[v]
+            #     kin = K[v] if self.CUT_AND_FLOW and len(g.children(v)) == 0 else k[v]
+                kin = K[v] if self.CUT_AND_FLOW and g.nb_children(v) == 0 else k[v]
                 if not self.HAS_SOIL:
                     # j[v] = (psi_e - psi_in[v]) * k[v]
                     j[v] = (psi_e - psi_in[v]) * kin
@@ -463,7 +464,7 @@ def segments_at_length(g, l, root=1, dl=1e-4):
     return vids
 
 
-def cut(g, cut_length, segment_length):
+def cut(g, cut_length, threshold=EPS):
     # Added Fabrice 2020-01-17: segment_length in parameters list
     """Cut the architecture at a given length `cut_length`.
 
@@ -480,14 +481,14 @@ def cut(g, cut_length, segment_length):
             g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).
     """
     # vids = segments_at_length(g, cut_length)
-    vids = segments_at_length(g, cut_length, dl = segment_length)
+    vids = segments_at_length(g, cut_length, dl = threshold)
 
     g_cut = g.copy()
     for v in vids:
         # g_cut.remove_tree(v)
         # the for loop below is a copy of openalea.mtg.Tree.remove_tree but use post_order2 instead of post_order
         #    to avoid "RuntimeError: maximum recursion depth exceeded"
-        for vtx_id in list(post_order2(g, v)):
+        for vtx_id in post_order2(g, v):
             g_cut.remove_vertex(vtx_id)
 
     return g_cut

@@ -35,7 +35,7 @@ def compute_K_from_laws(g):
 
     return g
 
-def compute_K(g, CONSTANT=1.):
+def compute_K(g, scale_factor=1.):
     # Fabrice 2020-01-17: this calculation was done hydroroot.flux.run but that meant that the MTG was changed at each
     #                       flux calculation which is not relevant the MTG properties have to be fixed
     """
@@ -49,10 +49,12 @@ def compute_K(g, CONSTANT=1.):
     In each vertex K = K_exp * CONSTANT / vertex_length
     """
     length = g.property('length')
-    K =g.property('K')
+    K_exp = g.property('K_exp')
+    K = {}
     for vid in K:
-        K[vid] /= length[vid]
-        K[vid] *= CONSTANT
+        K[vid] = K_exp[vid] / length[vid]
+        K[vid] = K_exp[vid] * scale_factor
+    g.properties()['K'] = K
     return g
 
 
