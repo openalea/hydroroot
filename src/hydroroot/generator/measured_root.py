@@ -221,3 +221,125 @@ def mtg_builder(
     return g
 
 
+def mtg_from_aqua_data(df, segment_length=1e-4):
+    """ Added F. Bauget 2019-12-19
+        reconstruct MTG from file in format used by aquaporin team
+        maximum order is 2
+
+        Author: C. Pradal
+        Modified: F. Bauget
+
+
+        Parameters
+        ==========
+            - df: pandas dataframe, 3 columns ['db','lr','order'], db and lr are length in m
+            - segment_length: length of the vertices, default 1.e-4 in m
+
+        Returns
+        =======
+            - g: MTG with the following properties set: edge_type, label, base_length, length
+
+         the format is: 3 columns separated by tab
+         * 1st col: "db" distance in m from base on the parent root where starts the lateral root
+         * 2nd col: "lr" length in m of the corresponding lateral root
+         * 3d col: "order" = 1 if parent root is the primary root, = 1-n if the parent root is a lateral root that starts at the node n on the parent root
+
+    """
+
+    g = MTG()
+    rid = vid = g.add_component(g.root)
+
+    rnid = g.node(rid)
+    rnid.base_length = 0.
+    rnid.length = segment_length
+    rnid.label = 'S'
+    rnid.order = 0
+
+    # Primary root
+    prev_len = 0.
+    ramifs = {}  # variable (nb racine (1 first), index entry) [(index vertice node, lenght lat )]
+
+    df_order = df[df.order == '1']  # array with 1st root
+    length_base = df_order.index
+
+    #    path = [1]
+    count = 0
+    for i in length_base:
+        len_base = df_order.iloc[i].db
+        code = '1'
+        while len_base - prev_len > 0:
+            # we add segment of segment_length till the next vertice => no lateral root yet so the edge_type is '<'
+            prev_len += segment_length
+            vid = g.add_child(vid, edge_type = '<', label = 'S', base_length = prev_len, length = segment_length,
+                              order = 0, code = code)
+        # Modification Decamber 2019by Fabrice: problem was that two following vertice may have the same base_length causing wrong g.property('position') recalculation in the conductance calculation
+        # did not pass test_reconstruct_from_aqua_data in test_archi_data.py
+        # vid = g.add_child(vid, edge_type='<', label='S', base_length=len_base, length=segment_length, order=0)
+        # prev_len = len_base # the last added vertice may be > than the first node so we change len_base which is to big
+        len_lateral = df_order.iloc[i].lr
+        if len_lateral > 0.:
+            count += 1
+            p = tuple([1, count])  # 1: PR, count: countieme RL
+            ramifs.setdefault(p, []).append((vid, len_lateral))  # randomly added, to sort it sorted(ramifs)
+
+    ramifs = add_branching(g, df, ramifs = ramifs, Order = 1, segment_length = segment_length)
+
+    ramifs = add_branching(g, df, ramifs = ramifs, Order = 3, segment_length = segment_length)
+    return g
+
+def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
+    """ F. Bauget 2019-12-19
+    add branching of a given order on the previous order
+    linked to mtg_from_aqua_data
+    Parameters:
+        - g: MTG
+        - df: pandas dataframe, 3 columns ['db','lr','order'], db and lr are length in m
+        - ramifs: dict with a list (Order, nth lateral root), and a dict [vid, lr] vid is the vertice index on the parent root from which the lateral of length lr starts
+        - Order: int the order of the new branching
+        - segment_length: float length in m of the vertices
+
+    Return:
+        - new_ramifs: dict to used as the ramifs parameter for a new call of add_branching
+    """
+    new_ramifs = {}
+    len_base = 0
+    count = 0  # useless ?
+    for path in ramifs:
+        vid, lr = ramifs[path][
+            0]  # vid is the vertice index on the parent root from which the lateral of length lr starts
+        order = '-'.join(map(str, path))
+        df_order = df[df.order == order]
+        length_base = df_order.index
+        code = order
+
+        len_base = lr
+
+        prev_len = 0.
+        _root_id = vid
+        parent_base = g.node(vid).base_length
+
+        if df_order.empty:
+            while len_base - prev_len > 0:
+                prev_len += segment_length
+                edge_type = '+' if _root_id == vid else '<'
+                vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
+                                  length = segment_length, order = Order, code = code)
+        else:
+            for i in length_base:
+                len_base = df_order.db[i]
+                edge_type = '+' if _root_id == vid else '<'
+                while len_base - prev_len > 0:
+                    prev_len += segment_length
+                    vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
+                                      length = segment_length, order = Order, code = code)
+                    edge_type = '<'
+                #Modification December 2019 by Fabrice: problem was that two following vertice may have the same base_length causing wrong g.property('position') recalculation in the conductance calculation
+                # did not pass test_reconstruct_from_aqua_data in test_archi_data.py
+                # vid = g.add_child(vid, edge_type='<', label='S', base_length=parent_base+len_base+segment_length, length=segment_length, order=1, code=code)
+                # prev_len = len_base
+                len_lateral = df_order.lr[i]
+                if len_lateral > 0.:
+                    count += 1
+                    p = tuple([Order + 1, count])
+                    new_ramifs.setdefault(p, []).append((vid, len_lateral))
+    return new_ramifs
