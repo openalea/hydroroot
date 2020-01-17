@@ -35,8 +35,27 @@ def compute_K_from_laws(g):
 
     return g
 
+def compute_K(g, scale_factor=1.):
+    # Fabrice 2020-01-17: this calculation was done hydroroot.flux.run but that meant that the MTG was changed at each
+    #                       flux calculation which is not relevant the MTG properties have to be fixed
+    """
+    Compute the conductance in dimension [L^3 P^(-1) T^(-1)] from the experimental one which is in [L^4 P^(-1) T^(-1)]
 
+    :parameters:
+        - 'g' (MTG) - the root architecture
+        - CONSTANT (float) - a factor used for sensitivity analysis
+    :return: g
 
+    In each vertex K = K_exp * CONSTANT / vertex_length
+    """
+    length = g.property('length')
+    K_exp = g.property('K_exp')
+    K = {}
+    for vid in K_exp:
+        K[vid] = K_exp[vid] / length[vid]
+        K[vid] = K[vid] * scale_factor
+    g.properties()['K'] = K
+    return g
 
 
 
@@ -93,7 +112,10 @@ def compute_k(g, k0 = 300.):
     return g
 
 
-def compute_K(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATED
+def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATED
+    # Fabrice 2020-01-17: changed the function name from "compute_K" to "compute_K_from_Poiseuille" because this name
+    #                     is now used to calculate the real conductance in [L^3 P^(-1) T^(-1)] from the experimental one
+    #                     in [L^4 P^(-1) T^(-1)]
     """ Compute the axial conductances (K) in a MTG according to Poiseuille law.
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
