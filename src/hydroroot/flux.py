@@ -464,7 +464,7 @@ def segments_at_length(g, l, root=1, dl=1e-4):
     return vids
 
 
-def cut(g, cut_length, threshold=EPS):
+def cut(g, cut_length, threshold=1e-4):
     # Added Fabrice 2020-01-17: segment_length in parameters list
     """Cut the architecture at a given length `cut_length`.
 

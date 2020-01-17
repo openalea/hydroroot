@@ -51,9 +51,9 @@ def compute_K(g, scale_factor=1.):
     length = g.property('length')
     K_exp = g.property('K_exp')
     K = {}
-    for vid in K:
+    for vid in K_exp:
         K[vid] = K_exp[vid] / length[vid]
-        K[vid] = K_exp[vid] * scale_factor
+        K[vid] = K[vid] * scale_factor
     g.properties()['K'] = K
     return g
 
