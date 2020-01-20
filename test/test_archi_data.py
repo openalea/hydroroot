@@ -10,7 +10,7 @@ from hydroroot.main import hydroroot_from_data
 from hydroroot.generator.measured_root import mtg_builder
 from hydroroot.length import fit_law
 from hydroroot import radius, markov, flux, conductance
-from generator.measured_root import mtg_from_aqua_data # Added F. Bauget 2019-12-16
+from hydroroot.generator.measured_root import mtg_from_aqua_data # Added F. Bauget 2019-12-16
 
 from openalea.mtg.traversal import pre_order2
 
