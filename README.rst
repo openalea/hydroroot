@@ -57,7 +57,7 @@ Conda Installation
     * openalea.mtg
     * openalea.plantgl
     * openalea.visualea
-    * pandas
+    * pandas > 0.17
     * numpy
 
 

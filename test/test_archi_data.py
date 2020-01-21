@@ -3,13 +3,9 @@
 """
 from openalea.deploy.shared_data import shared_data
 import pandas
-# import pylab
 
 import hydroroot
 from hydroroot.main import hydroroot_from_data
-# from hydroroot.generator.measured_root import mtg_builder
-# from hydroroot.length import fit_law
-# from hydroroot import radius, markov, flux, conductance
 from hydroroot.generator.measured_root import mtg_from_aqua_data # Added F. Bauget 2019-12-16
 
 from openalea.mtg.traversal import pre_order2
@@ -57,10 +53,8 @@ def test_archi_data(plant_id=8):
 
         pd['cumsum'] = pd.LR_length.cumsum()
         # Fabrice 2019-12-19 : AttributeError: 'DataFrame' object has no attribute 'sort'
-        if pandas.__version__ >= '0.17':
-            pd.sort_values('absolute_position', inplace = True)
-        else:
-            pd.sort('absolute_position', inplace = True)  # deprecated -> pd.sort_values
+        # pd.sort('absolute_position', inplace=True) # deprecated -> pd.sort_values
+        pd.sort_values('absolute_position', inplace=True)
         #pd.plot(x='distance_to_tip', y=['cumsum'],xticks=range(0,135,10))#, 'cum'],xticks=range(0,101,10))
 
         return pd
