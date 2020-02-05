@@ -5,7 +5,7 @@ date: 2019-12-20
 Functions related to io process in hydroroot
 """
 
-from openalea.mtg.aml import *
+from openalea.mtg.algo import *
 from openalea.mtg.traversal import *
 import pandas as pd
 
@@ -26,7 +26,6 @@ def export_mtg_to_aqua_file(g, filename = "out.csv"):
     simulated architecture
     At this stage (2019-12-20) only up to the 2d order
     """
-    Activate(g)
 
     results = {'distance_from_base_(mm)': [], 'lateral_root_length_(mm)': [], 'order': []}
 
@@ -37,7 +36,7 @@ def export_mtg_to_aqua_file(g, filename = "out.csv"):
         parent = g.parent(v)
         if g.edge_type(v) == '+' and g.order(v) == 1:
             # position is the length from tip so the total racine length is the 1st position on the racine
-            racine_length = g.property('position')[min(Axis(parent))] * 1e3  # unit change: m to mm
+            racine_length = g.property('position')[min(axis(g, parent))] * 1e3  # unit change: m to mm
             results['distance_from_base_(mm)'].append(racine_length - g.property('position')[parent] * 1e3)
 
             LR_length = g.property('position')[v] * 1e3
@@ -58,7 +57,7 @@ def export_mtg_to_aqua_file(g, filename = "out.csv"):
             for v2 in pre_order2(g, v):
                 parent2 = g.parent(v2)
                 if g.edge_type(v2) == '+' and parent <> parent2:
-                    racine_length = g.property('position')[min(Axis(parent2))] * 1e3
+                    racine_length = g.property('position')[min(axis(g, parent2))] * 1e3
                     results['distance_from_base_(mm)'].append(racine_length - g.property('position')[parent2] * 1e3)
 
                     LR_length = g.property('position')[v2] * 1e3
