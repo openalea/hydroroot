@@ -186,12 +186,14 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 lateral_length = random.randint(max(1,lateral_length-var), lateral_length+var)
 
                 # Censure variability
-                if lateral_length > nb_vertices*decrease[current_order]:
-                    if real_lateral_length <= nb_vertices*decrease[current_order]:
-                        lateral_length = real_lateral_length
-                    else:
-                        print("WARNING: lateral length is too large ", lateral_length)
-                        lateral_length = nb_vertices*decrease[current_order]
+                # the lateral lengths are constrained to the length law in def histo_relative_law
+                # the laterals should not be constrained to the primary root length
+                # if lateral_length > nb_vertices*decrease[current_order]:
+                #     if real_lateral_length <= nb_vertices*decrease[current_order]:
+                #         lateral_length = real_lateral_length
+                #     else:
+                #         print("WARNING: lateral length is too large ", lateral_length)
+                #         lateral_length = nb_vertices*decrease[current_order]
 
 
 
