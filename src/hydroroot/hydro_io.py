@@ -5,7 +5,7 @@ date: 2019-12-20
 Functions related to io process in hydroroot
 """
 
-from openalea.mtg.algo import *
+from openalea.mtg.algo import axis
 from openalea.mtg.traversal import *
 import pandas as pd
 
