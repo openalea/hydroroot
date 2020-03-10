@@ -137,7 +137,6 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
     X, values = discretize(x, y, size)
 
     means = [np.mean(ys) for ys in values]
-    median = [np.median(ys) for ys in values]
 
     def return_law(position, scale=scale):
         for i, x_min in enumerate(X):
@@ -156,11 +155,6 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
             # shoud not exceed the law, some randomness around length is done in markov, branching_variability
             if length > max(points):
                 length = max(points)
-        # if uniform == 'expo-median':
-        #     v = median[index]
-        #     length = random.expovariate(1. / v) if v > 0 else 0.
-        #     if length > max(points):
-        #         length = max(points)
         elif not uniform:
             index_value = random.randint(0,n-1)
             length = points[index_value]
