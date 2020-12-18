@@ -152,6 +152,9 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
         if uniform=='expo':
             v = means[index]
             length = random.expovariate(1. / v) if v > 0 else 0.
+            # shoud not exceed the law, some randomness around length is done in markov, branching_variability
+            if length > max(points):
+                length = max(points)
         elif not uniform:
             index_value = random.randint(0,n-1)
             length = points[index_value]

@@ -24,7 +24,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                        branching_variability=0.1, branching_delay=20,
                        length_law=None,
                        nude_tip_length=200, order_max=5,
-                       seed=None,  **kwargs):
+                       seed=None, censure_variability = False,  **kwargs):
     """
     Parameters
     ----------
@@ -37,7 +37,9 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
         - nude_tip_length : length at root tip with no ramification
         - LR_length_law : distribution of LR length along axis length
         - seed : Seed for random number generator (default=None).
+        - censure_variability : allow if True to constrain lateral number of vertices to nb_vertices according to the order
     """
+    # Modified FB 2020-03-10 : added flag in routine argument censure_variability see below
     if g is None:
         g = MTG()
     if vid == 0:
@@ -186,12 +188,16 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 lateral_length = random.randint(max(1,lateral_length-var), lateral_length+var)
 
                 # Censure variability
-                if lateral_length > nb_vertices*decrease[current_order]:
-                    if real_lateral_length <= nb_vertices*decrease[current_order]:
-                        lateral_length = real_lateral_length
-                    else:
-                        print("WARNING: lateral length is too large ", lateral_length)
-                        lateral_length = nb_vertices*decrease[current_order]
+                # Modified FB 2020-03-10 : by default lateral lengths not constrained to nb_vertices*decrease[current_order]
+                #       so it is an "arbitrary" constrain on length
+                # the lateral lengths are constrained to the length law in def histo_relative_law
+                if censure_variability:
+                    if lateral_length > nb_vertices*decrease[current_order]:
+                        if real_lateral_length <= nb_vertices*decrease[current_order]:
+                            lateral_length = real_lateral_length
+                        else:
+                            print("WARNING: lateral length is too large ", lateral_length)
+                            lateral_length = nb_vertices*decrease[current_order]
 
 
 

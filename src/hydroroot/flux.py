@@ -112,13 +112,20 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         #print 'entering Keq computation'
         for v in traversal.post_order2(g, v_base):
             kids = g.children(v)
-            if (not self.CUT_AND_FLOW) or kids:
-                r = 1./(k[v] + sum(Keq[cid] for cid in kids))
-                R = 1./K[v]
-                Keq[v] = 1./(r+R)
-            else:
-                assert self.CUT_AND_FLOW and (len(kids)==0)
-                Keq[v] = K[v]
+            # Added Fabrice 2020-02-21: for cut and flow, the radial conductance is set in cut_and_set_conductance()
+            # then no need to differentiate the case here which is more general in fact.
+            # And the commented lines below were wrong because it did set all tips however depending on the cut length
+            # only one or few of them may be actually cut.
+            # if (not self.CUT_AND_FLOW) or kids:
+            #     r = 1./(k[v] + sum(Keq[cid] for cid in kids))
+            #     R = 1./K[v]
+            #     Keq[v] = 1./(r+R)
+            # else:
+            #     assert self.CUT_AND_FLOW and (len(kids)==0)
+            #     Keq[v] = K[v]
+            r = 1./(k[v] + sum(Keq[cid] for cid in kids))
+            R = 1./K[v]
+            Keq[v] = 1./(r+R)
         #print 'exiting Keq computation'
 
         # Water flux and water potential computation
@@ -177,19 +184,16 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
             #print 'exiting Psi computation'
 
-            print 'entering Jv computation'
+            # print 'entering Jv computation'
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
-            # modif Fabrice 2020-01-17: if CUT_AND_FLOW then the input conductance at the tip is the axial one
-            #     kin = K[v] if self.CUT_AND_FLOW and len(g.children(v)) == 0 else k[v]
-                kin = K[v] if self.CUT_AND_FLOW and g.nb_children(v) == 0 else k[v]
+            # modif Fabrice 2020-02-21: for cut and flow the radial conductance is set in cut_and_set_conductance()
+            # then no need to differentiate the case here which is more general in fact
                 if not self.HAS_SOIL:
-                    # j[v] = (psi_e - psi_in[v]) * k[v]
-                    j[v] = (psi_e - psi_in[v]) * kin
+                    j[v] = (psi_e - psi_in[v]) * k[v]
                 else:
-                    # j[v] = (psi_e[v] - psi_in[v]) * k[v]
-                    j[v] = (psi_e[v] - psi_in[v]) * kin
-            # End modif Fabrice 2020-01-17
+                    j[v] = (psi_e[v] - psi_in[v]) * k[v]
+
                 children = g.children_iter(v)
                 # if children is None: #Fabrice 2020-01-17: wrong syntax never None even if there are no children use len instead
                 if len(g.children(v)) == 0:
@@ -204,8 +208,8 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             else:
                 Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
 
-            print "Local Computation Water Flux Jvl = ", J_out[v_base]
-            print "Global Computation Water Flux Jvg = ", Jv_global
+            # print "Local Computation Water Flux Jvl = ", J_out[v_base]
+            # print "Global Computation Water Flux Jvg = ", Jv_global
 
 
 
@@ -420,6 +424,8 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
             - `shunt` (bool) : use the RadialShunt Flux (True) or the classical one (False)
             - `a` : relative factor to the main radial path conductivity.
             - `b` : relative factor to the shortcut path conductivity.
+            - 'cut_and_flow (bool): deprecated, used before to differentiate the Keq calculation at the tips to simulate
+                        cut and flow experiment.
 
         :Example::
 
@@ -493,6 +499,42 @@ def cut(g, cut_length, threshold=1e-4):
 
     return g_cut
 
+def cut_and_set_conductance(g, cut_length, threshold=1e-4):
+    # Added Fabrice 2020-02-21: based on def cut()
+    """Cut the architecture at a given length `cut_length`, and set to the axial conductance value the radial
+        conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding
+
+        :Parameters:
+            - `g` (MTG) - the root architecture
+            - `cut_length` (float, m) - length at which the architecture is cut from collar.
+            - 'threshold' (float, mm) - length threshold to select the segments to remove in segments_at_length()
+
+        :Returns:
+            - `g`(MTG) - the architecture after the cut process. This is a copy.
+
+        :Example::
+
+            g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).
+                    k = K at the cut tips
+    """
+    # vids = segments_at_length(g, cut_length)
+    vids = segments_at_length(g, cut_length, dl = threshold)
+
+    g_cut = g.copy()
+    for v in vids:
+        # g_cut.remove_tree(v)
+        # the for loop below is a copy of openalea.mtg.Tree.remove_tree but use post_order2 instead of post_order
+        #    to avoid "RuntimeError: maximum recursion depth exceeded"
+        for vtx_id in post_order2(g, v):
+            g_cut.remove_vertex(vtx_id)
+            # added Fabrice 2020-02-21: remove the useless items in g_cut.property
+            for _property in g_cut.properties():
+                if vtx_id in g_cut.property(_property):
+                    del g_cut.property(_property)[vtx_id]
+
+        g_cut.property('k')[g.parent(v)] = g_cut.property('K')[g.parent(v)]
+
+    return g_cut
 
 def ramification_length_law(g, root=1, dl=1e-4):
     """Returns the length of the ramified axes along the main axis.
