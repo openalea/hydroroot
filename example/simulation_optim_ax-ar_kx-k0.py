@@ -138,8 +138,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     k_radial_data = radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
-    g, Keq, Jv = hydroroot_flow(g,
-                                       segment_length = parameter.archi['segment_length'],
+    g, Keq, Jv = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
                                        k0 = k_radial,
                                        Jv = parameter.exp['Jv'],
                                        psi_e = parameter.exp['psi_e'],
@@ -250,7 +249,7 @@ def fun3(x):
 
 if __name__ == '__main__':
 
-    Flag_Optim = False
+    Flag_Optim = True
     dK_constraint = -3.e-2 # dK/dx >= dK_constraint
     _tol = 1.0e-9
     
@@ -440,6 +439,9 @@ if __name__ == '__main__':
         count += 1
         print index, primary_length, k0*0.1, _length, surface, Jv
         
+
+    dresults = pd.DataFrame(results, columns = columns)
+
     if Flag_Optim:
         optim_results  = {}
         optim_results['x'] = copy.deepcopy(parameter.hydro['axial_conductance_data'][0])
@@ -448,8 +450,9 @@ if __name__ == '__main__':
         optim_results['K optimized'] = copy.deepcopy(_x)
 
         doptim = pd.DataFrame(optim_results, columns = ['x', 'K 1st', 'K optimized'])
-    
-    dresults = pd.DataFrame(results, columns = columns)
-    df = pd.concat([dresults, doptim], axis = 1)
+        df = pd.concat([dresults, doptim], axis = 1)
+    else:
+        df = dresults
+
     if output is not None: df.to_csv(output, index = False)
     
