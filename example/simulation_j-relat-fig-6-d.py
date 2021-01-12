@@ -17,33 +17,40 @@
 
 from random import _hexlify, _urandom
 
+import numpy as np
 import pandas as pd
+import glob
+import copy
 import argparse
 
-from openalea.mtg import MTG, traversal
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.colors import Normalize
 
-from hydroroot import radius, markov, flux, length
+from openalea.mtg import traversal
+from openalea.plantgl.all import Viewer
+from openalea.mtg.algo import axis
+
+
+from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law, reference_relative_law
 from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.analysis import intercept
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
-
-
-results = {}
-Jv_global = 1.0
+from hydroroot.display import plot as mtg_scene
 
 ONE_LAW = False
 EXPOVARIATE = True
-
+results = {}
 
 ################################################
 # get the model parameters, the length laws are
 # calculated from the files given in the yaml file
 ###############################################
 
-
 parameter = Parameters()
+# parameter.read_file('../example/parameters.yml')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
@@ -53,6 +60,14 @@ filename = args.inputfile
 output = args.outputfile
 parameter.read_file(filename)
 
+def my_toporder(g, scale):
+    """ Return the list of `g` vertices at scale `scale` in topological order """
+    axes = []
+    map(axes.extend,(traversal.pre_order2(g,vid)
+                          for vid in g.vertices(scale=scale)
+                          if not g.parent(vid)))
+    return axes
+
 # read architecture file
 def read_archi_data(fn):
     df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
@@ -60,11 +75,6 @@ def read_archi_data(fn):
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
 
     return df
-
-#################################################################################
-# MTG construction either from data reconstructed() or generated from parameters
-#   generated()
-#################################################################################
 
 def generate_g(seed = None, length_data = None, branching_variability = 0.25,
                delta = 2e-3, nude_length = 2e-3, primary_length = 0.13, segment_length = 1e-4, order_max = 4):
@@ -117,9 +127,6 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
         seed = seed)
     return g
 
-###############################################################################
-# data
-###############################################################################
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = True):
     """
     scale
@@ -160,7 +167,6 @@ def ref_length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform =
 def radial(v = 92, acol = [], scale = 1):
     xr = acol[0]  # at this stage kr constant so the same x than Ka
     yr = [v * scale] * len(xr)
-
     return xr, yr
 
 def axial(acol = [], scale = 1):
@@ -169,15 +175,9 @@ def axial(acol = [], scale = 1):
 
     return x, y
 
-
-###############################################################################
-# Main simulation function
-###############################################################################
-
 def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(long(_hexlify(_urandom(2500)), 16) % 100000000)
-
 
 def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None):
     """
@@ -218,6 +218,15 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
                        parameter.archi['branching_variability'], delta,
                        nude_length, primary_length, parameter.archi['segment_length'],
                        parameter.archi['order_max'])
+    # F. Bauget 2020-03-18 for debug rsml import
+    # g_c = rsml.rsml2mtg('/home/fabrice/Documents/hydroroot_FB/example/data/arabidopsis-simple.rsml')
+    # g = my_continuous_to_discrete(g_c, segment_length = parameter.archi['segment_length'], resolution = 1e-4)
+    # for rid in g.roots_iter(scale = 3):
+    #     g.property('edge_type')[rid] = '+'
+    # g.properties()['order'] = orders(g, scale = -1)
+    # g = make_dicotomous_topo_mtg(magnitude = 16, segment_length = parameter.archi['segment_length'],link_length = 0.1)
+    # g = make_herringbone_topo_mtg(magnitude = 16, segment_length = parameter.archi['segment_length'],link_length = 0.01)
+    # F. Bauget 2020-03-18
 
     # compute radius property on MTG
     g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
@@ -227,6 +236,8 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
     g = radius.compute_relative_position(g)
 
     # Calculation of the distance from base of each vertex, used for cut and flow
+    # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
+    # parameter dl which should be equal to vertex length but which is not pass
     _mylength = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
@@ -238,19 +249,28 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
-    if parameter.archi['read_architecture']:
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
-        primary_length = g.property('position')[v_base]
-
     # compute difference of length laws
-    if parameter.archi['read_architecture']:
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
-        primary_length = g.property('position')[v_base]
+    # integral_diff = 0.
+    # if not parameter.archi['read_architecture']:
+    #     X, Y = flux.ramification_length_law(g, root = 1, dl = parameter.archi['segment_length'])
+    #     length_law_mtg = length.fit_law(X, Y, ext = 2)
+    #     ref_law = ref_length_law(parameter.archi['length_data'][0], scale_x = 1. / 100.)
+    #
+    #     integral_diff = length.diff(length_law_mtg, ref_law)
+    # else:
+    #     integral_diff = None
+    #     v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+    #     primary_length = g.property('position')[v_base]
 
     # Compute the intercepts
     intercepts = intercept(g, sorted(parameter.output['intercepts']))
+    # ## if intercepts are relative to primary root
+    # new_int = []
+    # for x in parameter.output['intercepts']:
+    #     new_int.append(x * primary_length)
+    # intercepts = intercept(g, sorted(new_int))
 
-    return g, primary_length, _length, surface, intercepts, _seed
+    return g, primary_length, _length, surface, intercepts, _seed #, integral_diff
 
 def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None, cut_and_flow = False):
     if axial_data is None: axial_data = parameter.hydro['axial_conductance_data']
@@ -260,7 +280,8 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     k_radial_data = radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
-    g, Keq, Jv_global = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
+    g, Keq, Jv_global = hydroroot_flow(g,
+                                       segment_length = parameter.archi['segment_length'],
                                        k0 = k_radial,
                                        Jv = parameter.exp['Jv'],
                                        psi_e = parameter.exp['psi_e'],
@@ -271,48 +292,84 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     return g, Keq, Jv_global
 
 if __name__ == '__main__':
-
-    k0 = parameter.hydro['k0']
-    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
-    _seeds = list(dseeds['seed'])
-    _delta = list(dseeds['delta'])
-    _primary_length  = list(dseeds['primary_length'])
-    _nude_length = list(dseeds['nude_length'])
+    j_relat = {}
+    seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
     # predict the number of simulation run
-    nb_steps = len(dseeds)
+    nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold'])
     print 'Simulation runs: ', nb_steps
     print '#############################'
 
+    _columns = []
+    _columns.append('ax')
+    j_relat['ax'] = []
+    for i in seg_at_position:
+        _columns.append(str(i) + ' mm')
+        j_relat[str(i) + ' mm'] = []
+    _columns.append('Jv')
+    j_relat['Jv'] = []
 
-    columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)']
-    for key in columns:
-        results[key] = []
+    seed =parameter.archi['seed'][0]
+    primary_length = parameter.archi['primary_length'][0]
+    delta = parameter.archi['branching_delay'][0]
+    nude_length = parameter.archi['nude_length'][0]
 
+    g, primary_length, _length, surface, intercepts, _seed = root_creation(
+        primary_length = primary_length,
+        seed = seed,
+        delta = delta,
+        nude_length = nude_length)
 
-    for count2 in range(len(dseeds)):
-        seed = int(dseeds.loc[count2, 'seed'])
-        primary_length = dseeds.loc[count2, 'primary_length']
-        delta = dseeds.loc[count2, 'delta']
-        nude_length = dseeds.loc[count2, 'nude_length']
+    vertices_at_length = []
+    v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+    n_max = max(axis(g,v_base))
 
-        g, primary_length, _length, surface, intercepts, _seed = root_creation(primary_length = primary_length, seed = seed,
-            delta = delta, nude_length = nude_length, df = None)
+    for l in seg_at_position:
+        ## only on PR
+        vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
+        vertices_at_length.append([vids])
 
-        # sensibility analyse using multiplying factor on K and k
-        for axfold in parameter.output['axfold']:
-            for radfold in parameter.output['radfold']:
-                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
-                results['Jv (uL/s)'].append(Jv)
-                results['seed'].append(str(seed))
-                results['primary_length (m)'].append(primary_length)
-                results['k (10-8 m/s/MPa)'].append(k0 * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
-                results['_length (m)'].append(_length)
-                results['surface (m2)'].append(surface)
+    j1 = {}
+    for axfold in parameter.output['axfold']:
+        for radfold in parameter.output['radfold']:
+            avg_fold = axfold # the factor on winch the relative j is calculated
+            other_fold = radfold # the other
+            if avg_fold == 1: j1[other_fold] = []
 
+            g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
 
-        print len(dseeds)-count2
+            if avg_fold == 1:
+                g.add_property('j_relat')
+                g_1 = g.copy()
+            else:
+                for v in g:
+                    if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
 
-    dresults = pd.DataFrame(results, columns = columns)
-    if output is not None: dresults.to_csv(output, index = False)
+            c = 0
+            for l in seg_at_position:
+                c += 1
+                jtot = 0.0
+                n = len(vertices_at_length[c-1])
+                for v in vertices_at_length[c-1]:
+                    # remark: when done on the PR there is only 1 vertex
+                    jtot += g.property('J_out')[v]
 
+                if avg_fold == 1:
+                    j1[other_fold].append(jtot)
+                    j_relat[str(l) + ' mm'].append(l*1e-3)
+                else:
+                    j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
+
+            if avg_fold == 1:
+                j1[other_fold].append(Jv)
+                j_relat['Jv'].append(primary_length)
+            else:
+                j_relat['Jv'].append(Jv/j1[other_fold][c])
+
+            j_relat['ax'].append(axfold)
+            nb_steps -= 1
+            print 'nb of runs left: ', nb_steps
+
+    dj2 = pd.DataFrame(j_relat, columns = _columns)
+    dj1 = dj2.transpose()
+    dj1.to_csv("j_relat.csv", index = False, header = False)

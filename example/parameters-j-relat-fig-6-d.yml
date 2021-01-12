@@ -33,7 +33,7 @@ archi:
     #length of the primary root
     #float or list of float
     #unit: m
-    primary_length: 0.16 #range(0.15, 0.2, 0.01) # [0.04, 0.05, 0.06, 0.07, 0.08, 0.09]
+    primary_length: 0.16
 
     #branching delay
     #float or list of float
@@ -105,10 +105,10 @@ output:
 
     #factor to explore a k0 range
     # float or list of float
-    radfold: 1. #range(2, 0.04, -0.05)
+    radfold: 1.  #range(0.125,2.125,0.125) #range(1.5, 0.5, -0.01) #[10., 92., 200.] #range(0.1, 1.1, 0.1) #1.
 
     #like radfold but apply to axial_conductance_data
-    axfold: 1. #range(2, 0.04, -0.25)
+    axfold: range(1, 0.04, -0.05)
 
     #number of run with the same set of parameters i.e. number of different seeds
     #integer
