@@ -85,7 +85,7 @@ experimental:
     #water flux at the root base
     #float
     #unit: microL/s
-    Jv:  0.00723
+    Jv:
 
     #hydric potential outside the roots (pressure chamber)
     #float
@@ -105,10 +105,10 @@ output:
 
     #factor to explore a k0 range
     # float or list of float
-    radfold: 1. #range(2, 0.04, -0.05)
+    radfold: [ 0.05, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
     #like radfold but apply to axial_conductance_data
-    axfold: 1. #range(2, 0.04, -0.25)
+    axfold: [ 0.05, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
     #number of run with the same set of parameters i.e. number of different seeds
     #integer

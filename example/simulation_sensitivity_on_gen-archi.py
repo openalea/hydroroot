@@ -285,7 +285,7 @@ if __name__ == '__main__':
     print '#############################'
 
 
-    columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)']
+    columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'ax', 'length (m)', 'surface (m2)', 'Jv (uL/s)']
     for key in columns:
         results[key] = []
 
@@ -306,9 +306,10 @@ if __name__ == '__main__':
                 results['Jv (uL/s)'].append(Jv)
                 results['seed'].append(str(seed))
                 results['primary_length (m)'].append(primary_length)
-                results['k (10-8 m/s/MPa)'].append(k0 * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
-                results['_length (m)'].append(_length)
+                results['k (10-8 m/s/MPa)'].append(k0 * radfold * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
+                results['length (m)'].append(_length)
                 results['surface (m2)'].append(surface)
+                results['ax'].append(axfold)
 
 
         print len(dseeds)-count2

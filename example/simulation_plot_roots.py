@@ -222,5 +222,10 @@ if __name__ == '__main__':
 
             #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
             # it could also be 'J_out' the axial flux
-            print index
-            plot(g, name = 'plot-' + str(index) + '.png', prop_cmap = 'j')
+            # print index
+            if f == 'data/plant-1.txt':
+                prop_cmap = 'order'
+            else:
+                prop_cmap = 'j'
+            plot(g, name = 'plot-' + str(index) + '.png', prop_cmap = prop_cmap)
+

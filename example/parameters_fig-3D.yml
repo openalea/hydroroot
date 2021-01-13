@@ -21,7 +21,7 @@ archi:
     #may be a list of names, eg. [file1, file2, file3] wildcar may be used
     input_file: []
 
-    seed: 36771991
+    seed: 96503947
 
     #file names with length laws relative path
     #file format: "LR_length_mm" ; "relative_distance_to_tip"
@@ -33,12 +33,12 @@ archi:
     #length of the primary root
     #float or list of float
     #unit: m
-    primary_length: 0.09
+    primary_length: 0.13
 
     #branching delay
     #float or list of float
     #unit: m
-    branching_delay: 2.0e-3
+    branching_delay: 1.0e-3
 
     #branching variability
     #float between [0 ; 1], 0.25 means 25%

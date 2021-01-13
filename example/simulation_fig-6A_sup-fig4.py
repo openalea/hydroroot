@@ -272,15 +272,8 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
 if __name__ == '__main__':
 
-    k0 = parameter.hydro['k0']
-    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
-    _seeds = list(dseeds['seed'])
-    _delta = list(dseeds['delta'])
-    _primary_length  = list(dseeds['primary_length'])
-    _nude_length = list(dseeds['nude_length'])
-
     # predict the number of simulation run
-    nb_steps = len(dseeds)
+    nb_steps = len(parameter.output['axfold']*parameter.output['radfold'])
     print 'Simulation runs: ', nb_steps
     print '#############################'
 
@@ -289,30 +282,29 @@ if __name__ == '__main__':
     for key in columns:
         results[key] = []
 
+    seed = parameter.archi['seed'][0]
+    primary_length = parameter.archi['primary_length'][0]
+    delta = parameter.archi['delta'][0]
+    nude_length = parameter.archi['nude_length'][0]
 
-    for count2 in range(len(dseeds)):
-        seed = int(dseeds.loc[count2, 'seed'])
-        primary_length = dseeds.loc[count2, 'primary_length']
-        delta = dseeds.loc[count2, 'delta']
-        nude_length = dseeds.loc[count2, 'nude_length']
+    g, primary_length, _length, surface, intercepts, _seed = root_creation(primary_length = primary_length, seed = seed,
+        delta = delta, nude_length = nude_length, df = None)
 
-        g, primary_length, _length, surface, intercepts, _seed = root_creation(primary_length = primary_length, seed = seed,
-            delta = delta, nude_length = nude_length, df = None)
-
-        # sensibility analyse using multiplying factor on K and k
-        for axfold in parameter.output['axfold']:
-            for radfold in parameter.output['radfold']:
-                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
-                results['Jv (uL/s)'].append(Jv)
-                results['seed'].append(str(seed))
-                results['primary_length (m)'].append(primary_length)
-                results['k (10-8 m/s/MPa)'].append(k0 * radfold * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
-                results['length (m)'].append(_length)
-                results['surface (m2)'].append(surface)
-                results['ax'].append(axfold)
+    # sensibility analyse using multiplying factor on K and k
+    for axfold in parameter.output['axfold']:
+        for radfold in parameter.output['radfold']:
+            g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
+            results['Jv (uL/s)'].append(Jv)
+            results['seed'].append(str(seed))
+            results['primary_length (m)'].append(primary_length)
+            results['k (10-8 m/s/MPa)'].append(parameter.hydro['k0'] * radfold * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
+            results['length (m)'].append(_length)
+            results['surface (m2)'].append(surface)
+            results['ax'].append(axfold)
 
 
-        print len(dseeds)-count2
+    print nb_steps
+    nb_steps -= 1
 
     dresults = pd.DataFrame(results, columns = columns)
     if output is not None: dresults.to_csv(output, index = False)

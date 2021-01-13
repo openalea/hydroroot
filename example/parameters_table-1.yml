@@ -19,10 +19,8 @@ archi:
 
     #File name:
     #may be a list of names, eg. [file1, file2, file3] wildcar may be used
-    input_file: [ 20-06-09-FB-hydroroot-1ter.txt, 20-06-09-FB-160212-3-Col.txt, 20-06-09-FB-160212-4-Col.txt,
-                  20-06-09-FB-hydroroot-5.txt, 20-06-09-FB-hydroroot-7.txt, 20-06-10-FB-hydroroot-8.txt,
-                  20-06-16-FB-170426-full-archi-ch3G1.txt, 20-06-16-FB-170426-full-archi-ch4G1c.txt,
-                  200721-YBFB-Col-2-correct-scale.txt, 200812-YBFB-col-2.txt]
+    input_file: [plant-1.txt, plant-2.txt, plant-3.txt, plant-4.txt, plant-5.txt, plant-6.txt,
+                 plant-7.txt, plant-8.txt, plant-9.txt, plant-10.txt]
 
     seed:
 

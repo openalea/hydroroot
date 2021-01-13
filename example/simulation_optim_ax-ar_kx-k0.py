@@ -278,7 +278,15 @@ if __name__ == '__main__':
     for f in filename:
         df = read_archi_data(f) if parameter.archi['read_architecture'] else None
         index = f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
-        parameter.exp['Jv'], _Jv, cut_n_flow_length = flux_intercepts_for_optim(index)
+
+        # read the data measurements from data base
+        for key in df_exp['arch']:
+            if key in index.lower():
+                _list = df_exp[df_exp.arch == key].filter(regex = '^J').dropna(axis = 1).values.tolist()
+                parameter.exp['Jv'] = _list[0][0] # basal output flux full root (uncut)
+                _Jv = _list[0][1:]                # basal output flux cut root
+                _list = df_exp[df_exp.arch == key].filter(regex = '^lcut').dropna(axis = 1).values.tolist()
+                cut_n_flow_length = _list[0]      # cut lengthes
 
         axfold = parameter.output['axfold'][0]
         radfold = parameter.output['radfold'][0]
@@ -455,4 +463,4 @@ if __name__ == '__main__':
         df = dresults
 
     if output is not None: df.to_csv(output, index = False)
-    
+

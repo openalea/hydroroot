@@ -318,8 +318,8 @@ if __name__ == '__main__':
     for i in seg_at_position:
         _columns.append(str(i) + ' mm')
         j_relat[str(i) + ' mm'] = []
-    _columns.append('Jv')
-    j_relat['Jv'] = []
+    _columns.append('base')
+    j_relat['base'] = []
     count2 = 0
 
 
@@ -377,17 +377,17 @@ if __name__ == '__main__':
 
                 if avg_fold == 1:
                     j1[other_fold].append(Jv)
-                    j_relat['Jv'].append(primary_length)
+                    j_relat['base'].append(primary_length)
                 else:
-                    j_relat['Jv'].append(Jv/j1[other_fold][c])
+                    j_relat['base'].append(Jv/j1[other_fold][c])
 
                 j_relat['ax'].append(axfold)
 
-        if (seed == 37430610) & (axfold in [0.05,0.25,0.5,0.75]):
-            plot(g, name = 'sup-fig-5-' + str(axfold) + '.png', prop_cmap = 'j_relat')
+            if (seed == 37430610) & (round(axfold,2) in [0.05,0.25,0.5,0.75]):
+                plot(g, name = 'sup-fig-5-' + str(axfold) + '.png', prop_cmap = 'j_relat')
 
         nb_steps -= len(parameter.output['axfold'])
         print 'nb of runs left: ', nb_steps
 
     dj2 = pd.DataFrame(j_relat, columns = _columns)
-    dj2.to_csv("sup-fig-5.csv", index = False, header = False)
+    dj2.to_csv("sup-fig-5.csv")

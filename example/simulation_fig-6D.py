@@ -292,84 +292,91 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     return g, Keq, Jv_global
 
 if __name__ == '__main__':
-    j_relat = {}
     seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
-    # predict the number of simulation run
-    nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold'])
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
 
-    _columns = []
-    _columns.append('ax')
-    j_relat['ax'] = []
-    for i in seg_at_position:
-        _columns.append(str(i) + ' mm')
-        j_relat[str(i) + ' mm'] = []
-    _columns.append('Jv')
-    j_relat['Jv'] = []
+    outputfilename="fig-6D-RSA.csv"
+    for iloop in range(2): # 1st for the root, 2d for cylinder because max_order set to 0 at the of the 1st pass
 
-    seed =parameter.archi['seed'][0]
-    primary_length = parameter.archi['primary_length'][0]
-    delta = parameter.archi['branching_delay'][0]
-    nude_length = parameter.archi['nude_length'][0]
+        nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold'])
+        print 'Simulation runs: ', nb_steps
+        print '#############################'
+        print outputfilename
+        j_relat = {}
+        _columns = []
+        _columns.append('ax')
+        j_relat['ax'] = []
+        for i in seg_at_position:
+            _columns.append(str(i) + ' mm')
+            j_relat[str(i) + ' mm'] = []
+        _columns.append('Jv')
+        j_relat['Jv'] = []
 
-    g, primary_length, _length, surface, intercepts, _seed = root_creation(
-        primary_length = primary_length,
-        seed = seed,
-        delta = delta,
-        nude_length = nude_length)
+        seed =parameter.archi['seed'][0]
+        primary_length = parameter.archi['primary_length'][0]
+        delta = parameter.archi['branching_delay'][0]
+        nude_length = parameter.archi['nude_length'][0]
 
-    vertices_at_length = []
-    v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
-    n_max = max(axis(g,v_base))
 
-    for l in seg_at_position:
-        ## only on PR
-        vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
-        vertices_at_length.append([vids])
+        g, primary_length, _length, surface, intercepts, _seed = root_creation(
+            primary_length = primary_length,
+            seed = seed,
+            delta = delta,
+            nude_length = nude_length)
 
-    j1 = {}
-    for axfold in parameter.output['axfold']:
-        for radfold in parameter.output['radfold']:
-            avg_fold = axfold # the factor on winch the relative j is calculated
-            other_fold = radfold # the other
-            if avg_fold == 1: j1[other_fold] = []
+        vertices_at_length = []
+        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        n_max = max(axis(g,v_base))
 
-            g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
+        for l in seg_at_position:
+            ## only on PR
+            vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
+            vertices_at_length.append([vids])
 
-            if avg_fold == 1:
-                g.add_property('j_relat')
-                g_1 = g.copy()
-            else:
-                for v in g:
-                    if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
+        j1 = {}
+        for axfold in parameter.output['axfold']:
+            for radfold in parameter.output['radfold']:
+                avg_fold = axfold # the factor on winch the relative j is calculated
+                other_fold = radfold # the other
+                if avg_fold == 1: j1[other_fold] = []
 
-            c = 0
-            for l in seg_at_position:
-                c += 1
-                jtot = 0.0
-                n = len(vertices_at_length[c-1])
-                for v in vertices_at_length[c-1]:
-                    # remark: when done on the PR there is only 1 vertex
-                    jtot += g.property('J_out')[v]
+                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
 
                 if avg_fold == 1:
-                    j1[other_fold].append(jtot)
-                    j_relat[str(l) + ' mm'].append(l*1e-3)
+                    g.add_property('j_relat')
+                    g_1 = g.copy()
                 else:
-                    j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
+                    for v in g:
+                        if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
 
-            if avg_fold == 1:
-                j1[other_fold].append(Jv)
-                j_relat['Jv'].append(primary_length)
-            else:
-                j_relat['Jv'].append(Jv/j1[other_fold][c])
+                c = 0
+                for l in seg_at_position:
+                    c += 1
+                    jtot = 0.0
+                    n = len(vertices_at_length[c-1])
+                    for v in vertices_at_length[c-1]:
+                        # remark: when done on the PR there is only 1 vertex
+                        jtot += g.property('J_out')[v]
 
-            j_relat['ax'].append(axfold)
-            nb_steps -= 1
-            print 'nb of runs left: ', nb_steps
+                    if avg_fold == 1:
+                        j1[other_fold].append(jtot)
+                        j_relat[str(l) + ' mm'].append(l*1e-3)
+                    else:
+                        j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
 
-    dj2 = pd.DataFrame(j_relat, columns = _columns)
-    dj1 = dj2.transpose()
-    dj1.to_csv("j_relat.csv", index = False, header = False)
+                if avg_fold == 1:
+                    j1[other_fold].append(Jv)
+                    j_relat['Jv'].append(primary_length)
+                else:
+                    j_relat['Jv'].append(Jv/j1[other_fold][c])
+
+                j_relat['ax'].append(axfold)
+                nb_steps -= 1
+                print 'nb of runs left: ', nb_steps
+
+        parameter.archi['order_max'] = 0 # for the cylinder
+
+        dj2 = pd.DataFrame(j_relat, columns = _columns)
+        dj1 = dj2.transpose()
+        dj1.to_csv(outputfilename, index = False, header = False)
+        outputfilename = "fig-6D-cylindric.csv"
