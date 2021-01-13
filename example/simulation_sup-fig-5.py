@@ -291,11 +291,17 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
     return g, Keq, Jv_global
 
+def plot(g, name=None, **kwds):
+
+    Viewer.display(mtg_scene(g, **kwds))
+    if name is not None:
+            Viewer.frameGL.saveImage(name)
+
 if __name__ == '__main__':
     j_relat = {}
     seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
-    dseeds = pd.read_csv('/home/fabrice/Documents/Arabidopsis/Papier/subset_generated-roots-20-10-07_PR_016.csv')
+    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_PR_016.csv')
     _seeds = list(dseeds['seed'])
     _delta = list(dseeds['delta'])
     _primary_length = list(dseeds['primary_length'])
@@ -376,8 +382,12 @@ if __name__ == '__main__':
                     j_relat['Jv'].append(Jv/j1[other_fold][c])
 
                 j_relat['ax'].append(axfold)
+
+        if (seed == 37430610) & (axfold in [0.05,0.25,0.5,0.75]):
+            plot(g, name = 'sup-fig-5-' + str(axfold) + '.png', prop_cmap = 'j_relat')
+
         nb_steps -= len(parameter.output['axfold'])
         print 'nb of runs left: ', nb_steps
 
     dj2 = pd.DataFrame(j_relat, columns = _columns)
-    dj2.to_csv("j_relat.csv", index = False, header = False)
+    dj2.to_csv("sup-fig-5.csv", index = False, header = False)
