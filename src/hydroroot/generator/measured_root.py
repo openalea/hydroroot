@@ -282,9 +282,16 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
             p = tuple([1, count])  # 1: PR, count: countieme RL
             ramifs.setdefault(p, []).append((vid, len_lateral))  # randomly added, to sort it sorted(ramifs)
 
-    ramifs = add_branching(g, df, ramifs = ramifs, Order = 1, segment_length = segment_length)
+    # F. Bauget 2020-06-11 : error in order which is the lateral order or the number of edges + between root and the
+    #                        vertices on the lateral of this order
+    _order = 1
+    while ramifs:
+        ramifs = add_branching(g, df, ramifs = ramifs, Order = _order, segment_length = segment_length)
+        _order += 1
 
-    ramifs = add_branching(g, df, ramifs = ramifs, Order = 3, segment_length = segment_length)
+    # ramifs = add_branching(g, df, ramifs = ramifs, Order = 1, segment_length = segment_length)
+    #
+    # ramifs = add_branching(g, df, ramifs = ramifs, Order = 3, segment_length = segment_length)
     return g
 
 def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
@@ -303,7 +310,7 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
     """
     new_ramifs = {}
     len_base = 0
-    count = 0  # useless ?
+    # count = 0  # F. Bauget 2020-06-11 : comment same date below
     for path in ramifs:
         vid, lr = ramifs[path][
             0]  # vid is the vertice index on the parent root from which the lateral of length lr starts
@@ -325,6 +332,8 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                 vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
                                   length = segment_length, order = Order, code = code)
         else:
+            count = 0  # F. Bauget 2020-06-11 : this is the count of laterals on a root so at each
+                        # new root with lateral should be reset to 0
             for i in length_base:
                 len_base = df_order.db[i]
                 edge_type = '+' if _root_id == vid else '<'
@@ -340,6 +349,8 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                 len_lateral = df_order.lr[i]
                 if len_lateral > 0.:
                     count += 1
-                    p = tuple([Order + 1, count])
+                    # F. Bauget 2020-04-16 : for debug it seems that I made a mistake for order >= 3
+                    # p = tuple([Order + 1, count])
+                    p = tuple(['-'.join(map(str, path)), count])
                     new_ramifs.setdefault(p, []).append((vid, len_lateral))
     return new_ramifs
