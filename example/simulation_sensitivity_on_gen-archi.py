@@ -274,10 +274,10 @@ if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
     dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
-    _seeds = list(dseeds['seed'])
-    _delta = list(dseeds['delta'])
-    _primary_length  = list(dseeds['primary_length'])
-    _nude_length = list(dseeds['nude_length'])
+
+    # if a seed is given in the parameters.yml file then restrict to this seed
+    if parameter.archi['seed'] is not None:
+        dseeds = dseeds[dseeds.seed == parameter.archi['seed']]
 
     # predict the number of simulation run
     nb_steps = len(dseeds)
@@ -289,12 +289,12 @@ if __name__ == '__main__':
     for key in columns:
         results[key] = []
 
-
-    for count2 in range(len(dseeds)):
-        seed = int(dseeds.loc[count2, 'seed'])
-        primary_length = dseeds.loc[count2, 'primary_length']
-        delta = dseeds.loc[count2, 'delta']
-        nude_length = dseeds.loc[count2, 'nude_length']
+    count=len(dseeds)
+    for id in dseeds.index:
+        seed = dseeds.seed[id]
+        primary_length = dseeds.primary_length[id]
+        delta = dseeds.delta[id]
+        nude_length = dseeds.nude_length[id]
 
         g, primary_length, _length, surface, intercepts, _seed = root_creation(primary_length = primary_length, seed = seed,
             delta = delta, nude_length = nude_length, df = None)
@@ -311,8 +311,8 @@ if __name__ == '__main__':
                 results['surface (m2)'].append(surface)
                 results['ax'].append(axfold)
 
-
-        print len(dseeds)-count2
+        count-=1
+        print count
 
     dresults = pd.DataFrame(results, columns = columns)
     if output is not None: dresults.to_csv(output, index = False)
