@@ -22,7 +22,7 @@ def get_root_visitor(prune=None):
         angles = [90,45]+[30]*5
         n = g.node(v)
         radius = n.radius*1.e4
-        order = n.order
+        order = int(n.order)
         length = n.length*1.e4
 
         if prune:
@@ -103,4 +103,13 @@ def my_colorbar(values, cmap, norm):
     cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap, norm=norm, values=values)
 
 
+def get_root_visitor_with_point(prune=None):
+    visitor = get_root_visitor(prune=prune)
 
+    def root_visitor3D(g, v, turtle, prune=prune):
+   
+        visitor(g, v, turtle, prune=prune)
+        n = g.node(v)
+        n.position3d = tuple(turtle.getPosition())
+
+    return root_visitor3D
