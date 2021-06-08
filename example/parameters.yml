@@ -19,7 +19,8 @@ archi:
 
     #File name:
     #may be a list of names, eg. [file1, file2, file3] wildcar may be used
-    input_file: [ 2020-01-19-9h06-cut-n-flow-archi2.txt, 160316#2-cut-n-flow-archi2.txt, 200219-YBFB-Col-cut-n-flow-archi2.txt, 200619-YBFB-Col-1-cut-n-flow-archi2.txt, 200619-YBFB-Col-2-cut-n-flow-archi2.txt, 200619-YBFB-e11-2-cut-n-flow-archi0.txt, 200619-YBFB-e15-1-cut-n-flow-archi0.txt, 200619-YBFB-e15-2-cut-n-flow-archi2.txt, 200702-YBFB-Col-1-cut-n-flow-archi2.txt, 200703-YBFB-Col-2-cut-n-flow-archi2.txt, 200703-YBFB-Col-3-cut-n-flow-archi2.txt, 200703-YBFB-e11-3-cut-n-flow-archi0.txt, 200703-YBFB-e15-3-cut-n-flow-archi2.txt, 200721-YBFB-e11-2-cut-n-flow-archi0.txt, 200721-YBFB-e15-1-cut-n-flow-archi0.txt, 200721-YBFB-e15-2-cut-n-flow-archi0.txt, 200724-YBFB-e11-2-cut-n-flow-archi2.txt, 200812-YBFB-e11-3-cut-n-flow-archi0.txt, 200812-YBFB-e15-1-cut-n-flow-archi0.txt, 200812-YBFB-e15-3-cut-n-flow-archi2.txt, 15012020-1045-cut-n-flow-archi2.txt]
+    input_file: [plant-1.txt, plant-2.txt, plant-3.txt, plant-4.txt, plant-5.txt, plant-6.txt,
+                 plant-7.txt, plant-8.txt, plant-9.txt, plant-10.txt]
 
     seed:
 
@@ -79,8 +80,8 @@ hydro:
     #unit: microL.m/(s.Mpa)
     axial_conductance_data:
         - [0, 1.5e-2, 4.0e-2, 6.0e-2, 7.65e-2, 9.65e-2, 11.75e-2, 14.85e-2, 19.75e-2]
-        - [ 3.24E-05, 2.99E-04, 3.90E-04, 3.53E-04, 3.98E-04, 7.23E-04, 9.16E-04, 8.36E-04, 4.36E-04] # K c-n-f 20-08-25, verified by FB 20/10/27
-#        - [2.90E-05, 1.24E-04, 1.77E-03, 2.18E-03, 1.83E-03, 3.05E-03, 4.19E-03, 3.45E-03, 2.60E-03] # lowess Poiseuille
+#        - [ 3.24E-05, 2.99E-04, 3.90E-04, 3.53E-04, 3.98E-04, 7.23E-04, 9.16E-04, 8.36E-04, 4.36E-04] # K c-n-f 20-08-25, verified by FB 20/10/27
+        - [2.90E-05, 1.24E-04, 1.77E-03, 2.18E-03, 1.83E-03, 3.05E-03, 4.19E-03, 3.45E-03, 2.60E-03] # lowess Poiseuille
 
 experimental:
     #water flux at the root base
@@ -102,7 +103,7 @@ output:
     #distance from the base for intercepts calculation
     # float or list of float
     #unit: m
-    intercepts: [0.01, 0.02, 0.03, 0.045, 0.06, 0.08]
+    intercepts: []
 
     #factor to explore a k0 range
     # float or list of float

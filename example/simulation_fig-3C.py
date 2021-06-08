@@ -165,9 +165,9 @@ def plot(g, name=None, **kwds):
     if name is not None:
             Viewer.frameGL.saveImage(name)
 
-def my_plot_with_bar(prop, lognorm = True):
+def my_plot_with_bar(prop):
     values = np.array(g.property(prop).values())
-    plot(g, prop_cmap = prop, lognorm = lognorm)
+    plot(g, prop_cmap = prop, lognorm = True)
     fig, ax = plt.subplots(figsize = (6, 1))
     fig.subplots_adjust(bottom = 0.5)
     cmap = mpl.cm.jet
@@ -178,54 +178,23 @@ def my_plot_with_bar(prop, lognorm = True):
 
 if __name__ == '__main__':
 
-    # files names of the architecture if reconstructed from a file
-    # if not we just give a dummy name for the loop used to launch run
-    filename = []
-    if parameter.archi['read_architecture']:
-        run_nb = 1
-        parameter.archi['seed'] = [1] # to give something to the For-Loop below
-        for f in parameter.archi['input_file']:
-            filename = filename + (glob.glob(parameter.archi['input_dir'] + f))
-    else:
-        run_nb = parameter.output['run_nb']
-        filename = ['one_run']  # just to have one run in the For-Loop below
-        if parameter.archi['seed'] is None:
-            s = my_seed()
-            parameter.archi['seed'] = list(s)
-
-
+    count = 0
     for seed in parameter.archi['seed']:
-        for f in filename:
-            if parameter.archi['read_architecture']:
-                df = read_archi_data(f)
-                g = mtg_from_aqua_data(df, parameter.archi['segment_length'])
-            else:
-                length_data = parameter.archi['length_data']
-                g = generate_g(seed, length_data,
-                               parameter.archi['branching_variability'], parameter.archi['branching_delay'][0],
-                               parameter.archi['nude_length'][0], parameter.archi['primary_length'][0],
-                               parameter.archi['segment_length'],parameter.archi['order_max'])
+        length_data = parameter.archi['length_data']
+        g = generate_g(seed, length_data,
+                       parameter.archi['branching_variability'], parameter.archi['branching_delay'][count],
+                       parameter.archi['nude_length'][count], parameter.archi['primary_length'][count],
+                       parameter.archi['segment_length'],parameter.archi['order_max'])
 
-            # compute radius property on MTG
-            g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
+        # compute radius property on MTG
+        g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
 
-            # compute length property and parametrisation
-            g = radius.compute_length(g, parameter.archi['segment_length'])
-            g = radius.compute_relative_position(g)
+        # compute length property and parametrisation
+        g = radius.compute_length(g, parameter.archi['segment_length'])
+        g = radius.compute_relative_position(g)
 
-            g, Keq, Jv = hydro_calculation(g)
+        g, Keq, Jv = hydro_calculation(g)
 
-            if parameter.archi['read_architecture']:
-                index = f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
-            else:
-                index = seed
+        plot(g, name = 'plot-' + str(seed) + '.png', prop_cmap = 'order')
 
-            #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
-            # it could also be 'J_out' the axial flux
-            # print index
-            if f == 'data/plant-1.txt':
-                prop_cmap = 'order'
-            else:
-                prop_cmap = 'j'
-            plot(g, name = 'plot-' + str(index) + '.png', prop_cmap = prop_cmap)
-
+        count += 1

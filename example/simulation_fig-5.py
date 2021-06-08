@@ -273,10 +273,12 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
-    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
+    # dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
+    # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv')
+    dseeds = pd.read_csv('data/test_fig-5.csv')
 
     # if a seed is given in the parameters.yml file then restrict to this seed
-    if parameter.archi['seed'] is not None:
+    if parameter.archi['seed'][0] is not None:
         dseeds = dseeds[dseeds.seed == parameter.archi['seed']]
 
     # predict the number of simulation run
@@ -284,12 +286,14 @@ if __name__ == '__main__':
     print 'Simulation runs: ', nb_steps
     print '#############################'
 
-
-    columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'ax', 'length (m)', 'surface (m2)', 'Jv (uL/s)']
-    for key in columns:
-        results[key] = []
-
-    count=len(dseeds)
+    for i in range(3):
+        results[i] = {}
+        columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'ax', 'length (m)', 'surface (m2)', 'Jv (uL/s)',
+                   'internode (m)', 'nude length (m)']
+        for key in columns:
+            results[i][key] = []
+    count = 0
+    # sensibility analyse using multiplying factor on K and k
     for id in dseeds.index:
         seed = dseeds.seed[id]
         primary_length = dseeds.primary_length[id]
@@ -298,22 +302,43 @@ if __name__ == '__main__':
 
         g, primary_length, _length, surface, intercepts, _seed = root_creation(primary_length = primary_length, seed = seed,
             delta = delta, nude_length = nude_length, df = None)
+            
+        i = 0
+        for axfold, k0 in [(0.5, 98.6), (1.0, 32.76), (2.0, 71.43)]:
+            g, Keq, Jv = hydro_calculation(g, axfold = axfold, k_radial = k0)
+            results[i]['Jv (uL/s)'].append(Jv)
+            results[i]['seed'].append(str(seed))
+            results[i]['primary_length (m)'].append(primary_length)
+            results[i]['k (10-8 m/s/MPa)'].append(k0 * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
+            results[i]['length (m)'].append(_length)
+            results[i]['surface (m2)'].append(surface)
+            results[i]['ax'].append(axfold)
+            results[i]['internode (m)'].append(dseeds.delta[id])
+            results[i]['nude length (m)'].append(dseeds.nude_length[id])
+            i += 1
+            
+        count += 1
+        print float(count) / 3.0 / len(dseeds), ' %'
 
-        # sensibility analyse using multiplying factor on K and k
-        for axfold in parameter.output['axfold']:
-            for radfold in parameter.output['radfold']:
-                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
-                results['Jv (uL/s)'].append(Jv)
-                results['seed'].append(str(seed))
-                results['primary_length (m)'].append(primary_length)
-                results['k (10-8 m/s/MPa)'].append(k0 * radfold * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
-                results['length (m)'].append(_length)
-                results['surface (m2)'].append(surface)
-                results['ax'].append(axfold)
+    dresults = pd.DataFrame(results[0], columns = columns)
+    # if output is not None: dresults.to_csv(output, index = False)
+    ax = dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', c='Blue')
+    ax.set_ylim([0, 0.06]), ax.set_xlim([0, 20e-4])
+    ax.set_title('figure 5-A')
 
-        count-=1
-        print count
+    dresults = pd.DataFrame(results[1], columns = columns)
+    # if output is not None: dresults.to_csv(output, index = False)
+    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, c='orange')
+    ax2 = dresults.plot.scatter('primary_length (m)', 'Jv (uL/s)')
+    ax2.set_title('figure 5-B')
+    ax3 = dresults.plot.scatter('internode (m)', 'Jv (uL/s)')
+    ax3.set_title('figure 5-C')
+    ax4 = dresults.plot.scatter('nude length (m)', 'Jv (uL/s)')
+    ax4.set_title('figure 5-D')
 
-    dresults = pd.DataFrame(results, columns = columns)
-    if output is not None: dresults.to_csv(output, index = False)
+    dresults = pd.DataFrame(results[2], columns = columns)
+    # if output is not None: dresults.to_csv(output, index = False)
+    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, c='green')
 
+    drealplants = pd.read_csv('data/10-arabido-plants.csv')
+    drealplants.plot.scatter('surface', 'Jv', ax = ax, c='black', s=25)

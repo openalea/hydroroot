@@ -294,6 +294,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 if __name__ == '__main__':
     seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
+    colors = ['orange', 'cyan', 'green', 'magenta', 'blue']
 
     outputfilename="fig-6D-RSA.csv"
     for iloop in range(2): # 1st for the root, 2d for cylinder because max_order set to 0 at the of the 1st pass
@@ -378,5 +379,91 @@ if __name__ == '__main__':
 
         dj2 = pd.DataFrame(j_relat, columns = _columns)
         dj1 = dj2.transpose()
+        if iloop == 0:
+            ax = dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, colors = colors, legend = False)
+        else:
+            dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, ax = ax, style = '--', colors = colors, legend = False)
+            ax.set_xlabel('Distance to tip (m)')
+            ax.set_ylabel('Normelized local flow (J)')
+            ax.set_title('figure 6-D')
         dj1.to_csv(outputfilename, index = False, header = False)
         outputfilename = "fig-6D-cylindric.csv"
+
+    # for supplemental figure 5-B
+    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_PR_016.csv')
+
+    nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold']) * len(dseeds)
+
+    j_relat = {}
+    _columns = []
+    _columns.append('ax')
+    j_relat['ax'] = []
+    for i in seg_at_position:
+        _columns.append(str(i) + ' mm')
+        j_relat[str(i) + ' mm'] = []
+    _columns.append('Jv')
+    j_relat['Jv'] = []
+
+    for id in dseeds.index:
+        seed = dseeds.seed[id]
+        primary_length = dseeds.primary_length[id]
+        delta = dseeds.delta[id]
+        nude_length = dseeds.nude_length[id]
+
+        g, primary_length, _length, surface, intercepts, _seed = root_creation(
+            primary_length = primary_length,
+            seed = seed,
+            delta = delta,
+            nude_length = nude_length)
+
+        vertices_at_length = []
+        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        n_max = max(axis(g,v_base))
+
+        for l in seg_at_position:
+            ## only on PR
+            vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
+            vertices_at_length.append([vids])
+
+        j1 = {}
+        for axfold in parameter.output['axfold']:
+            for radfold in parameter.output['radfold']:
+                avg_fold = axfold # the factor on winch the relative j is calculated
+                other_fold = radfold # the other
+                if avg_fold == 1: j1[other_fold] = []
+
+                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
+
+                if avg_fold == 1:
+                    g.add_property('j_relat')
+                    g_1 = g.copy()
+                else:
+                    for v in g:
+                        if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
+
+                c = 0
+                for l in seg_at_position:
+                    c += 1
+                    jtot = 0.0
+                    n = len(vertices_at_length[c-1])
+                    for v in vertices_at_length[c-1]:
+                        # remark: when done on the PR there is only 1 vertex
+                        jtot += g.property('J_out')[v]
+
+                    if avg_fold == 1:
+                        j1[other_fold].append(jtot)
+                        j_relat[str(l) + ' mm'].append(l*1e-3)
+                    else:
+                        j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
+
+                if avg_fold == 1:
+                    j1[other_fold].append(Jv)
+                    j_relat['Jv'].append(primary_length)
+                else:
+                    j_relat['Jv'].append(Jv/j1[other_fold][c])
+
+                j_relat['ax'].append(axfold)
+                nb_steps -= 1
+                print 'nb of runs left: ', nb_steps
+
+    dj2 = pd.DataFrame(j_relat, columns = _columns)

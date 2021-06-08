@@ -58,7 +58,7 @@ def radial(v = 92, acol = [], scale = 1):
     yr = [v * scale] * len(xr)
     return xr, yr
 
-def axial(acol = [], scale = 1):
+def axial(acol = [], scale = 1.0):
     x, y = acol
     y = [a * scale for a in y]
     return x, y
@@ -152,6 +152,9 @@ if __name__ == '__main__':
     columns = ['plant', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)']
     print columns
 
+    axfold = parameter.output['axfold'][0]
+    radfold = parameter.output['radfold'][0]
+
     results = {}
     for key in columns:
         results[key] = []
@@ -178,7 +181,7 @@ if __name__ == '__main__':
         k0 = parameter.hydro['k0']
         Jv = 0.0
 
-        g, Keq, Jv = hydro_calculation(g, axial_data = axial_data, k_radial = k0)
+        g, Keq, Jv = hydro_calculation(g, axial_data = axial_data, k_radial = k0, axfold = axfold, radfold = radfold)
 
         if Flag_Optim:
             k0_old = k0
@@ -188,7 +191,7 @@ if __name__ == '__main__':
             F = 1.
             # Newton-Raphson loop to get k0
             while (F > eps):
-                g, Keq, Jv = hydro_calculation(g, axial_data = axial_data, k_radial = k0)
+                g, Keq, Jv = hydro_calculation(g, axial_data = axial_data, k_radial = k0, axfold = axfold, radfold = radfold)
 
                 F = (Jv - parameter.exp['Jv']) ** 2.0
 
