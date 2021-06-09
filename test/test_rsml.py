@@ -2,7 +2,7 @@ from openalea.mtg import *
 from hydroroot import display
 from path import Path
 
-data = Path('./data/test_rsml.mtg')
+data = Path('./data/200703-YBFB-Col-2.mtg')
 g = MTG(data)
 
 # 2 Compute 3D polylines
@@ -26,7 +26,10 @@ root_id = next(g.component_roots_iter(g.root))
 g = g.insert_scale(inf_scale=1, partition=lambda v: v==root_id, default_label='P')
 
 #3 Transform to rsml 
-from rsml import continuous, io
+from rsml import continuous, io, plot
 
-g = continuous.discrete_to_continuous(g, position='position3D')
+g = continuous.discrete_to_continuous(g, position='position3d')
 io.mtg2rsml(g, 'myfile.rsml')
+
+#plot mtg from rsml file
+g2 = io.rsml2mtg('myfile.rsml')
