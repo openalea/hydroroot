@@ -14,16 +14,32 @@ import openalea.plantgl.all as pgl
 
 from .radius import discont_radius
 
-def get_root_visitor(prune=None):
+def get_root_visitor(prune=None, factor = 1.0e4):
+    # F. Bauget 2021-06-10 : added parameters factor_length and factor_radius because they were hard codded to 1.0e4
+    # without any reason unless historically the segment_length was chosen = 1.0e-4
+    # but may be a problem if we export in rsml because the unit may be wrong
+    """
+    Turtle going through the architecture
+    used in plot and get_root_visitor_with_point
+
+    :parameters:
+        - `prune` (float) - distance from base after witch the MTG is no longer read
+        - `factor` - a factor apply to length and radius properties
+
+    :For example: if the MTG vertices length is 0.1 mm (1.0e-4 m), then if we want to set each vertex
+                  as a dot (let say a pixel) we have to multiply length by 1/1e-4 is useful for plot
+    """
     def root_visitor(g, v, turtle, prune=prune):
         mylength = {}
         if prune and ('mylength' in g.properties()):
             mylength = g.property('mylength')
         angles = [90,45]+[30]*5
         n = g.node(v)
-        radius = n.radius*1.e4
+        # radius = n.radius*1.e4
+        radius = n.radius * factor
         order = int(n.order)
-        length = n.length*1.e4
+        # length = n.length*1.e4
+        length = n.length * factor
 
         if prune:
             if mylength.get(v,0.)>prune:
@@ -103,8 +119,18 @@ def my_colorbar(values, cmap, norm):
     cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap, norm=norm, values=values)
 
 
-def get_root_visitor_with_point(prune=None):
-    visitor = get_root_visitor(prune=prune)
+def get_root_visitor_with_point(prune=None, factor = 1.0e4):
+    """
+    Get 3D position of root segment by using turtle in get_root_visitor
+    Create a new property position3d = [x,y,z] coordinate
+
+    :parameters:
+        - `prune` (float) - distance from base after witch the MTG is no longer read
+        - `factor` - a factor apply to property length (see get_root_visitor)
+
+    Remark: the 3D coordinate are calculated from an virtual 3D representation with imaginary angles
+    """
+    visitor = get_root_visitor(prune=prune, factor = factor)
 
     def root_visitor3D(g, v, turtle, prune=prune):
    
