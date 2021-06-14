@@ -11,17 +11,17 @@
 archi:
     #if read_architecture is true then architecture will be constructed from the file(s) given by input_dir and input_file
     #otherwise the architecture will be generated according to the parameters
-    read_architecture: False
+    read_architecture: True
 
     #Input architecture from scanned image (distance_from_base_(mm) \t lateral_root_length_(mm) \t order)
     #folder name
-    input_dir: data/Arabido/
+    input_dir: data/
 
     #File name:
     #may be a list of names, eg. [file1, file2, file3] wildcar may be used
-    input_file:
+    input_file: [plant-1.txt]
 
-    seed: 37430610
+    seed:
 
     #file names with length laws relative path
     #file format: "LR_length_mm" ; "relative_distance_to_tip"
@@ -85,7 +85,7 @@ experimental:
     #water flux at the root base
     #float
     #unit: microL/s
-    Jv:  0.00723
+    Jv:
 
     #hydric potential outside the roots (pressure chamber)
     #float
@@ -108,7 +108,7 @@ output:
     radfold: 1.
 
     #like radfold but apply to axial_conductance_data
-    axfold: range(1, 0.04, -0.05)
+    axfold: [ 0.125, 1.0, 2.0]
 
     #number of run with the same set of parameters i.e. number of different seeds
     #integer

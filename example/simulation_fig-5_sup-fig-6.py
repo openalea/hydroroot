@@ -17,6 +17,7 @@
 
 from random import _hexlify, _urandom
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 
@@ -286,7 +287,7 @@ if __name__ == '__main__':
     print 'Simulation runs: ', nb_steps
     print '#############################'
 
-    for i in range(3):
+    for i in range(5):
         results[i] = {}
         columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'ax', 'length (m)', 'surface (m2)', 'Jv (uL/s)',
                    'internode (m)', 'nude length (m)']
@@ -304,7 +305,7 @@ if __name__ == '__main__':
             delta = delta, nude_length = nude_length, df = None)
             
         i = 0
-        for axfold, k0 in [(0.5, 98.6), (1.0, 32.76), (2.0, 71.43)]:
+        for axfold, k0 in [(0.5, 98.6), (1.0, 32.76), (2.0, 71.43), (5.0, 71.43), (0.01, 98.6)]:
             g, Keq, Jv = hydro_calculation(g, axfold = axfold, k_radial = k0)
             results[i]['Jv (uL/s)'].append(Jv)
             results[i]['seed'].append(str(seed))
@@ -342,3 +343,27 @@ if __name__ == '__main__':
 
     drealplants = pd.read_csv('data/10-arabido-plants.csv')
     drealplants.plot.scatter('surface', 'Jv', ax = ax, c='black', s=25)
+
+    #supplemental figure 6
+    fig = {}
+    ax5 = {}
+    ax6 = {}
+    for s in ['primary_length (m)', 'internode (m)', 'nude length (m)']:
+        fig[s] = plt.figure()
+        ax5[s] = fig[s].add_subplot(111, label = "1")
+        dresults = pd.DataFrame(results[3], columns = columns)
+        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax5[s], colors = 'black')
+        ax5[s].set_title('supplemental figure 6-A')
+        ax5[s].axis(xmin = 0.0, xmax = max(results[3][s])*1.1, ymin = 0.0, ymax = max(results[3]['Jv (uL/s)'])*1.1)
+        xmax = ax5[s].get_xlim()[1] * 0.99
+        xmin = ax5[s].get_xlim()[0] - 0.01 * ax5[s].get_xlim()[1]
+    
+        ax6[s] = fig[s].add_subplot(111, label = "2", frame_on = False)
+        dresults = pd.DataFrame(results[4], columns = columns)
+        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax6[s], colors = 'orange', edgecolors = 'orange')
+        ax6[s].set_xlim(xmin,xmax)
+        ax6[s].axis(ymin = 0.0, ymax = max(results[4]['Jv (uL/s)'])*1.1)
+        ax6[s].yaxis.tick_right()
+        ax6[s].yaxis.set_label_position('right')
+        ax6[s].get_xaxis().set_visible(False)
+        ax6[s].tick_params(axis = 'y', colors = "orange")

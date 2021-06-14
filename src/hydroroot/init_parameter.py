@@ -105,6 +105,9 @@ class Parameters():
             self.archi[pid] = parameter['archi'][pid]
         for pid in parameter['hydro']:
             self.hydro[pid] = parameter['hydro'][pid]
+        if 'solute' in parameter.keys(): # because not in the actual version
+            for pid in parameter['solute']:
+                self.solute[pid] = parameter['solute'][pid]
         for pid in parameter['experimental']:
             self.exp[pid] = parameter['experimental'][pid]
         for pid in parameter['output']:

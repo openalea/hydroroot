@@ -193,6 +193,7 @@ if __name__ == '__main__':
             s = my_seed()
             parameter.archi['seed'] = list(s)
 
+
     for seed in parameter.archi['seed']:
         for f in filename:
             if parameter.archi['read_architecture']:
@@ -212,17 +213,16 @@ if __name__ == '__main__':
             g = radius.compute_length(g, parameter.archi['segment_length'])
             g = radius.compute_relative_position(g)
 
-            for axfold in parameter.output['axfold']:
-                g, Keq, Jv = hydro_calculation(g, axfold = axfold)
+            g, Keq, Jv = hydro_calculation(g)
 
-                if parameter.archi['read_architecture']:
-                    index = f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
-                else:
-                    index = seed
+            if parameter.archi['read_architecture']:
+                index = f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
+            else:
+                index = seed
 
-                #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
-                # it could also be 'J_out' the axial flux
-                # print index
-                prop_cmap = 'j'
-                plot(g, name = 'plot-' + str(index) + str(axfold) + '.png', prop_cmap = prop_cmap)
+            #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
+            # it could also be 'J_out' the axial flux
+            # print index
+            prop_cmap = 'order'
+            plot(g, name = 'plot-' + str(index) + '.png', prop_cmap = prop_cmap)
 

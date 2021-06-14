@@ -318,8 +318,10 @@ if __name__ == '__main__':
     for i in seg_at_position:
         _columns.append(str(i) + ' mm')
         j_relat[str(i) + ' mm'] = []
+        # j_relat[str(i) + ' mm'].append(i*1e-3)
     _columns.append('base')
     j_relat['base'] = []
+    # j_relat['base'].append(_primary_length[0]) # all have the same primary length
     count2 = 0
 
 
@@ -371,13 +373,15 @@ if __name__ == '__main__':
 
                     if avg_fold == 1:
                         j1[other_fold].append(jtot)
-                        j_relat[str(l) + ' mm'].append(l*1e-3)
+                        j_relat[str(l) + ' mm'].append(1.0)
+                        # j_relat[str(l) + ' mm'].append(l*1e-3)
                     else:
                         j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
 
                 if avg_fold == 1:
                     j1[other_fold].append(Jv)
-                    j_relat['base'].append(primary_length)
+                    # j_relat['base'].append(primary_length)
+                    j_relat['base'].append(1.0)
                 else:
                     j_relat['base'].append(Jv/j1[other_fold][c])
 
@@ -391,3 +395,12 @@ if __name__ == '__main__':
 
     dj2 = pd.DataFrame(j_relat, columns = _columns)
     dj2.to_csv("sup-fig-5.csv")
+
+    ax = {}
+    for s in ['1 mm', '65 mm', '130 mm']:
+        ax[s] = dj2.plot.scatter('ax', s, colors = 'orange', edgecolors = 'orange', label = s + ' to tip')
+        dj2.plot.scatter('ax', 'base', ax = ax[s], colors = 'blue', edgecolors = 'blue', label = 'base')
+        ax[s].set_ylabel('Normalize local flow (J)')
+        ax[s].legend(loc = 'upper left')
+        ax[s].set_xlim((0, 1))
+        ax[s].set_ylim((0, 1))
