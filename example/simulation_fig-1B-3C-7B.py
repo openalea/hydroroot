@@ -14,19 +14,21 @@
 # Imports
 
 # VERSION = 2
-
+import copy
 from random import _hexlify, _urandom
 
 import numpy as np
 import pandas as pd
 import glob
 import argparse
+import tempfile, os
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.colors import Normalize
 
 from openalea.plantgl.all import Viewer
+from IPython.display import Image, display
 
 from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law
@@ -43,9 +45,12 @@ from hydroroot.display import plot as mtg_scene
 parameter = Parameters()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("inputfile")
+parser.add_argument("inputfile", help="yaml input file")
+parser.add_argument("--prop", help="property to display, e.g.: order, j")
 args = parser.parse_args()
 filename = args.inputfile
+prop = args.prop
+if prop is None: prop = 'order'
 parameter.read_file(filename)
 
 # read architecture file
@@ -193,6 +198,7 @@ if __name__ == '__main__':
             s = my_seed()
             parameter.archi['seed'] = list(s)
 
+
     for seed in parameter.archi['seed']:
         for f in filename:
             if parameter.archi['read_architecture']:
@@ -222,15 +228,14 @@ if __name__ == '__main__':
 
                 #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
                 # it could also be 'J_out' the axial flux
-                # print index
-                prop_cmap = 'j'
-                # plot(g, name = 'plot-' + str(index) + str(axfold) + '.png', prop_cmap = prop_cmap)
+                print index, axfold
+                # prop_cmap = 'order'
 
-
-                from IPython.display import Image, display
-                import tempfile, os
-                from openalea.plantgl.all import Viewer
-                plot(g, prop_cmap = prop_cmap)
+                # g has radius, here we set fictive radii just for visual comfort
+                alpha = 0.2 # radius in millimeter identical for all orders
+                gcopy = g.copy() # copy because we change the radius property in plot below
+                plot(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = prop)
+                Viewer.widgetGeometry.setSize(450, 600) # set the picture size in px
                 fn = tempfile.mktemp(suffix='.png')
                 Viewer.saveSnapshot(fn)
                 Viewer.stop()

@@ -17,9 +17,11 @@
 
 from random import _hexlify, _urandom
 
+import sys
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+import time
 
 from openalea.mtg import MTG, traversal
 
@@ -37,6 +39,8 @@ Jv_global = 1.0
 ONE_LAW = False
 EXPOVARIATE = True
 
+start_time = time.time()
+
 
 ################################################
 # get the model parameters, the length laws are
@@ -53,6 +57,7 @@ args = parser.parse_args()
 filename = args.inputfile
 output = args.outputfile
 parameter.read_file(filename)
+
 
 # read architecture file
 def read_archi_data(fn):
@@ -274,9 +279,9 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
-    # dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
-    # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv')
-    dseeds = pd.read_csv('data/test_fig-5.csv')
+    # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # Complete set
+    dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # 10 times shortest
+
 
     # if a seed is given in the parameters.yml file then restrict to this seed
     if parameter.archi['seed'][0] is not None:
@@ -305,7 +310,7 @@ if __name__ == '__main__':
             delta = delta, nude_length = nude_length, df = None)
             
         i = 0
-        for axfold, k0 in [(0.5, 98.6), (1.0, 32.76), (2.0, 71.43), (5.0, 71.43), (0.01, 98.6)]:
+        for axfold, k0 in [(0.5, 98.6), (1.0, 327.6), (2.0, 714.3), (5.0, 714.3), (0.01, 98.6)]:
             g, Keq, Jv = hydro_calculation(g, axfold = axfold, k_radial = k0)
             results[i]['Jv (uL/s)'].append(Jv)
             results[i]['seed'].append(str(seed))
@@ -319,30 +324,38 @@ if __name__ == '__main__':
             i += 1
             
         count += 1
-        print float(count) / 3.0 / len(dseeds), ' %'
+        progress = float(count) / len(dseeds)
+        # print progress*100, ' %'
+        sys.stdout.write('\r')
+        # sys.stdout.write("[%-100s] %d%%" % ('=' * int(progress*100), int(progress*100)))
+        sys.stdout.write("runs done " + '{:0.4}'.format(progress*100) + ' %')
+        sys.stdout.flush()
 
     dresults = pd.DataFrame(results[0], columns = columns)
     # if output is not None: dresults.to_csv(output, index = False)
-    ax = dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', c='Blue')
+    ax = dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', color='Blue', edgecolors = 'Blue')
     ax.set_ylim([0, 0.06]), ax.set_xlim([0, 20e-4])
     ax.set_title('figure 5-A')
 
     dresults = pd.DataFrame(results[1], columns = columns)
     # if output is not None: dresults.to_csv(output, index = False)
-    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, c='orange')
+    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, color='orange', edgecolors = 'orange')
     ax2 = dresults.plot.scatter('primary_length (m)', 'Jv (uL/s)')
     ax2.set_title('figure 5-B')
+    ax2.axis(xmin = 0.0, xmax = max(results[1]['primary_length (m)'])*1.1, ymin = 0.0, ymax = max(results[1]['Jv (uL/s)'])*1.1)
     ax3 = dresults.plot.scatter('internode (m)', 'Jv (uL/s)')
+    ax3.axis(xmin = 0.0, xmax = max(results[1]['internode (m)'])*1.1, ymin = 0.0, ymax = max(results[1]['Jv (uL/s)'])*1.1)
     ax3.set_title('figure 5-C')
     ax4 = dresults.plot.scatter('nude length (m)', 'Jv (uL/s)')
+    ax4.axis(xmin = 0.0, xmax = max(results[1]['nude length (m)'])*1.1, ymin = 0.0, ymax = max(results[1]['Jv (uL/s)'])*1.1)
     ax4.set_title('figure 5-D')
 
     dresults = pd.DataFrame(results[2], columns = columns)
     # if output is not None: dresults.to_csv(output, index = False)
-    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, c='green')
+    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, color='green', edgecolors = 'green')
 
     drealplants = pd.read_csv('data/10-arabido-plants.csv')
-    drealplants.plot.scatter('surface', 'Jv', ax = ax, c='black', s=25)
+    drealplants.plot.scatter('surface', 'Jv', ax = ax, color='black', s=25)
 
     #supplemental figure 6
     fig = {}
@@ -352,18 +365,20 @@ if __name__ == '__main__':
         fig[s] = plt.figure()
         ax5[s] = fig[s].add_subplot(111, label = "1")
         dresults = pd.DataFrame(results[3], columns = columns)
-        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax5[s], colors = 'black')
+        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax5[s], color = 'black')
         ax5[s].set_title('supplemental figure 6-A')
         ax5[s].axis(xmin = 0.0, xmax = max(results[3][s])*1.1, ymin = 0.0, ymax = max(results[3]['Jv (uL/s)'])*1.1)
         xmax = ax5[s].get_xlim()[1] * 0.99
         xmin = ax5[s].get_xlim()[0] - 0.01 * ax5[s].get_xlim()[1]
-    
+
         ax6[s] = fig[s].add_subplot(111, label = "2", frame_on = False)
         dresults = pd.DataFrame(results[4], columns = columns)
-        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax6[s], colors = 'orange', edgecolors = 'orange')
+        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax6[s], color = 'orange', edgecolors = 'orange')
         ax6[s].set_xlim(xmin,xmax)
         ax6[s].axis(ymin = 0.0, ymax = max(results[4]['Jv (uL/s)'])*1.1)
         ax6[s].yaxis.tick_right()
         ax6[s].yaxis.set_label_position('right')
         ax6[s].get_xaxis().set_visible(False)
-        ax6[s].tick_params(axis = 'y', colors = "orange")
+        ax6[s].tick_params(axis = 'y', color = "orange")
+
+    print 'running time is ', time.time() - start_time

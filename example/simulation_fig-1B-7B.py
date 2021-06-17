@@ -21,12 +21,14 @@ import numpy as np
 import pandas as pd
 import glob
 import argparse
+import tempfile, os
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.colors import Normalize
 
 from openalea.plantgl.all import Viewer
+from IPython.display import Image, display
 
 from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law
@@ -222,7 +224,16 @@ if __name__ == '__main__':
 
             #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
             # it could also be 'J_out' the axial flux
-            # print index
+            print index
             prop_cmap = 'order'
-            plot(g, name = 'plot-' + str(index) + '.png', prop_cmap = prop_cmap)
 
+            # g has radius, here we set fictive radii just for visual comfort
+            alpha = 5.
+            plot(g, has_radius=False, r_base=alpha * 1.e-4, r_tip=alpha * 5e-5, prop_cmap = prop_cmap)
+            Viewer.widgetGeometry.setSize(450, 600)
+            fn = tempfile.mktemp(suffix='.png')
+            Viewer.saveSnapshot(fn)
+            Viewer.stop()
+            img = Image(fn)
+            os.unlink(fn)
+            display(img)

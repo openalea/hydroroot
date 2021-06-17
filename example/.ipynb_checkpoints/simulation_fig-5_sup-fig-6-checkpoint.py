@@ -17,32 +17,35 @@
 
 from random import _hexlify, _urandom
 
+import sys
+import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
-import sys
 
-from openalea.mtg import traversal
-from openalea.mtg.algo import axis
+from openalea.mtg import MTG, traversal
 
-
-from hydroroot import radius, markov
+from hydroroot import radius, markov, flux, length
 from hydroroot.law import histo_relative_law, reference_relative_law
 from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.analysis import intercept
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
 
+
+results = {}
+Jv_global = 1.0
+
 ONE_LAW = False
 EXPOVARIATE = True
-results = {}
+
 
 ################################################
 # get the model parameters, the length laws are
 # calculated from the files given in the yaml file
 ###############################################
 
+
 parameter = Parameters()
-# parameter.read_file('../example/parameters.yml')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
@@ -52,6 +55,7 @@ filename = args.inputfile
 output = args.outputfile
 parameter.read_file(filename)
 
+
 # read architecture file
 def read_archi_data(fn):
     df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
@@ -59,6 +63,11 @@ def read_archi_data(fn):
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
 
     return df
+
+#################################################################################
+# MTG construction either from data reconstructed() or generated from parameters
+#   generated()
+#################################################################################
 
 def generate_g(seed = None, length_data = None, branching_variability = 0.25,
                delta = 2e-3, nude_length = 2e-3, primary_length = 0.13, segment_length = 1e-4, order_max = 4):
@@ -111,6 +120,9 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
         seed = seed)
     return g
 
+###############################################################################
+# data
+###############################################################################
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = True):
     """
     scale
@@ -151,6 +163,7 @@ def ref_length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform =
 def radial(v = 92, acol = [], scale = 1):
     xr = acol[0]  # at this stage kr constant so the same x than Ka
     yr = [v * scale] * len(xr)
+
     return xr, yr
 
 def axial(acol = [], scale = 1):
@@ -159,9 +172,15 @@ def axial(acol = [], scale = 1):
 
     return x, y
 
+
+###############################################################################
+# Main simulation function
+###############################################################################
+
 def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(long(_hexlify(_urandom(2500)), 16) % 100000000)
+
 
 def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None):
     """
@@ -211,8 +230,6 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
     g = radius.compute_relative_position(g)
 
     # Calculation of the distance from base of each vertex, used for cut and flow
-    # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
-    # parameter dl which should be equal to vertex length but which is not pass
     _mylength = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
@@ -224,10 +241,19 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
+    if parameter.archi['read_architecture']:
+        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        primary_length = g.property('position')[v_base]
+
+    # compute difference of length laws
+    if parameter.archi['read_architecture']:
+        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        primary_length = g.property('position')[v_base]
+
     # Compute the intercepts
     intercepts = intercept(g, sorted(parameter.output['intercepts']))
 
-    return g, primary_length, _length, surface, intercepts, _seed #, integral_diff
+    return g, primary_length, _length, surface, intercepts, _seed
 
 def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None, cut_and_flow = False):
     if axial_data is None: axial_data = parameter.hydro['axial_conductance_data']
@@ -237,8 +263,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     k_radial_data = radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
-    g, Keq, Jv_global = hydroroot_flow(g,
-                                       segment_length = parameter.archi['segment_length'],
+    g, Keq, Jv_global = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
                                        k0 = k_radial,
                                        Jv = parameter.exp['Jv'],
                                        psi_e = parameter.exp['psi_e'],
@@ -249,102 +274,106 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     return g, Keq, Jv_global
 
 if __name__ == '__main__':
-    seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
-    colors = ['orange', 'cyan', 'green', 'magenta', 'blue']
+    k0 = parameter.hydro['k0']
+    # dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv')
+    dseeds = pd.read_csv('data/generated-roots-20-10-07.csv')
+    # dseeds = pd.read_csv('data/test_fig-5.csv')
 
-    outputfilename="fig-6D-RSA.csv"
-    for iloop in range(2): # 1st for the root, 2d for cylinder because max_order set to 0 at the of the 1st pass
+    # if a seed is given in the parameters.yml file then restrict to this seed
+    if parameter.archi['seed'][0] is not None:
+        dseeds = dseeds[dseeds.seed == parameter.archi['seed']]
 
-        nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold'])
-        print 'Simulation runs: ', nb_steps
-        print '#############################'
-        print 'figure 6-D'
-        print outputfilename
-        j_relat = {}
-        _columns = []
-        _columns.append('ax')
-        j_relat['ax'] = []
-        for i in seg_at_position:
-            _columns.append(str(i) + ' mm')
-            j_relat[str(i) + ' mm'] = []
-        _columns.append('Jv')
-        j_relat['Jv'] = []
+    # predict the number of simulation run
+    nb_steps = len(dseeds)
+    print 'Simulation runs: ', nb_steps
+    print '#############################'
 
-        seed =parameter.archi['seed'][0]
-        primary_length = parameter.archi['primary_length'][0]
-        delta = parameter.archi['branching_delay'][0]
-        nude_length = parameter.archi['nude_length'][0]
+    for i in range(5):
+        results[i] = {}
+        columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'ax', 'length (m)', 'surface (m2)', 'Jv (uL/s)',
+                   'internode (m)', 'nude length (m)']
+        for key in columns:
+            results[i][key] = []
+    count = 0
+    # sensibility analyse using multiplying factor on K and k
+    for id in dseeds.index:
+        seed = dseeds.seed[id]
+        primary_length = dseeds.primary_length[id]
+        delta = dseeds.delta[id]
+        nude_length = dseeds.nude_length[id]
 
+        g, primary_length, _length, surface, intercepts, _seed = root_creation(primary_length = primary_length, seed = seed,
+            delta = delta, nude_length = nude_length, df = None)
+            
+        i = 0
+        for axfold, k0 in [(0.5, 98.6), (1.0, 32.76), (2.0, 71.43), (5.0, 71.43), (0.01, 98.6)]:
+            g, Keq, Jv = hydro_calculation(g, axfold = axfold, k_radial = k0)
+            results[i]['Jv (uL/s)'].append(Jv)
+            results[i]['seed'].append(str(seed))
+            results[i]['primary_length (m)'].append(primary_length)
+            results[i]['k (10-8 m/s/MPa)'].append(k0 * 0.1)  # uL/s/MPa/m2 -> 10-8 m/s/MPa
+            results[i]['length (m)'].append(_length)
+            results[i]['surface (m2)'].append(surface)
+            results[i]['ax'].append(axfold)
+            results[i]['internode (m)'].append(dseeds.delta[id])
+            results[i]['nude length (m)'].append(dseeds.nude_length[id])
+            i += 1
+            
+        count += 1
+        progress = float(count) / len(dseeds)
+        # print progress*100, ' %'
+        sys.stdout.write('\r')
+        # sys.stdout.write("[%-100s] %d%%" % ('=' * int(progress*100), int(progress*100)))
+        sys.stdout.write("runs done " + '{:0.4}'.format(progress*100) + ' %')
+        sys.stdout.flush()
 
-        g, primary_length, _length, surface, intercepts, _seed = root_creation(
-            primary_length = primary_length,
-            seed = seed,
-            delta = delta,
-            nude_length = nude_length)
+    dresults = pd.DataFrame(results[0], columns = columns)
+    # if output is not None: dresults.to_csv(output, index = False)
+    ax = dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', color='Blue', edgecolors = 'Blue')
+    ax.set_ylim([0, 0.06]), ax.set_xlim([0, 20e-4])
+    ax.set_title('figure 5-A')
 
-        vertices_at_length = []
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
-        n_max = max(axis(g,v_base))
+    dresults = pd.DataFrame(results[1], columns = columns)
+    # if output is not None: dresults.to_csv(output, index = False)
+    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, color='orange', edgecolors = 'orange')
+    ax2 = dresults.plot.scatter('primary_length (m)', 'Jv (uL/s)')
+    ax2.set_title('figure 5-B')
+    ax2.axis(xmin = 0.0, xmax = max(results[1]['primary_length (m)'])*1.1, ymin = 0.0, ymax = max(results[1]['Jv (uL/s)'])*1.1)
+    ax3 = dresults.plot.scatter('internode (m)', 'Jv (uL/s)')
+    ax3.axis(xmin = 0.0, xmax = max(results[1]['internode (m)'])*1.1, ymin = 0.0, ymax = max(results[1]['Jv (uL/s)'])*1.1)
+    ax3.set_title('figure 5-C')
+    ax4 = dresults.plot.scatter('nude length (m)', 'Jv (uL/s)')
+    ax4.axis(xmin = 0.0, xmax = max(results[1]['nude length (m)'])*1.1, ymin = 0.0, ymax = max(results[1]['Jv (uL/s)'])*1.1)
+    ax4.set_title('figure 5-D')
 
-        for l in seg_at_position:
-            ## only on PR
-            vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
-            vertices_at_length.append([vids])
+    dresults = pd.DataFrame(results[2], columns = columns)
+    # if output is not None: dresults.to_csv(output, index = False)
+    dresults.plot.scatter('surface (m2)', 'Jv (uL/s)', ax = ax, color='green', edgecolors = 'green')
 
-        j1 = {}
-        for axfold in parameter.output['axfold']:
-            for radfold in parameter.output['radfold']:
-                avg_fold = axfold # the factor on winch the relative j is calculated
-                other_fold = radfold # the other
-                if avg_fold == 1: j1[other_fold] = []
+    drealplants = pd.read_csv('data/10-arabido-plants.csv')
+    drealplants.plot.scatter('surface', 'Jv', ax = ax, color='black', s=25)
 
-                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
-
-                if avg_fold == 1:
-                    g.add_property('j_relat')
-                    g_1 = g.copy()
-                else:
-                    for v in g:
-                        if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
-
-                c = 0
-                for l in seg_at_position:
-                    c += 1
-                    jtot = 0.0
-                    n = len(vertices_at_length[c-1])
-                    for v in vertices_at_length[c-1]:
-                        # remark: when done on the PR there is only 1 vertex
-                        jtot += g.property('J_out')[v]
-
-                    if avg_fold == 1:
-                        j1[other_fold].append(jtot)
-                        j_relat[str(l) + ' mm'].append(l*1e-3)
-                    else:
-                        j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
-
-                if avg_fold == 1:
-                    j1[other_fold].append(Jv)
-                    j_relat['Jv'].append(primary_length)
-                else:
-                    j_relat['Jv'].append(Jv/j1[other_fold][c])
-
-                j_relat['ax'].append(axfold)
-                nb_steps -= 1
-                sys.stdout.write('\r')
-                sys.stdout.write(str(nb_steps))
-                sys.stdout.flush()
-
-        parameter.archi['order_max'] = 0 # for the cylinder
-
-        dj2 = pd.DataFrame(j_relat, columns = _columns)
-        dj1 = dj2.transpose()
-        if iloop == 0:
-            ax = dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, color = colors, legend = False)
-        else:
-            dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, ax = ax, style = '--', color = colors, legend = False)
-            ax.set_xlabel('Distance to tip (m)')
-            ax.set_ylabel('Normelized local flow (J)')
-            ax.set_title('figure 6-D')
-        dj1.to_csv(outputfilename, index = False, header = False)
-        outputfilename = "fig-6D-cylindric.csv"
+    #supplemental figure 6
+    fig = {}
+    ax5 = {}
+    ax6 = {}
+    for s in ['primary_length (m)', 'internode (m)', 'nude length (m)']:
+        fig[s] = plt.figure()
+        ax5[s] = fig[s].add_subplot(111, label = "1")
+        dresults = pd.DataFrame(results[3], columns = columns)
+        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax5[s], color = 'black')
+        ax5[s].set_title('supplemental figure 6-A')
+        ax5[s].axis(xmin = 0.0, xmax = max(results[3][s])*1.1, ymin = 0.0, ymax = max(results[3]['Jv (uL/s)'])*1.1)
+        xmax = ax5[s].get_xlim()[1] * 0.99
+        xmin = ax5[s].get_xlim()[0] - 0.01 * ax5[s].get_xlim()[1]
+    
+        ax6[s] = fig[s].add_subplot(111, label = "2", frame_on = False)
+        dresults = pd.DataFrame(results[4], columns = columns)
+        dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax6[s], color = 'orange', edgecolors = 'orange')
+        ax6[s].set_xlim(xmin,xmax)
+        ax6[s].axis(ymin = 0.0, ymax = max(results[4]['Jv (uL/s)'])*1.1)
+        ax6[s].yaxis.tick_right()
+        ax6[s].yaxis.set_label_position('right')
+        ax6[s].get_xaxis().set_visible(False)
+        ax6[s].tick_params(axis = 'y', color = "orange")

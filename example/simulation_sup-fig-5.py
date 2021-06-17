@@ -17,20 +17,16 @@
 
 from random import _hexlify, _urandom
 
-import numpy as np
 import pandas as pd
-import glob
-import copy
 import argparse
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-from matplotlib.colors import Normalize
+import sys
+import time
+import tempfile, os
 
 from openalea.mtg import traversal
 from openalea.plantgl.all import Viewer
 from openalea.mtg.algo import axis
-
+from IPython.display import Image, display
 
 from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law, reference_relative_law
@@ -43,6 +39,8 @@ from hydroroot.display import plot as mtg_scene
 ONE_LAW = False
 EXPOVARIATE = True
 results = {}
+
+start_time = time.time()
 
 ################################################
 # get the model parameters, the length laws are
@@ -301,7 +299,9 @@ if __name__ == '__main__':
     j_relat = {}
     seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
-    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_PR_016.csv')
+    # dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_PR_016.csv')
+    # dseeds = pd.read_csv('data/short_subset_generated-roots-20-10-07_PR_016.csv')
+    dseeds = pd.read_csv('data/test.csv')
     _seeds = list(dseeds['seed'])
     _delta = list(dseeds['delta'])
     _primary_length = list(dseeds['primary_length'])
@@ -309,6 +309,7 @@ if __name__ == '__main__':
     
     # predict the number of simulation run
     nb_steps = len(parameter.output['axfold']) * len(_seeds)
+    nb_steps2=nb_steps
     print 'Simulation runs: ', nb_steps
     print '#############################'
 
@@ -346,6 +347,7 @@ if __name__ == '__main__':
             vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
             vertices_at_length.append([vids])
 
+        g_ax = {}
         j1 = {}
         for axfold in parameter.output['axfold']:
             for radfold in parameter.output['radfold']:
@@ -387,20 +389,37 @@ if __name__ == '__main__':
 
                 j_relat['ax'].append(axfold)
 
-            if (seed == 37430610) & (round(axfold,2) in [0.05,0.25,0.5,0.75]):
-                plot(g, name = 'sup-fig-5-' + str(axfold) + '.png', prop_cmap = 'j_relat')
+                nb_steps2 -= 1
+                sys.stdout.write('\r')
+                sys.stdout.write('{:0.4}'.format(100.0 - float(nb_steps2)/float(nb_steps)*100) + ' %')
+                sys.stdout.flush()
 
-        nb_steps -= len(parameter.output['axfold'])
-        print 'nb of runs left: ', nb_steps
+            if (seed == 37430610) & (round(axfold,2) in [0.05,0.25,0.5,0.75]):
+                print ' ax = ', axfold
+                # g has radius, here we set fictive radii just for visual comfort
+                # alpha = 0.2  # radius in millimeter identical for all orders
+                # gcopy = g.copy()  # copy because we change the radius property in plot below
+                # plot(gcopy, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat')
+                # plot(g, prop_cmap = 'j_relat')
+                g_ax[str(axfold)]=g.copy()
+                # Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
+                # fn = tempfile.mktemp(suffix = '.png')
+                # Viewer.saveSnapshot(fn)
+                # Viewer.stop()
+                # img = Image(fn)
+                # os.unlink(fn)
+                # display(img)
+
 
     dj2 = pd.DataFrame(j_relat, columns = _columns)
     dj2.to_csv("sup-fig-5.csv")
 
     ax = {}
     for s in ['1 mm', '65 mm', '130 mm']:
-        ax[s] = dj2.plot.scatter('ax', s, colors = 'orange', edgecolors = 'orange', label = s + ' to tip')
-        dj2.plot.scatter('ax', 'base', ax = ax[s], colors = 'blue', edgecolors = 'blue', label = 'base')
+        ax[s] = dj2.plot.scatter('ax', s, color = 'orange', edgecolors = 'orange', label = s + ' to tip')
+        dj2.plot.scatter('ax', 'base', ax = ax[s], color = 'blue', edgecolors = 'blue', label = 'base')
         ax[s].set_ylabel('Normalize local flow (J)')
         ax[s].legend(loc = 'upper left')
         ax[s].set_xlim((0, 1))
         ax[s].set_ylim((0, 1))
+    print 'running time is ', time.time() - start_time

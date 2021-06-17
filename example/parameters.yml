@@ -19,8 +19,7 @@ archi:
 
     #File name:
     #may be a list of names, eg. [file1, file2, file3] wildcar may be used
-    input_file: [plant-1.txt, plant-2.txt, plant-3.txt, plant-4.txt, plant-5.txt, plant-6.txt,
-                 plant-7.txt, plant-8.txt, plant-9.txt, plant-10.txt]
+    input_file: [200619-YBFB-Col-2-cut-n-flow-archi2.txt]
 
     seed:
 
@@ -34,12 +33,12 @@ archi:
     #length of the primary root
     #float or list of float
     #unit: m
-    primary_length: range(0.04, 0.21, 0.01)
+    primary_length:
 
     #branching delay
     #float or list of float
     #unit: m
-    branching_delay: range(1.0e-3, 3.0e-3, 0.25e-3)
+    branching_delay:
 
     #branching variability
     #float between [0 ; 1], 0.25 means 25%
@@ -55,7 +54,7 @@ archi:
     #part of roots without any lateral root, distance from tip
     #float or list of float
     #unit: m
-    nude_length: [0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035]
+    nude_length:
 
     #reference radius of the primary root
     #float
@@ -71,7 +70,7 @@ hydro:
     #radial conductivity
     #float
     #unit: microL/(s.MPa.m**2)
-    k0: 327.6558
+    k0: 104.0 #327.6558
 
     #axial_conductance_data
     #   - [x1, ......, xn]

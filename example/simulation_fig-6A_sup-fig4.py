@@ -20,6 +20,7 @@ from random import _hexlify, _urandom
 import numpy as np
 import pandas as pd
 import argparse
+import sys
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -307,7 +308,10 @@ if __name__ == '__main__':
             results['ax'].append(axfold)
 
 
-            print nb_steps
+            # print nb_steps
+            sys.stdout.write('\r')
+            sys.stdout.write(str(nb_steps))
+            sys.stdout.flush()
             nb_steps -= 1
 
     dresults = pd.DataFrame(results, columns = columns)
@@ -328,7 +332,9 @@ if __name__ == '__main__':
     ax2.set_ylim([0, 0.03])
     ax2.set_title('supplemental figure 4-A')
     dresults[dresults['k (10-8 m/s/MPa)'] == 32.76558].plot.line('ax', 'Jv (uL/s)', ax = ax2, c = 'orange')
+    ax2.get_legend().remove()
     ax3 = dresults.plot.scatter('k (10-8 m/s/MPa)', 'Jv (uL/s)', c='black')
     dresults[dresults['ax'] == 1.0].plot.line('k (10-8 m/s/MPa)', 'Jv (uL/s)', ax = ax3, c = 'orange')
+    ax3.get_legend().remove()
     ax3.set_ylim([0, 0.03])
     ax3.set_title('supplemental figure 4-B')

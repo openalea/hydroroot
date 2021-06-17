@@ -19,18 +19,18 @@ from random import _hexlify, _urandom
 
 import numpy as np
 import pandas as pd
-import glob
 import argparse
+import tempfile, os
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.colors import Normalize
 
 from openalea.plantgl.all import Viewer
+from IPython.display import Image, display
 
 from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law
-from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
 from hydroroot.display import plot as mtg_scene
@@ -195,6 +195,16 @@ if __name__ == '__main__':
 
         g, Keq, Jv = hydro_calculation(g)
 
-        plot(g, name = 'plot-' + str(seed) + '.png', prop_cmap = 'order')
+        # plot(g, name = 'plot-' + str(seed) + '.png', prop_cmap = 'order')
+        print 'seed: ', seed
+        prop_cmap = 'order'
+
+        plot(g, prop_cmap = prop_cmap)
+        fn = tempfile.mktemp(suffix = '.png')
+        Viewer.saveSnapshot(fn)
+        Viewer.stop()
+        img = Image(fn)
+        os.unlink(fn)
+        display(img)
 
         count += 1

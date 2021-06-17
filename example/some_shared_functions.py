@@ -17,11 +17,18 @@
 
 from random import _hexlify, _urandom
 
+import numpy as np
 import pandas as pd
+import glob
+import copy
 import argparse
-import sys
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.colors import Normalize
 
 from openalea.mtg import traversal
+from openalea.plantgl.all import Viewer
 from openalea.mtg.algo import axis
 
 
@@ -31,6 +38,7 @@ from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.analysis import intercept
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
+from hydroroot.display import plot as mtg_scene
 
 ONE_LAW = False
 EXPOVARIATE = True
@@ -163,7 +171,10 @@ def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(long(_hexlify(_urandom(2500)), 16) % 100000000)
 
-def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None):
+def root_creation(read_architecture = False, seed = None, primary_length = 0.13, delta = 2.0e-3,
+                  branching_variability = 0.25, order_max = 4, segment_length = 1.0e-4, nude_length = 2.0e-2,
+                  ref_radius = 7.0e-5, order_decrease_factor = 0.7, df = None, length_data = None,
+                  intercepts_distance = []):
     """
     creation of an mtg with properties like radius and vertex length set.
 
@@ -187,8 +198,8 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
         _seed: the seed used in the generator
         integral_diff: debug calculation to test generated lateral length law gap with the experimental one
     """
-    if parameter.archi['read_architecture']:
-        g = mtg_from_aqua_data(df, parameter.archi['segment_length'])
+    if read_architecture:
+        g = mtg_from_aqua_data(df, segment_length)
         _seed = None
     else:
         # if no seed just create one
@@ -197,17 +208,16 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
         else:
             _seed = seed
 
-        length_data = parameter.archi['length_data']
         g = generate_g(_seed, length_data,
-                       parameter.archi['branching_variability'], delta,
-                       nude_length, primary_length, parameter.archi['segment_length'],
-                       parameter.archi['order_max'])
+                       branching_variability, delta,
+                       nude_length, primary_length, segment_length,
+                       order_max)
 
     # compute radius property on MTG
-    g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
+    g = radius.ordered_radius(g, ref_radius, order_decrease_factor)
 
     # compute length property and parametrisation
-    g = radius.compute_length(g, parameter.archi['segment_length'])
+    g = radius.compute_length(g, segment_length)
     g = radius.compute_relative_position(g)
 
     # Calculation of the distance from base of each vertex, used for cut and flow
@@ -216,20 +226,20 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
     _mylength = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + parameter.archi['segment_length'] if pid else parameter.archi['segment_length']
+        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
     g.properties()['mylength'] = _mylength
 
     # _length is the total length of the RSA (sum of the length of all the segments)
-    _length = g.nb_vertices(scale = 1) * parameter.archi['segment_length']
+    _length = g.nb_vertices(scale = 1) * segment_length
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
     # Compute the intercepts
-    intercepts = intercept(g, sorted(parameter.output['intercepts']))
+    intercepts = intercept(g, sorted(intercepts_distance))
 
     return g, primary_length, _length, surface, intercepts, _seed #, integral_diff
 
-def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None, cut_and_flow = False):
+def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None):
     if axial_data is None: axial_data = parameter.hydro['axial_conductance_data']
     if k_radial is None: k_radial = parameter.hydro['k0']
     # compute axial & radial
@@ -259,7 +269,6 @@ if __name__ == '__main__':
         nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold'])
         print 'Simulation runs: ', nb_steps
         print '#############################'
-        print 'figure 6-D'
         print outputfilename
         j_relat = {}
         _columns = []
@@ -331,20 +340,97 @@ if __name__ == '__main__':
 
                 j_relat['ax'].append(axfold)
                 nb_steps -= 1
-                sys.stdout.write('\r')
-                sys.stdout.write(str(nb_steps))
-                sys.stdout.flush()
+                print 'nb of runs left: ', nb_steps
 
         parameter.archi['order_max'] = 0 # for the cylinder
 
         dj2 = pd.DataFrame(j_relat, columns = _columns)
         dj1 = dj2.transpose()
         if iloop == 0:
-            ax = dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, color = colors, legend = False)
+            ax = dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, colors = colors, legend = False)
         else:
-            dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, ax = ax, style = '--', color = colors, legend = False)
+            dj1.loc['1 mm':'155 mm',[0, 1, 5, 10, 15, 19]].plot.line(x=0, ax = ax, style = '--', colors = colors, legend = False)
             ax.set_xlabel('Distance to tip (m)')
             ax.set_ylabel('Normelized local flow (J)')
             ax.set_title('figure 6-D')
         dj1.to_csv(outputfilename, index = False, header = False)
         outputfilename = "fig-6D-cylindric.csv"
+
+    # for supplemental figure 5-B
+    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_PR_016.csv')
+
+    nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold']) * len(dseeds)
+
+    j_relat = {}
+    _columns = []
+    _columns.append('ax')
+    j_relat['ax'] = []
+    for i in seg_at_position:
+        _columns.append(str(i) + ' mm')
+        j_relat[str(i) + ' mm'] = []
+    _columns.append('Jv')
+    j_relat['Jv'] = []
+
+    for id in dseeds.index:
+        seed = dseeds.seed[id]
+        primary_length = dseeds.primary_length[id]
+        delta = dseeds.delta[id]
+        nude_length = dseeds.nude_length[id]
+
+        g, primary_length, _length, surface, intercepts, _seed = root_creation(
+            primary_length = primary_length,
+            seed = seed,
+            delta = delta,
+            nude_length = nude_length)
+
+        vertices_at_length = []
+        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        n_max = max(axis(g,v_base))
+
+        for l in seg_at_position:
+            ## only on PR
+            vids = int(n_max-l*1.0e-3/parameter.archi['segment_length'])
+            vertices_at_length.append([vids])
+
+        j1 = {}
+        for axfold in parameter.output['axfold']:
+            for radfold in parameter.output['radfold']:
+                avg_fold = axfold # the factor on winch the relative j is calculated
+                other_fold = radfold # the other
+                if avg_fold == 1: j1[other_fold] = []
+
+                g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
+
+                if avg_fold == 1:
+                    g.add_property('j_relat')
+                    g_1 = g.copy()
+                else:
+                    for v in g:
+                        if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
+
+                c = 0
+                for l in seg_at_position:
+                    c += 1
+                    jtot = 0.0
+                    n = len(vertices_at_length[c-1])
+                    for v in vertices_at_length[c-1]:
+                        # remark: when done on the PR there is only 1 vertex
+                        jtot += g.property('J_out')[v]
+
+                    if avg_fold == 1:
+                        j1[other_fold].append(jtot)
+                        j_relat[str(l) + ' mm'].append(l*1e-3)
+                    else:
+                        j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
+
+                if avg_fold == 1:
+                    j1[other_fold].append(Jv)
+                    j_relat['Jv'].append(primary_length)
+                else:
+                    j_relat['Jv'].append(Jv/j1[other_fold][c])
+
+                j_relat['ax'].append(axfold)
+                nb_steps -= 1
+                print 'nb of runs left: ', nb_steps
+
+    dj2 = pd.DataFrame(j_relat, columns = _columns)

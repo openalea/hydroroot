@@ -18,6 +18,7 @@
 import pandas as pd
 import glob
 import argparse
+import sys
 
 from openalea.mtg import traversal
 
@@ -149,8 +150,7 @@ if __name__ == '__main__':
     print 'Simulation runs: ', nb_steps
     print '#############################'
 
-    columns = ['plant', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)']
-    print columns
+    columns = ['plant', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'total length (m)', 'surface (m2)', 'Jv (uL/s)']
 
     axfold = parameter.output['axfold'][0]
     radfold = parameter.output['radfold'][0]
@@ -163,6 +163,9 @@ if __name__ == '__main__':
         df = read_archi_data(f) if parameter.archi['read_architecture'] else None
 
         index = f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
+        sys.stdout.write('\r')
+        sys.stdout.write(str(index))
+        sys.stdout.flush()
 
         _archi_name = str(index).lower()
         j = None
@@ -209,13 +212,13 @@ if __name__ == '__main__':
         results['plant'].append(index)
         results['primary_length (m)'].append(primary_length)
         results['k (10-8 m/s/MPa)'].append(k0*0.1) #uL/s/MPa/m2 -> 10-8 m/s/MPa
-        results['_length (m)'].append(_length)
+        results['total length (m)'].append(_length)
         results['surface (m2)'].append(surface)
         results['Jv (uL/s)'].append(Jv)
-        print index, primary_length, k0*0.1, _length, surface, Jv
 
+    dr = pd.DataFrame(results, columns = columns)
+    print dr.loc[:, ['plant', 'total length (m)', 'surface (m2)', 'k (10-8 m/s/MPa)']]
     if output is not None:
-        dr = pd.DataFrame(results, columns = columns)
         dr.to_csv(output,  index = False)
 
 

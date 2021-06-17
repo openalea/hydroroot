@@ -57,9 +57,16 @@ parameter = Parameters()
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
 parser.add_argument("-o", "--outputfile", help="output csv file")
+parser.add_argument("-op", "--optimize", help="optimize K and k", action="store_true")
+# parser.add_argument("-v", "--verbose", help="display convergence", action="store_true")
 args = parser.parse_args()
 filename = args.inputfile
 output = args.outputfile
+if output is None: output = "out.csv"
+Flag_Optim = args.optimize
+if Flag_Optim is None: Flag_Optim = False
+# Flag_verbose = args.verbose
+# if Flag_verbose is None: Flag_verbose = False
 parameter.read_file(filename)
 
 # read architecture file
@@ -149,7 +156,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     return g, Keq, Jv
 
 def fun1(x):
-
+    # axfold and radfold adjusted
     axfold = x[0]
     radfold = x[-1]
 
@@ -249,7 +256,7 @@ def fun3(x):
 
 if __name__ == '__main__':
 
-    Flag_Optim = True
+    # Flag_Optim = True
     dK_constraint = -3.e-2 # dK/dx >= dK_constraint
     _tol = 1.0e-9
     
@@ -269,7 +276,7 @@ if __name__ == '__main__':
     psi_e = parameter.exp['psi_e']
     psi_base = parameter.exp['psi_base']
 
-    columns = ['plant', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)', 'Jexp (uL/s)']
+    columns = ['plant', 'cut length (m)', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)', 'Jexp (uL/s)']
 
     results = {}
     for key in columns:
@@ -410,6 +417,7 @@ if __name__ == '__main__':
 
     results['plant'].append(index)
     results['primary_length (m)'].append(primary_length)
+    results['cut length (m)'].append(0.0)
     results['k (10-8 m/s/MPa)'].append(k0*0.1) #uL/s/MPa/m2 -> 10-8 m/s/MPa
     results['_length (m)'].append(_length)
     results['surface (m2)'].append(surface)
@@ -439,6 +447,7 @@ if __name__ == '__main__':
         primary_length = cut_length
         results['plant'].append(index)
         results['primary_length (m)'].append(primary_length)
+        results['cut length (m)'].append(g_cut['tot'].property('position')[1] - primary_length)
         results['k (10-8 m/s/MPa)'].append(k0*0.1) #uL/s/MPa/m2 -> 10-8 m/s/MPa
         results['_length (m)'].append(_length)
         results['surface (m2)'].append(surface)
@@ -449,6 +458,9 @@ if __name__ == '__main__':
         
 
     dresults = pd.DataFrame(results, columns = columns)
+
+    ax = dresults.plot.scatter('cut length (m)', 'Jexp (uL/s)', c = 'black')
+    dresults.plot.line('cut length (m)', 'Jv (uL/s)', c = 'purple', ax = ax)
 
     if Flag_Optim:
         optim_results  = {}
@@ -463,4 +475,4 @@ if __name__ == '__main__':
         df = dresults
 
     if output is not None: df.to_csv(output, index = False)
-
+    print 'running time is ', time.time() - start_time
