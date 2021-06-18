@@ -1,13 +1,8 @@
 ###############################################################################
-#
-# Authors: C. Pradal, Y. Boursiac
-# Date : 14/10/2016
-#
-# Date: 2019-12-03
-# Modified by F. Bauget to test yaml configuration file
-#
-# Date: 2019-12-10
-# F. Bauget merging simulation.py and hydro_measures
+# Date: 2021-06-18
+# F. Bauget
+#   Use of HydroRoot to calcul local relative fluxes on a given architecture and on a
+#   single primary root with the same hydraulic characteristics
 ###############################################################################
 
 ######
@@ -30,7 +25,7 @@ from hydroroot.law import histo_relative_law, reference_relative_law
 from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.analysis import intercept
 from hydroroot.main import hydroroot_flow
-from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
+from hydroroot.init_parameter import Parameters
 
 ONE_LAW = False
 EXPOVARIATE = True
@@ -54,6 +49,20 @@ parameter.read_file(filename)
 
 # read architecture file
 def read_archi_data(fn):
+    """
+    Read a csv (tab separated) file with the architecture in the following format
+        |'distance_from_base_(mm)' | 'lateral_root_length_(mm)' | order |
+        |float | float | string|
+        order = 1 for laterals of 1st order ob the primary
+        order = n-m for the lateral number m on the lateral number n of 1st order
+        order = n-m-o for the lateral number o of the previous one
+        etc.
+        Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
+
+    :param fn: string - the architecture filename in csv format
+
+    :return: DataFrame
+    """
     df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
     df['db'] = df['distance_from_base_(mm)'] * 1.e-3
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
@@ -113,7 +122,15 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = True):
     """
-    scale
+    Creation of the function giving the lateral length according to its position on the parent branch
+
+    :param pd: DataFrame - DataFrame with the laterals length law
+    :param scale_x: float (0.01) - x scale by default transform x in % to real value
+    :param scale_y: float (1.0) - any possible scale factor on y
+    :param scale: float (1e-4) - the segment length (m)
+    :param uniform: boolean or string (False) - if False use randomly an exact data point, True use a uniform distribution
+            between the minimum and the maximum of the data LR_length_mm, if 'expo', use an expovariate law
+    :return: a function giving the lateral length according to its position
     """
     x = pd.relative_distance_to_tip.tolist()
     y = pd.LR_length_mm.tolist()
@@ -128,22 +145,6 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = Tru
                                      scale = scale,
                                      plot = False,
                                      uniform = uniform)
-    return _length_law
-
-def ref_length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = True):
-    """
-    scale
-    """
-    x = pd.relative_distance_to_tip.tolist()
-    y = pd.LR_length_mm.tolist()
-
-    # size of the windows: 5%
-    size = 5. * scale_x
-
-    _length_law = reference_relative_law(x, y,
-                                         size = size,
-                                         scale_x = scale_x,
-                                         scale_y = 1.e-3 * scale_y)
     return _length_law
 
 # to change the conductivities values by a factor to be able to do some

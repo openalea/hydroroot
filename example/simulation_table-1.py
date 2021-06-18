@@ -1,13 +1,8 @@
 ###############################################################################
-#
-# Authors: C. Pradal, Y. Boursiac
-# Date : 14/10/2016
-#
-# Date: 2019-12-03
-# Modified by F. Bauget to test yaml configuration file
-#
-# Date: 2019-12-10
-# F. Bauget merging simulation.py and hydro_measures
+# Date: 2021-06-18
+# F. Bauget
+#   Use of HydroRoot to determinate the radial conductivity k on the set of
+#   architecture given in the yaml file
 ###############################################################################
 
 ######
@@ -45,8 +40,21 @@ parameter.read_file(filename)
 
 # read architecture file
 def read_archi_data(fn):
-    df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
+    """
+    Read a csv (tab separated) file with the architecture in the following format
+        |'distance_from_base_(mm)' | 'lateral_root_length_(mm)' | order |
+        |float | float | string|
+        order = 1 for laterals of 1st order ob the primary
+        order = n-m for the lateral number m on the lateral number n of 1st order
+        order = n-m-o for the lateral number o of the previous one
+        etc.
+        Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
 
+    :param fn: string - the architecture filename in csv format
+
+    :return: DataFrame
+    """
+    df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
     df['db'] = df['distance_from_base_(mm)'] * 1.e-3
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
 

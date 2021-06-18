@@ -1,13 +1,9 @@
 ###############################################################################
-#
-# Authors: C. Pradal, Y. Boursiac
-# Date : 14/10/2016
-#
-# Date: 2019-12-03
-# Modified by F. Bauget to test yaml configuration file
-#
-# Date: 2019-12-10
-# F. Bauget merging simulation.py and hydro_measures
+# Date: 2021-06-18
+# F. Bauget
+#   Use of HydroRoot to calcul local relative fluxes on some sensibility analysis 
+#   on the axial and radial conductivity using  a set of known architectures generated-roots-20-10-07.csv
+#   Sensibility analysis on the factor axfold on axial data and radfold on radial k given in the parameter yaml file are used
 ###############################################################################
 
 ######
@@ -17,24 +13,30 @@
 
 from random import _hexlify, _urandom
 
+from pylab import cm
+import numpy as np
 import pandas as pd
 import argparse
 import sys
 import time
 import tempfile, os
 
+from matplotlib.colors import Normalize
+
+import openalea.plantgl.all as pgl
+from openalea.mtg import turtle as turt
+from openalea.mtg.plantframe import color
 from openalea.mtg import traversal
-from openalea.plantgl.all import Viewer
 from openalea.mtg.algo import axis
 from IPython.display import Image, display
 
 from hydroroot import radius, markov
-from hydroroot.law import histo_relative_law, reference_relative_law
+from hydroroot.law import histo_relative_law
 from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.analysis import intercept
 from hydroroot.main import hydroroot_flow
-from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
-from hydroroot.display import plot as mtg_scene
+from hydroroot.init_parameter import Parameters
+from hydroroot.display import get_root_visitor
 
 ONE_LAW = False
 EXPOVARIATE = True
@@ -58,16 +60,22 @@ filename = args.inputfile
 output = args.outputfile
 parameter.read_file(filename)
 
-def my_toporder(g, scale):
-    """ Return the list of `g` vertices at scale `scale` in topological order """
-    axes = []
-    map(axes.extend,(traversal.pre_order2(g,vid)
-                          for vid in g.vertices(scale=scale)
-                          if not g.parent(vid)))
-    return axes
-
 # read architecture file
 def read_archi_data(fn):
+    """
+    Read a csv (tab separated) file with the architecture in the following format
+        |'distance_from_base_(mm)' | 'lateral_root_length_(mm)' | order |
+        |float | float | string|
+        order = 1 for laterals of 1st order ob the primary
+        order = n-m for the lateral number m on the lateral number n of 1st order
+        order = n-m-o for the lateral number o of the previous one
+        etc.
+        Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
+
+    :param fn: string - the architecture filename in csv format
+
+    :return: DataFrame
+    """
     df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
     df['db'] = df['distance_from_base_(mm)'] * 1.e-3
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
@@ -127,7 +135,15 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = True):
     """
-    scale
+    Creation of the function giving the lateral length according to its position on the parent branch
+
+    :param pd: DataFrame - DataFrame with the laterals length law
+    :param scale_x: float (0.01) - x scale by default transform x in % to real value
+    :param scale_y: float (1.0) - any possible scale factor on y
+    :param scale: float (1e-4) - the segment length (m)
+    :param uniform: boolean or string (False) - if False use randomly an exact data point, True use a uniform distribution
+            between the minimum and the maximum of the data LR_length_mm, if 'expo', use an expovariate law
+    :return: a function giving the lateral length according to its position
     """
     x = pd.relative_distance_to_tip.tolist()
     y = pd.LR_length_mm.tolist()
@@ -142,22 +158,6 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = Tru
                                      scale = scale,
                                      plot = False,
                                      uniform = uniform)
-    return _length_law
-
-def ref_length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = True):
-    """
-    scale
-    """
-    x = pd.relative_distance_to_tip.tolist()
-    y = pd.LR_length_mm.tolist()
-
-    # size of the windows: 5%
-    size = 5. * scale_x
-
-    _length_law = reference_relative_law(x, y,
-                                         size = size,
-                                         scale_x = scale_x,
-                                         scale_y = 1.e-3 * scale_y)
     return _length_law
 
 # to change the conductivities values by a factor to be able to do some
@@ -216,15 +216,6 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
                        parameter.archi['branching_variability'], delta,
                        nude_length, primary_length, parameter.archi['segment_length'],
                        parameter.archi['order_max'])
-    # F. Bauget 2020-03-18 for debug rsml import
-    # g_c = rsml.rsml2mtg('/home/fabrice/Documents/hydroroot_FB/example/data/arabidopsis-simple.rsml')
-    # g = my_continuous_to_discrete(g_c, segment_length = parameter.archi['segment_length'], resolution = 1e-4)
-    # for rid in g.roots_iter(scale = 3):
-    #     g.property('edge_type')[rid] = '+'
-    # g.properties()['order'] = orders(g, scale = -1)
-    # g = make_dicotomous_topo_mtg(magnitude = 16, segment_length = parameter.archi['segment_length'],link_length = 0.1)
-    # g = make_herringbone_topo_mtg(magnitude = 16, segment_length = parameter.archi['segment_length'],link_length = 0.01)
-    # F. Bauget 2020-03-18
 
     # compute radius property on MTG
     g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
@@ -247,28 +238,10 @@ def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
-    # compute difference of length laws
-    # integral_diff = 0.
-    # if not parameter.archi['read_architecture']:
-    #     X, Y = flux.ramification_length_law(g, root = 1, dl = parameter.archi['segment_length'])
-    #     length_law_mtg = length.fit_law(X, Y, ext = 2)
-    #     ref_law = ref_length_law(parameter.archi['length_data'][0], scale_x = 1. / 100.)
-    #
-    #     integral_diff = length.diff(length_law_mtg, ref_law)
-    # else:
-    #     integral_diff = None
-    #     v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
-    #     primary_length = g.property('position')[v_base]
-
     # Compute the intercepts
     intercepts = intercept(g, sorted(parameter.output['intercepts']))
-    # ## if intercepts are relative to primary root
-    # new_int = []
-    # for x in parameter.output['intercepts']:
-    #     new_int.append(x * primary_length)
-    # intercepts = intercept(g, sorted(new_int))
 
-    return g, primary_length, _length, surface, intercepts, _seed #, integral_diff
+    return g, primary_length, _length, surface, intercepts, _seed
 
 def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None, cut_and_flow = False):
     if axial_data is None: axial_data = parameter.hydro['axial_conductance_data']
@@ -289,19 +262,93 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
     return g, Keq, Jv_global
 
-def plot(g, name=None, **kwds):
+def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prop_cmap='radius', cmap='jet',lognorm=None,
+         prune=None, name=None):
+    """
+    Display the architecture in plantGL Viewer with roots colors according to the property chosen
+    :param g: MTG()
+    :param has_radius: Boolean (False) - True use the radius property values, calculate them otehrwise according to r_base and r_tip
+    :param r_base: float (1e-4) - if has_radius is False, the radius at the base of a root whatever its order (mm)
+    :param r_tip: float (5e-5) - if has_radius is False, the radius at the tip of a root whatever its order (mm)
+    :param prop_cmap: string ('radius') - the property name used for the color map
+    :param cmap: string ('jet') - the name of the matplotlib colormap to use
+    :param lognorm: Boolean (False) - True: log-normalised, normalised otherwise
+    :param prune: float (None) - distance from the base of the primary after which the root is not displayed
+    :param name: string (None) - if not None, the name of the saved file
+    :return:
+    """
+    g = g1.copy() # because we may change the radius if we want
+    visitor = get_root_visitor(prune=prune)
 
-    Viewer.display(mtg_scene(g, **kwds))
+    # changing radius just for display
+    r_base, r_tip = float(r_base), float(r_tip)
+    if not has_radius:
+        radius.discont_radius(g,r_base=r_base, r_tip=r_tip)
+
+    turtle = turt.PglTurtle()
+    turtle.down(180)
+    scene = turt.TurtleFrame(g, visitor=visitor, turtle=turtle, gc=False)
+
+    # Compute color from radius
+    if type(lognorm) is bool:
+        color.colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
+    else:
+        my_colormap_not_normed(g,prop_cmap, cmap=cmap)
+
+    shapes = dict( (sh.getId(),sh) for sh in scene)
+
+    colors = g.property('color')
+    for vid in colors:
+        if vid in shapes:
+            shapes[vid].appearance = pgl.Material(colors[vid])
+    scene = pgl.Scene(shapes.values())
+
+    pgl.Viewer.display(scene)
     if name is not None:
-            Viewer.frameGL.saveImage(name)
+            pgl.Viewer.frameGL.saveImage(name)
+
+def my_colormap_not_normed(g, property_name, cmap='jet'):
+    # F. Bauget 2020-04-01 : not normed colormap
+    prop = g.property(property_name)
+    keys = prop.keys()
+    values = np.array(prop.values())
+    _cmap = cm.get_cmap(cmap)
+
+    colors = (_cmap(values)[:,0:3])*255
+    colors = np.array(colors,dtype=np.int).tolist()
+
+    g.properties()['color'] = dict(zip(keys,colors))
+
+def my_plot_with_bar(g, prop, lognorm = None):
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    values = np.array(g.property(prop).values())
+    plot(g, prop_cmap = prop, lognorm = lognorm)
+
+    if type(lognorm) is bool:
+        vmin = values.vmin()
+        vmax = values.max()
+    else:
+        vmin = 0.0
+        vmax = 1.0
+
+    fig, ax = plt.subplots(figsize = (6, 1))
+    fig.subplots_adjust(bottom = 0.5)
+    cmap = mpl.cm.jet
+    norm = mpl.colors.Normalize(vmin = vmin, vmax = vmax)
+    cb1 = mpl.colorbar.ColorbarBase(ax, cmap = cmap, norm = norm, orientation = 'horizontal')
+    cb1.set_label(prop)
+    fig.show()
 
 if __name__ == '__main__':
     j_relat = {}
     seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
 
     # dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_PR_016.csv')
-    # dseeds = pd.read_csv('data/short_subset_generated-roots-20-10-07_PR_016.csv')
-    dseeds = pd.read_csv('data/test.csv')
+    dseeds = pd.read_csv('data/short_subset_generated-roots-20-10-07_PR_016.csv')
+    # dseeds = pd.read_csv('data/test.csv')
     _seeds = list(dseeds['seed'])
     _delta = list(dseeds['delta'])
     _primary_length = list(dseeds['primary_length'])
@@ -319,10 +366,9 @@ if __name__ == '__main__':
     for i in seg_at_position:
         _columns.append(str(i) + ' mm')
         j_relat[str(i) + ' mm'] = []
-        # j_relat[str(i) + ' mm'].append(i*1e-3)
     _columns.append('base')
     j_relat['base'] = []
-    # j_relat['base'].append(_primary_length[0]) # all have the same primary length
+
     count2 = 0
 
 
@@ -361,8 +407,8 @@ if __name__ == '__main__':
                     g.add_property('j_relat')
                     g_1 = g.copy()
                 else:
-                    for v in g:
-                        if v>0: g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
+                    for v in g.vertices_iter(scale = g.max_scale()):
+                        g.property('j_relat')[v] = g.property('J_out')[v]/g_1.property('J_out')[v]
 
                 c = 0
                 for l in seg_at_position:
@@ -376,13 +422,11 @@ if __name__ == '__main__':
                     if avg_fold == 1:
                         j1[other_fold].append(jtot)
                         j_relat[str(l) + ' mm'].append(1.0)
-                        # j_relat[str(l) + ' mm'].append(l*1e-3)
                     else:
                         j_relat[str(l) + ' mm'].append(jtot/j1[other_fold][c-1])
 
                 if avg_fold == 1:
                     j1[other_fold].append(Jv)
-                    # j_relat['base'].append(primary_length)
                     j_relat['base'].append(1.0)
                 else:
                     j_relat['base'].append(Jv/j1[other_fold][c])
@@ -397,22 +441,19 @@ if __name__ == '__main__':
             if (seed == 37430610) & (round(axfold,2) in [0.05,0.25,0.5,0.75]):
                 print ' ax = ', axfold
                 # g has radius, here we set fictive radii just for visual comfort
-                # alpha = 0.2  # radius in millimeter identical for all orders
-                # gcopy = g.copy()  # copy because we change the radius property in plot below
-                # plot(gcopy, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat')
-                # plot(g, prop_cmap = 'j_relat')
-                g_ax[str(axfold)]=g.copy()
-                # Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
-                # fn = tempfile.mktemp(suffix = '.png')
-                # Viewer.saveSnapshot(fn)
-                # Viewer.stop()
-                # img = Image(fn)
-                # os.unlink(fn)
-                # display(img)
+                alpha = 0.2  # radius in millimeter identical for all orders
+                plot(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat', lognorm = None)
+                pgl.Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
+                fn = tempfile.mktemp(suffix = '.png')
+                pgl.Viewer.saveSnapshot(fn)
+                pgl.Viewer.stop()
+                img = Image(fn)
+                os.unlink(fn)
+                display(img)
 
 
     dj2 = pd.DataFrame(j_relat, columns = _columns)
-    dj2.to_csv("sup-fig-5.csv")
+    if output is not None: dj2.to_csv(output, index = False)
 
     ax = {}
     for s in ['1 mm', '65 mm', '130 mm']:
@@ -422,4 +463,5 @@ if __name__ == '__main__':
         ax[s].legend(loc = 'upper left')
         ax[s].set_xlim((0, 1))
         ax[s].set_ylim((0, 1))
+
     print 'running time is ', time.time() - start_time

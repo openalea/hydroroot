@@ -1,38 +1,34 @@
 ###############################################################################
-#
-# Authors: C. Pradal, Y. Boursiac
-# Date : 14/10/2016
-#
-# Date: 2019-12-03
-# Modified by F. Bauget to test yaml configuration file
-#
-# Date: 2019-12-10
-# F. Bauget merging simulation.py and hydro_measures
+# Date: 2021-06-18
+# F. Bauget
+#   Use of HydroRoot to compute architecture or to construct it from texte file
+#   Display them with a colormap based on a MTG property ('j', 'order', etc.)
+#       argument --prop passed through command line
+#   If order chosen then display root with a color according to there order
 ###############################################################################
 
 ######
 # Imports
 
 # VERSION = 2
-
+import copy
 from random import _hexlify, _urandom
 
-import numpy as np
 import pandas as pd
 import glob
 import argparse
+import tempfile, os
 
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-from matplotlib.colors import Normalize
-
-from openalea.plantgl.all import Viewer
+import openalea.plantgl.all as pgl
+from openalea.mtg import turtle as turt
+from IPython.display import Image, display
 
 from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law
 from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.main import hydroroot_flow
-from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
+from hydroroot.init_parameter import Parameters
+from hydroroot.display import get_root_visitor
 from hydroroot.display import plot as mtg_scene
 
 ################################################
@@ -43,13 +39,30 @@ from hydroroot.display import plot as mtg_scene
 parameter = Parameters()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("inputfile")
+parser.add_argument("inputfile", help="yaml input file")
+parser.add_argument("--prop", help="property to display, e.g.: order, j")
 args = parser.parse_args()
 filename = args.inputfile
+prop = args.prop
+if prop is None: prop = 'order'
 parameter.read_file(filename)
 
 # read architecture file
 def read_archi_data(fn):
+    """
+    Read a csv (tab separated) file with the architecture in the following format
+        |'distance_from_base_(mm)' | 'lateral_root_length_(mm)' | order |
+        |float | float | string|
+        order = 1 for laterals of 1st order ob the primary
+        order = n-m for the lateral number m on the lateral number n of 1st order
+        order = n-m-o for the lateral number o of the previous one
+        etc.
+        Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
+
+    :param fn: string - the architecture filename in csv format
+
+    :return: DataFrame
+    """
     df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
     df['db'] = df['distance_from_base_(mm)'] * 1.e-3
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
@@ -109,7 +122,15 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 ###############################################################################
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'expo'):
     """
-    scale
+    Creation of the function giving the lateral length according to its position on the parent branch
+
+    :param pd: DataFrame - DataFrame with the laterals length law
+    :param scale_x: float (0.01) - x scale by default transform x in % to real value
+    :param scale_y: float (1.0) - any possible scale factor on y
+    :param scale: float (1e-4) - the segment length (m)
+    :param uniform: boolean or string (False) - if False use randomly an exact data point, True use a uniform distribution
+            between the minimum and the maximum of the data LR_length_mm, if 'expo', use an expovariate law
+    :return: a function giving the lateral length according to its position
     """
     x = pd.relative_distance_to_tip.tolist()
     y = pd.LR_length_mm.tolist()
@@ -159,22 +180,72 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
     return g, keq, jv
 
-def plot(g, name=None, **kwds):
+def plot_order(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
+    """
+    Display the architecture in plantGL Viewer with roots colors according to there order
+    The radius property may be changed for display purpose.
+    The MTG g1 stay unmodified
 
-    Viewer.display(mtg_scene(g, **kwds))
+    :param g1: MTG() - the architecture to display
+    :param has_radius: Boolean (True) - True use the radius property values, calculate them otehrwise according to r_base and r_tip
+    :param  r_base: float (1e-4) - if has_radius is False, the radius at the base of a root whatever its order (mm)
+    :param  r_tip: float (5e-5) - if has_radius is False, the radius at the tip of a root whatever its order (mm)
+    :param  prune: float (None) - distance from the base of the primary after which the root is not displayed
+    :param name: string (None) - if not None, the name of the saved file
+    :return:
+    """
+    g = g1.copy() # because we may change the radius if we want
+    visitor = get_root_visitor(prune=prune)
+
+    # changing radius just for display
+    r_base, r_tip = float(r_base), float(r_tip)
+    if not has_radius:
+        radius.discont_radius(g,r_base=r_base, r_tip=r_tip)
+
+    turtle = turt.PglTurtle()
+    turtle.down(180)
+    scene = turt.TurtleFrame(g, visitor=visitor, turtle=turtle, gc=False)
+
+    c = {}
+    c[0] = [0,0,255]
+    c[1] = [0,127,0]
+    c[2] = [255,0,0]
+    c[3] = c[2]
+    for v in g.vertices_iter(scale = g.max_scale()):
+        o = g.property('order')[v]
+        g.property('color')[v] = c[o]
+
+    shapes = dict( (sh.getId(),sh) for sh in scene)
+
+    colors = g.property('color')
+    for vid in colors:
+        if vid in shapes:
+            shapes[vid].appearance = pgl.Material(colors[vid])
+    scene = pgl.Scene(shapes.values())
+
+    pgl.Viewer.display(scene)
     if name is not None:
-            Viewer.frameGL.saveImage(name)
+            pgl.Viewer.frameGL.saveImage(name)
 
-def my_plot_with_bar(prop, lognorm = True):
-    values = np.array(g.property(prop).values())
-    plot(g, prop_cmap = prop, lognorm = lognorm)
-    fig, ax = plt.subplots(figsize = (6, 1))
-    fig.subplots_adjust(bottom = 0.5)
-    cmap = mpl.cm.jet
-    norm = mpl.colors.Normalize(vmin = values.min(), vmax = values.max())
-    cb1 = mpl.colorbar.ColorbarBase(ax, cmap = cmap, norm = norm, orientation = 'horizontal')
-    cb1.set_label(prop)
-    fig.show()
+
+def plot(g, name=None, **kwds):
+    """
+    Display the architecture in plantGL Viewer with roots colors according to the property chosen
+    :param g: MTG()
+    :param name: string - if not None, the name of the saved file
+    :param kwds: parameters of hydroroot.display.plot()
+        - has_radius: Boolean (False) - True use the radius property values, calculate them otehrwise according to r_base and r_tip
+        - r_base: float (1e-4) - if has_radius is False, the radius at the base of a root whatever its order (mm)
+        - r_tip: float (5e-5) - if has_radius is False, the radius at the tip of a root whatever its order (mm)
+        - prune: float (None) - distance from the base of the primary after which the root is not displayed
+        - prop_cmap: string ('radius') - the property name used for the color map
+        - cmap: string ('jet') - the name of the matplotlib colormap to use
+        - lognorm: Boolean (False) - True: log-normalised, normalised otherwise
+    :return:
+    """
+    pgl.Viewer.display(mtg_scene(g, **kwds))
+    if name is not None:
+            pgl.Viewer.frameGL.saveImage(name)
 
 if __name__ == '__main__':
 
@@ -192,6 +263,7 @@ if __name__ == '__main__':
         if parameter.archi['seed'] is None:
             s = my_seed()
             parameter.archi['seed'] = list(s)
+
 
     for seed in parameter.archi['seed']:
         for f in filename:
@@ -222,18 +294,20 @@ if __name__ == '__main__':
 
                 #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
                 # it could also be 'J_out' the axial flux
-                # print index
-                prop_cmap = 'j'
-                # plot(g, name = 'plot-' + str(index) + str(axfold) + '.png', prop_cmap = prop_cmap)
+                print index, axfold
+                # prop_cmap = 'order'
 
-
-                from IPython.display import Image, display
-                import tempfile, os
-                from openalea.plantgl.all import Viewer
-                plot(g, prop_cmap = prop_cmap)
+                # g has radius, here we set fictive radii just for visual comfort
+                alpha = 0.2 # radius in millimeter identical for all orders
+                gcopy = g.copy() # copy because we change the radius property in plot below
+                if prop != 'order':
+                    plot(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = prop)
+                else:
+                    plot_order(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
+                pgl.Viewer.widgetGeometry.setSize(450, 600) # set the picture size in px
                 fn = tempfile.mktemp(suffix='.png')
-                Viewer.saveSnapshot(fn)
-                Viewer.stop()
+                pgl.Viewer.saveSnapshot(fn)
+                pgl.Viewer.stop()
                 img = Image(fn)
                 os.unlink(fn)
                 display(img)

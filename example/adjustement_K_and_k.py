@@ -1,13 +1,8 @@
 ###############################################################################
-#
-# Authors: C. Pradal, Y. Boursiac
-# Date : 14/10/2016
-#
-# Date: 2019-12-03
-# Modified by F. Bauget to test yaml configuration file
-#
-# Date: 2019-12-10
-# F. Bauget merging simulation.py and hydro_measures
+# Date: 2021-06-18
+# F. Bauget
+#   Use of HydroRoot to adjust axial conductance data and radial conductivity on
+#   cut and flow experiments
 ###############################################################################
 
 ######
@@ -21,24 +16,13 @@ import glob
 import copy
 import argparse
 
-#import matplotlib.pyplot as plt
-#import matplotlib as mpl
-#from matplotlib.colors import Normalize
-
 from openalea.mtg import traversal
 from scipy import optimize
 
 from hydroroot import radius, flux, conductance
 from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.main import hydroroot_flow
-from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
-
-from data_base import flux_intercepts_for_optim
-
-################################################
-# get the model parameters, the length laws are
-# calculated from the files given in the yaml file
-###############################################
+from hydroroot.init_parameter import Parameters
 
 import datetime, time
 
@@ -47,12 +31,16 @@ g = None
 Jv_global = 1.0
 g_cut = {}
 tip_id = {}
-
 cut_n_flow_length = []
 
 start_time = time.time()
 
 parameter = Parameters()
+
+################################################
+# get the model parameters, the length laws are
+# calculated from the files given in the yaml file
+###############################################
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
@@ -71,6 +59,20 @@ parameter.read_file(filename)
 
 # read architecture file
 def read_archi_data(fn):
+    """
+    Read a csv (tab separated) file with the architecture in the following format
+        |'distance_from_base_(mm)' | 'lateral_root_length_(mm)' | order |
+        |float | float | string|
+        order = 1 for laterals of 1st order ob the primary
+        order = n-m for the lateral number m on the lateral number n of 1st order
+        order = n-m-o for the lateral number o of the previous one
+        etc.
+        Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
+
+    :param fn: string - the architecture filename in csv format
+
+    :return: DataFrame
+    """
     df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
     df['db'] = df['distance_from_base_(mm)'] * 1.e-3
     df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
@@ -156,7 +158,14 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     return g, Keq, Jv
 
 def fun1(x):
-    # axfold and radfold adjusted
+    """
+    Simulation of the flux at the different cut lengths according to the new parameter value
+
+    Implementation 1: only axfold (Kx factor) and radfold (k radial factor) are changed
+
+    :param x: the array of adjusted parameters
+    :return: F the sum((Jv - Jv_exp) ** 2.0)
+    """
     axfold = x[0]
     radfold = x[-1]
 
@@ -188,7 +197,14 @@ def fun1(x):
     return F
 
 def fun2(x):
-    # only axial_data[1]
+    """
+    Simulation of the flux at the different cut lengths according to the new parameter value
+
+    Implementation 2: only axial_data is changed
+
+    :param x: the array of adjusted parameters
+    :return: F the sum((Jv - Jv_exp) ** 2.0)
+    """
     k0 = parameter.hydro['k0']
 
     axial_data = copy.deepcopy(parameter.hydro['axial_conductance_data'])
@@ -223,7 +239,14 @@ def fun2(x):
     return F
 
 def fun3(x):
-    # only k0 is optimized
+    """
+    Simulation of the flux at the different cut lengths according to the new parameter value
+
+    Implementation 3: only k is changed
+
+    :param x: the array of adjusted parameters
+    :return: F the sum((Jv - Jv_exp) ** 2.0)
+    """
     count = 0
     g_cut['tot']  = conductance.compute_k(g_cut['tot'] , k0 = x[0])
     
@@ -256,7 +279,7 @@ def fun3(x):
 
 if __name__ == '__main__':
 
-    # Flag_Optim = True
+
     dK_constraint = -3.e-2 # dK/dx >= dK_constraint
     _tol = 1.0e-9
     
@@ -393,6 +416,8 @@ if __name__ == '__main__':
             k0_old2 = k0
             parameter.hydro['k0'] = k0
 
+            ## -1 axial data adjusted
+            #########################
             constraints = optimize.LinearConstraint(A, lb, ub)
             res = optimize.minimize(fun2, x, bounds = bnds, constraints = constraints, options={'ftol': _tol})
 
@@ -402,16 +427,17 @@ if __name__ == '__main__':
 
             print "finished minimize Kx", res
 
+            ## -1 radial k adjusted
+            #######################
             resk0 = optimize.minimize(fun3, k0, method = 'Nelder-Mead')
 
             print 'Simu, ', k0, resk0.fun, resk0.x[0], 'dk0 = ', (k0-resk0.x[0])**2., 'dKx = ', dKx
 
             k0 = resk0.x[0]
         
-        # axial_data[1] = list(res.x)
+
         parameter.hydro['k0'] = k0
 
-    # cut_length = primary_length
     primary_length = g_cut['tot'].property('position')[1]
     g_cut['tot'], Keq, Jv = hydro_calculation(g_cut['tot'], k_radial = k0 ,axial_data = axial_data)
 
@@ -425,7 +451,10 @@ if __name__ == '__main__':
     results['Jexp (uL/s)'].append(parameter.exp['Jv'])
     
     print primary_length, Jv
-    
+
+    ######################################
+    ## Simulations with Kx and k adjusted
+    ######################################
     count = 0
     for cut_length in cut_n_flow_length:
         _g = g_cut[str(cut_length)].copy()
