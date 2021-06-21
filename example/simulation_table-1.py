@@ -10,18 +10,14 @@
 
 # VERSION = 2
 
-import pandas as pd
 import glob
 import argparse
 import sys
 
-from openalea.mtg import traversal
-
-from hydroroot import radius
-from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters
 
+from shared_functions import *
 
 ################################################
 # get the model parameters, the length laws are
@@ -37,91 +33,6 @@ args = parser.parse_args()
 filename = args.inputfile
 output = args.outputfile
 parameter.read_file(filename)
-
-# read architecture file
-def read_archi_data(fn):
-    """
-    Read a csv (tab separated) file with the architecture in the following format
-        |'distance_from_base_(mm)' | 'lateral_root_length_(mm)' | order |
-        |float | float | string|
-        order = 1 for laterals of 1st order ob the primary
-        order = n-m for the lateral number m on the lateral number n of 1st order
-        order = n-m-o for the lateral number o of the previous one
-        etc.
-        Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
-
-    :param fn: string - the architecture filename in csv format
-
-    :return: DataFrame
-    """
-    df = pd.read_csv(fn, sep = '\t', dtype = {'order': str})
-    df['db'] = df['distance_from_base_(mm)'] * 1.e-3
-    df['lr'] = df['lateral_root_length_(mm)'] * 1.e-3
-
-    return df
-
-# to change the conductivities values by a factor to be able to do some
-#    sensitivity studie
-def radial(v = 92, acol = [], scale = 1):
-    xr = acol[0]  # at this stage kr constant so the same x than Ka
-    yr = [v * scale] * len(xr)
-    return xr, yr
-
-def axial(acol = [], scale = 1.0):
-    x, y = acol
-    y = [a * scale for a in y]
-    return x, y
-
-def root_creation(df = None):
-    """
-    creation of an mtg with properties like radius and vertex length set.
-
-    The MTG is either generated or created from a data.
-    The radius and vertex length properties are set.
-    The following properties are computed: length, position, mylength, surface, volume, total length,
-        primary root length, nb of intercepts
-
-    :param:
-        primary_length: primary root length for generated mtg
-        seed:  seed for generated mtg, if None randomly generated
-        delta: branching delay  for generated mtg
-        nude_length: length from tip without lateral for generated mtg
-        df: pandas DataFrame with the architecture data to be reconstructed
-    :return:
-        g: MTG with the different properties set or computed (see comments above),
-        primary_length: primary root length (output for generated mtg)
-        _length: total root length
-        surface: total root surface
-    """
-    g = mtg_from_aqua_data(df, parameter.archi['segment_length'])
-
-
-    # compute radius property on MTG
-    g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
-
-    # compute length property and parametrisation
-    g = radius.compute_length(g, parameter.archi['segment_length'])
-    g = radius.compute_relative_position(g)
-
-    # Calculation of the distance from base of each vertex, used for cut and flow
-    # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
-    # parameter dl which should be equal to vertex length but which is not pass
-    _mylength = {}
-    for v in traversal.pre_order2(g, 1):
-        pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + parameter.archi['segment_length'] if pid else parameter.archi['segment_length']
-    g.properties()['mylength'] = _mylength
-
-    # _length is the total length of the RSA (sum of the length of all the segments)
-    _length = g.nb_vertices(scale = 1) * parameter.archi['segment_length']
-    g, surface = radius.compute_surface(g)
-    g, volume = radius.compute_volume(g)
-
-    v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
-    primary_length = g.property('position')[v_base]
-
-
-    return g, primary_length, _length, surface
 
 def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None):
     if axial_data is None: axial_data = parameter.hydro['axial_conductance_data']
@@ -186,7 +97,8 @@ if __name__ == '__main__':
             break
         parameter.exp['Jv'] = j
 
-        g, primary_length, _length, surface = root_creation(df = df)
+        g, primary_length, _length, surface, seed = root_creation(df = df, segment_length = parameter.archi['segment_length'],
+            order_decrease_factor = parameter.archi['order_decrease_factor'], ref_radius = parameter.archi['ref_radius'])
 
         axial_data = parameter.hydro['axial_conductance_data']
         k0 = parameter.hydro['k0']
