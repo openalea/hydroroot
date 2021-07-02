@@ -48,18 +48,19 @@ Installation
 Conda Installation
 ++++++++++++++++++
 
-::
+.. code::
     conda create -n hydroroot -c conda-forge -c openalea openalea.hydroroot
 
 
-=== Requirements ===
+Requirements 
+++++++++++++
 
     * openalea.mtg
     * openalea.plantgl
     * openalea.visualea
+    * RSML
     * pandas > 0.17
     * numpy
-
 
 Usage
 +++++
