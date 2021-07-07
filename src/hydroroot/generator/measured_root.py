@@ -302,11 +302,7 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
 
     # ramifs = add_branching(g, df, ramifs = ramifs, Order = 1, segment_length = segment_length)
     #
-    # # F. Bauget 2020-04-16 : added one, for debug it seems that I made a mistake for order >= 3
-    # ramifs = add_branching(g, df, ramifs = ramifs, Order = 2, segment_length = segment_length)
-    #
     # ramifs = add_branching(g, df, ramifs = ramifs, Order = 3, segment_length = segment_length)
-
     return g
 
 def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):

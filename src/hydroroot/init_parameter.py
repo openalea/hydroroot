@@ -13,6 +13,8 @@ Parameters class:
             Calls other methods to perform some initialization
 """
 
+# F. Bauget 2021-05-04: added solute parameters
+
 import numpy
 import yaml
 import pandas
@@ -22,7 +24,7 @@ import glob
 class Parameters():
     """
     Init Parameters class. Set setting default values and structure
-    Parameters contains 4 dictionaries grouping inputs in 4 gategories:
+    Parameters contains 5 dictionaries grouping inputs in 5 gategories:
         -   archi: all inputs related to the architecture generation or reconstruction
                 *  read_architecture: Bool, True = read the architecture from a data (i.e. reconstructed MTG)
                 *  input_dir:  string, input directory of the architecture file
@@ -43,6 +45,12 @@ class Parameters():
         - hydro: inputs related to the hydrodynamics
                 *  k0: float, the radial conductivity
                 *  axial_conductance_data: list of 2 list of float, the axial conductance vs distance from the tip
+        - solute: inputs related to solutes transport eather permating or not
+                *  J_s: float, active pumping rate
+                *  P_s: float, permeability coefficient
+                *  Cse: float, concentration of permeating solutes
+                *  Ce: float, concentration of non-permeating solutes
+                *  sigma: float, reflextion coefficient
         - exp: inputs related to the experimental conditions and measurements
                 *  jv: float, measured flux at the base
                 *  psi_e: float, water potential surrounding the root
@@ -75,7 +83,12 @@ class Parameters():
             'k0': 92.0,
             'axial_conductance_data': [[0., 0.03, 0.06, 0.09, 0.12, 0.15, 0.18],
                                     [2.9e-4, 34.8e-4, 147.4e-4, 200.3e-4, 292.6e-4, 262.5e-4, 511.1e-4]]}
-
+        self.solute = {
+            'J_s': 0.,
+            'P_s': 0.,
+            'Cse': 0.,
+            'Ce': 0.,
+            'sigma': 1.}
         self.exp = {
             'Jv': 0.1,
             'psi_e': 0.4,

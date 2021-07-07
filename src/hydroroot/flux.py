@@ -183,8 +183,8 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
 
             #print 'exiting Psi computation'
-
-            # print 'entering Jv computation'
+        # F. Bauget 2021-06-11 : commented annoying print
+            # print 'entering Jv computation
             for v in traversal.post_order2(g, v_base):
             # compute water flux according to the psis from root tips to root base
             # modif Fabrice 2020-02-21: for cut and flow the radial conductance is set in cut_and_set_conductance()
