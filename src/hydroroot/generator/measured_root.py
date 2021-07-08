@@ -260,7 +260,7 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
 
     df_order = df[df.order == '1']  # array with 1st root
     length_base = df_order.index
-    if 'radius' in df_order.keys(): # F. Bauget 2020-11-02 : added the possibility to set real radii
+    if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
         PR_radius = df.iloc[-1].radius
         rnid.radius = PR_radius
 
@@ -272,7 +272,7 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
         while len_base - prev_len > 0:
             # we add segment of segment_length till the next vertice => no lateral root yet so the edge_type is '<'
             prev_len += segment_length
-            if 'radius' in df_order.keys(): # F. Bauget 2020-11-02 : added the possibility to set real radii
+            if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
                 vid = g.add_child(vid, edge_type = '<', label = 'S', base_length = prev_len, length = segment_length,
                                   order = 0, code = code, radius = PR_radius)
             else:
@@ -285,7 +285,7 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
         len_lateral = df_order.iloc[i].lr
         if len_lateral > 0.:
             count += 1
-            if 'radius' in df_order.keys(): # F. Bauget 2020-11-02 : added the possibility to set real radii
+            if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
                 r = df_order.iloc[i].radius
                 p = tuple([1, count, 0.])  # 1: PR, count: countieme RL
                 ramifs.setdefault(p, []).append((vid, len_lateral, r))  # randomly added, to sort it sorted(ramifs)
@@ -325,7 +325,7 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
     # count = 0  # F. Bauget 2020-06-11 : comment same date below
     for path in ramifs:
 
-        if 'radius' in df.keys(): # F. Bauget 2020-11-02
+        if 'radius' in df: # F. Bauget 2020-11-02
             vid, lr, r = ramifs[path][0]
         else:
             vid, lr = ramifs[path][0]  # vid is the vertice index on the parent root from which the lateral of length lr starts
@@ -344,7 +344,7 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
             while len_base - prev_len > 0:
                 prev_len += segment_length
                 edge_type = '+' if _root_id == vid else '<'
-                if 'radius' in df_order.keys(): # F. Bauget 2020-11-02 : added the possibility to set real radii
+                if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
                     vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
                                   length = segment_length, order = Order, code = code, radius = r)
                 else:
@@ -357,7 +357,7 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                 edge_type = '+' if _root_id == vid else '<'
                 while len_base - prev_len > 0:
                     prev_len += segment_length
-                    if 'radius' in df_order.keys():  # F. Bauget 2020-11-02 : added the possibility to set real radii
+                    if 'radius' in df_order:  # F. Bauget 2020-11-02 : added the possibility to set real radii
                         vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
                                           length = segment_length, order = Order, code = code, radius = r)
                     else:
@@ -371,7 +371,7 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                 len_lateral = df_order.lr[i]
                 if len_lateral > 0.:
                     count += 1
-                    if 'radius' in df_order.keys(): # F. Bauget 2020-11-02 : added the possibility to set real radii
+                    if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
                         r = df_order.iloc[i].radius
                         p = tuple(['-'.join(map(str, path)), count, 0.])  # 1: PR, count: countieme RL
                         ramifs.setdefault(p, []).append((vid, len_lateral, r))  # randomly added, to sort it sorted(ramifs)
