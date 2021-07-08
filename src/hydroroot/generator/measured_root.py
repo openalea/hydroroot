@@ -243,7 +243,6 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
          * 1st col: "db" distance in m from base on the parent root where starts the lateral root
          * 2nd col: "lr" length in m of the corresponding lateral root
          * 3d col: "order" = 1 if parent root is the primary root, = 1-n if the parent root is a lateral root that starts at the node n on the parent root
-
     """
 
     g = MTG()
@@ -261,6 +260,9 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
 
     df_order = df[df.order == '1']  # array with 1st root
     length_base = df_order.index
+    if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
+        PR_radius = df.iloc[-1].radius
+        rnid.radius = PR_radius
 
     #    path = [1]
     count = 0
@@ -270,8 +272,12 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
         while len_base - prev_len > 0:
             # we add segment of segment_length till the next vertice => no lateral root yet so the edge_type is '<'
             prev_len += segment_length
-            vid = g.add_child(vid, edge_type = '<', label = 'S', base_length = prev_len, length = segment_length,
-                              order = 0, code = code)
+            if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
+                vid = g.add_child(vid, edge_type = '<', label = 'S', base_length = prev_len, length = segment_length,
+                                  order = 0, code = code, radius = PR_radius)
+            else:
+                vid = g.add_child(vid, edge_type = '<', label = 'S', base_length = prev_len, length = segment_length,
+                                  order = 0, code = code)
         # Modification Decamber 2019by Fabrice: problem was that two following vertice may have the same base_length causing wrong g.property('position') recalculation in the conductance calculation
         # did not pass test_reconstruct_from_aqua_data in test_archi_data.py
         # vid = g.add_child(vid, edge_type='<', label='S', base_length=len_base, length=segment_length, order=0)
@@ -279,8 +285,13 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
         len_lateral = df_order.iloc[i].lr
         if len_lateral > 0.:
             count += 1
-            p = tuple([1, count])  # 1: PR, count: countieme RL
-            ramifs.setdefault(p, []).append((vid, len_lateral))  # randomly added, to sort it sorted(ramifs)
+            if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
+                r = df_order.iloc[i].radius
+                p = tuple([1, count, 0.])  # 1: PR, count: countieme RL
+                ramifs.setdefault(p, []).append((vid, len_lateral, r))  # randomly added, to sort it sorted(ramifs)
+            else:
+                p = tuple([1, count])  # 1: PR, count: countieme RL
+                ramifs.setdefault(p, []).append((vid, len_lateral))  # randomly added, to sort it sorted(ramifs)
 
     # F. Bauget 2020-06-11 : error in order which is the lateral order or the number of edges + between root and the
     #                        vertices on the lateral of this order
@@ -301,7 +312,8 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
     Parameters:
         - g: MTG
         - df: pandas dataframe, 3 columns ['db','lr','order'], db and lr are length in m
-        - ramifs: dict with a list (Order, nth lateral root), and a dict [vid, lr] vid is the vertice index on the parent root from which the lateral of length lr starts
+        - ramifs: dict with a list (Order, nth lateral root), and a dict [vid, lr] vid is the vertice index on the
+                    parent root from which the lateral of length lr starts
         - Order: int the order of the new branching
         - segment_length: float length in m of the vertices
 
@@ -312,8 +324,11 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
     len_base = 0
     # count = 0  # F. Bauget 2020-06-11 : comment same date below
     for path in ramifs:
-        vid, lr = ramifs[path][
-            0]  # vid is the vertice index on the parent root from which the lateral of length lr starts
+
+        if 'radius' in df: # F. Bauget 2020-11-02
+            vid, lr, r = ramifs[path][0]
+        else:
+            vid, lr = ramifs[path][0]  # vid is the vertice index on the parent root from which the lateral of length lr starts
         order = '-'.join(map(str, path))
         df_order = df[df.order == order]
         length_base = df_order.index
@@ -329,18 +344,25 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
             while len_base - prev_len > 0:
                 prev_len += segment_length
                 edge_type = '+' if _root_id == vid else '<'
-                vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
+                if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
+                    vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
+                                  length = segment_length, order = Order, code = code, radius = r)
+                else:
+                    vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
                                   length = segment_length, order = Order, code = code)
         else:
-            count = 0  # F. Bauget 2020-06-11 : this is the count of laterals on a root so at each
-                        # new root with lateral should be reset to 0
+            count = 0 # F. Bauget 2020-06-11 : this is the count of laterals on a root so at each new root with lateral should be reset to 0
             for i in length_base:
                 len_base = df_order.db[i]
                 edge_type = '+' if _root_id == vid else '<'
                 while len_base - prev_len > 0:
                     prev_len += segment_length
-                    vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
-                                      length = segment_length, order = Order, code = code)
+                    if 'radius' in df_order:  # F. Bauget 2020-11-02 : added the possibility to set real radii
+                        vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
+                                          length = segment_length, order = Order, code = code, radius = r)
+                    else:
+                        vid = g.add_child(vid, edge_type = edge_type, label = 'S', base_length = parent_base + prev_len,
+                                          length = segment_length, order = Order, code = code)
                     edge_type = '<'
                 #Modification December 2019 by Fabrice: problem was that two following vertice may have the same base_length causing wrong g.property('position') recalculation in the conductance calculation
                 # did not pass test_reconstruct_from_aqua_data in test_archi_data.py
@@ -349,8 +371,11 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                 len_lateral = df_order.lr[i]
                 if len_lateral > 0.:
                     count += 1
-                    # F. Bauget 2020-04-16 : for debug it seems that I made a mistake for order >= 3
-                    # p = tuple([Order + 1, count])
-                    p = tuple(['-'.join(map(str, path)), count])
-                    new_ramifs.setdefault(p, []).append((vid, len_lateral))
+                    if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
+                        r = df_order.iloc[i].radius
+                        p = tuple(['-'.join(map(str, path)), count, 0.])  # 1: PR, count: countieme RL
+                        ramifs.setdefault(p, []).append((vid, len_lateral, r))  # randomly added, to sort it sorted(ramifs)
+                    else:
+                        p = tuple(['-'.join(map(str, path)), count])
+                        new_ramifs.setdefault(p, []).append((vid, len_lateral))
     return new_ramifs

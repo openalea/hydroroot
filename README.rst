@@ -48,6 +48,7 @@ Installation
 Conda Installation
 ++++++++++++++++++
 
+.. code::
 
     conda create -n hydroroot -c conda-forge -c openalea openalea.hydroroot
 
@@ -65,7 +66,7 @@ Requirements
 Usage
 +++++
 
-
+.. bash::
     hydroroot -i param.yml 
 
 
