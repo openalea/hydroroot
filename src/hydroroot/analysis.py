@@ -15,6 +15,9 @@ def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
     ==========
         - g: MTG
         - l: length
+        - root: the root vertex from which the tree traversal start
+        - dl: length of MTG segments (use for g.property('mylength') calculation
+        - max_order: maximum order of considering roots
 
     Returns
     =======
@@ -49,8 +52,22 @@ def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
     return count
 
 
-def intercept(g, dists, max_order=None):
-    """Compute intercepts at a given length from collet."""
+def intercept(g, dists, dl=1e-4, max_order=None):
+    # F. Bauget 2021-07-09 : added dl to arguments
+    """
+    Compute intercepts at given lengths from collet.
+
+    Parameters
+    ----------
+    g: (MTG)
+    dists: (list of Float) list distances from the collet
+    max_order: (int) maximum order of considering roots
+
+    Returns
+    -------
+    intercepts: list of number of intercepts according to distances in dists
+    """
+
 
     intercepts = [nb_roots(g, x, max_order=max_order) for x in dists]
     return intercepts

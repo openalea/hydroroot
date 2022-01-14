@@ -25,11 +25,11 @@ def expovariate_law(data_xy, size=5e-2, scale_x=1e-2, scale_y=1e3, plot=False):
 
     Parameters
     ==========
-        - data_xy:
-        - size:
-        - scale_x:
-        - scale_y:
-        - plot:
+        - data_xy: the data to fit
+        - size: the sample size, default 5 cm
+        - scale_x: a scaling factor on x array
+        - scale_y: a scaling factor on x array
+        - plot: True plot the law
 
     Example
     =======

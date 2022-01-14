@@ -20,13 +20,26 @@ def hydroroot_mtg(
     n=None,
     **kwds
 ):
-    """Simulate a root system.
-
+    """
+    Simulate and generate a root system.
+    
     Parameters
-    ==========
+    ----------
+        - primary_length (Float) the primary root length
+        - delta (Float) the inter-branching length
+        - beta (Float) branching variability, random variability around delta (0.25 gives 25% of variability)
+        - order_max (int) root order maximum
+        - segment_length (Float) the MTG segment length
+        - nude_length (Float) distance to the tip without any laterals
+        - seed (int) the seed for the random generator
+        - ref_radius (Float) the primary root radius
+        - order_decrease_factor (Float) the radius decrease factor applied when increasing order
+        - length_data: (pandas dataframe) the length law 
+        - n: (int) maximum number of vertices
 
     Returns
-    =======
+    -------
+        - g
         - surface
         - volume
 
@@ -78,6 +91,24 @@ def hydroroot_flow(
     axial_conductivity_data=None,
     radial_conductivity_data=None,
 ):
+    """
+    Flux and equivalent conductance calculation
+
+    Parameters
+    ----------
+        - g (MTG)
+        - segment_length (Float) the MTG segment length
+        - k0 (Float) not used
+        - Jv (Float) flux in (microL/s)
+        - psi_e (Float) external hydrostatic potential (MPa)
+        - psi_base (Float) hydrostatic potential at the root base (MPa)
+        - axial_conductivity_data (list of Float) K vs distance to tip
+        - radial_conductivity_data (list of Float) k vs distance to tip
+
+    Returns
+    -------
+
+    """
     xa, ya = axial_conductivity_data
     # commented line below, BUG correction, the global flux was diverging when decreasing segment_length
     # ya was not supposed to be multiplied by (segment_length / 1.e-4)
@@ -128,18 +159,7 @@ def hydroroot(
 ):
     """Simulate a root system and compute global conductance and flux.
 
-    Parameters
-    ==========
-
-    Returns
-    =======
-        - surface
-        - volume
-        - Keq
-        - Jv
-
-    Example
-    =======
+    see hydroroot_mtg and hydroroot_flow
 
     """
     g, surface, volume = hydroroot_mtg(primary_length=primary_length,
@@ -207,16 +227,10 @@ def hydroroot_from_data(
 
     Parameters
     ==========
+    - primary_length_data (list Float) data with the lateral positions from the base
+    - lateral_length_data (list Float) data with the lateral lengths
 
-    Returns
-    =======
-        - surface
-        - volume
-        - Keq
-        - Jv
-
-    Example
-    =======
+    see hydroroot_mtg and hydroroot_flow for the other parameters
 
     """
     xl, yl = length_data

@@ -15,7 +15,7 @@ Authors
 
 Institutes  
 ----------
-CIRAD / INRA / inria
+CIRAD / INRA / inria / CNRS
 
 Status
 ------
@@ -33,7 +33,7 @@ About
 Description
 -----------
 
-OpenAlea.HydroRoot is a XXX
+OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root architecture system generator package.
 
 
 Content
@@ -41,6 +41,11 @@ Content
 
 The OpenAlea.HydroRoot package contains a root architecture simulation model coupled with an hydraulic solver. 
 
+Example
+-------
+
+Heat map representaion of the incoming local radial flows on an arabidopsis root. 
+![Alt Text](example/data/fig-6E.png)
 
 Installation
 ------------
@@ -61,13 +66,14 @@ Requirements
     * RSML
     * pandas > 0.17
     * numpy
+    * scipy
 
 Usage
 +++++
 ::
 
-    hydroroot -i param.yml 
-
+    see the jupyter notebook figures_tables.ipynb for examples. This notebook is aimed to run different simulations to
+    generate figures and tables illustrating the HydroRoot capabilities.
 
 Documentation
 ~~~~~~~~~~~~~

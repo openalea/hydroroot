@@ -65,6 +65,25 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
          visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
          prune=None):
     """
+    Create a scene from g
+
+    Parameters
+    ----------
+    g: (MTG)
+    has_radius: (boolean) True use of g.property('radius'), False radii are calculated
+    r_base: (float) radius of the base (m) used for radius calculation if has_radius = True
+    r_tip: (float) radius of the tip (m) used for radius calculation if has_radius = True
+    visitor: Turtle going through the architecture see get_root_visitor
+    prop_cmap: property used for the color map
+    cmap: matplotlib color map
+    lognorm: True log scale normalization, False normal normalization used for color map
+    prune: (float) - distance from base after witch the MTG is no longer read
+
+    Returns
+    -------
+    scene
+
+
     Exemple:
 
         >>> from openalea.plantgl.all import *
@@ -98,6 +117,20 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
 
 
 def my_colormap(g, property_name, cmap='jet',lognorm=True):
+    """
+    set the property g.property('color') according to the normalized values of property_name
+
+    Parameters
+    ----------
+    g: (MTG)
+    property_name: property used for the color map
+    cmap: matplotlib color map
+    lognorm: True log scale normalization, False normal normalization used for color map
+
+    Returns
+    -------
+    g
+    """
     prop = g.property(property_name)
     keys = prop.keys()
     values = np.array(prop.values())
@@ -114,6 +147,20 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True):
 
 
 def my_colorbar(values, cmap, norm):
+    """
+    colorbar displaying cmap scale
+    Parameters
+    ----------
+    values: values used to calculate scale
+    cmap: matplotlib colormap
+    norm: normalization
+
+    see https://matplotlib.org/3.1.1/api/colorbar_api.html
+
+    Returns
+    -------
+
+    """
     fig = pyplot.figure(figsize=(8,3))
     ax = fig.add_axes([0.05, 0.65, 0.9, 0.15])
     cb = mpl.colorbar.ColorbarBase(ax,cmap=cmap, norm=norm, values=values)
