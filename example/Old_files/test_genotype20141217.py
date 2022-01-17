@@ -91,7 +91,7 @@ for genotype in ['col', 'esk11', 'esk15', 'irx34', 'pip2122']:
     axial_conductivity_data=axial_conductivity_data, 
     radial_conductivity_data=radial_conductivity_data,
     )
-    print genotype, 'volume:', volume,'Keq:', Keq, 'Jv:', Jv_global, Jv_global/volume
+    print(genotype, 'volume:', volume,'Keq:', Keq, 'Jv:', Jv_global, Jv_global/volume)
 
 """
 col : 1.02133448396 0.306400345189 1087538.56179

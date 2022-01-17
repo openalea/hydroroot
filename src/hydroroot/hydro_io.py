@@ -35,7 +35,7 @@ def export_mtg_to_aqua_file(g, filename = "out.csv"):
 
     results = {'distance_from_base_(mm)': [], 'lateral_root_length_(mm)': [], 'order': []}
 
-    v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+    v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
 
     count = 0
     for v in pre_order2(g, 1):
@@ -62,7 +62,7 @@ def export_mtg_to_aqua_file(g, filename = "out.csv"):
             count += 1
             for v2 in pre_order2(g, v):
                 parent2 = g.parent(v2)
-                if g.edge_type(v2) == '+' and parent <> parent2:
+                if g.edge_type(v2) == '+' and parent != parent2:
                     racine_length = g.property('position')[min(axis(g, parent2))] * 1e3
                     results['distance_from_base_(mm)'].append(racine_length - g.property('position')[parent2] * 1e3)
 

@@ -12,7 +12,8 @@
 
 # VERSION = 2
 import copy
-from random import _hexlify, _urandom
+from binascii import hexlify as _hexlify # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
+from os import urandom as _urandom # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
 
 import pandas as pd
 
@@ -137,7 +138,7 @@ def axial(acol = [], scale = 1):
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
-    return int(long(_hexlify(_urandom(2500)), 16) % 100000000)
+    return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
 def root_creation(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
@@ -206,7 +207,7 @@ def root_creation(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_lengt
     g, volume = radius.compute_volume(g)
 
     if df is not None:
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
         primary_length = g.property('position')[v_base]
 
     return g, primary_length, _length, surface, _seed

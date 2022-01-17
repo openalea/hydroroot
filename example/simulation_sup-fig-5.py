@@ -11,7 +11,7 @@
 
 # VERSION = 2
 
-from random import _hexlify, _urandom
+# F. Bauget 2021-12-14: removed unused import when migration to python 3 was done
 
 from pylab import cm
 import numpy as np
@@ -112,7 +112,7 @@ def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prop_cmap='radius', cmap
     for vid in colors:
         if vid in shapes:
             shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(shapes.values())
+    scene = pgl.Scene(list(shapes.values()))
 
     pgl.Viewer.display(scene)
     if name is not None:
@@ -121,21 +121,21 @@ def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prop_cmap='radius', cmap
 def my_colormap_not_normed(g, property_name, cmap='jet'):
     # F. Bauget 2020-04-01 : not normed colormap
     prop = g.property(property_name)
-    keys = prop.keys()
-    values = np.array(prop.values())
+    keys = list(prop.keys())
+    values = np.array(list(prop.values()))
     _cmap = cm.get_cmap(cmap)
 
     colors = (_cmap(values)[:,0:3])*255
     colors = np.array(colors,dtype=np.int).tolist()
 
-    g.properties()['color'] = dict(zip(keys,colors))
+    g.properties()['color'] = dict(list(zip(keys,colors)))
 
 def my_plot_with_bar(g, prop, lognorm = None):
     import matplotlib as mpl
     import matplotlib.pyplot as plt
     import numpy as np
 
-    values = np.array(g.property(prop).values())
+    values = np.array(list(g.property(prop).values()))
     plot(g, prop_cmap = prop, lognorm = lognorm)
 
     if type(lognorm) is bool:
@@ -168,8 +168,8 @@ if __name__ == '__main__':
     # predict the number of simulation run
     nb_steps = len(parameter.output['axfold']) * len(_seeds)
     nb_steps2=nb_steps
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
     _columns = []
     _columns.append('ax')
@@ -196,7 +196,7 @@ if __name__ == '__main__':
             ref_radius = parameter.archi['ref_radius'])
 
         vertices_at_length = []
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
         n_max = max(axis(g,v_base))
 
         for l in seg_at_position:
@@ -250,7 +250,7 @@ if __name__ == '__main__':
                 sys.stdout.flush()
 
             if (seed == 37430610) & (round(axfold,2) in [0.05,0.25,0.5,0.75]):
-                print ' ax = ', axfold
+                print(' ax = ', axfold)
                 # g has radius, here we set fictive radii just for visual comfort
                 alpha = 0.2  # radius in millimeter identical for all orders
                 plot(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat', lognorm = None)
@@ -275,4 +275,4 @@ if __name__ == '__main__':
         ax[s].set_xlim((0, 1))
         ax[s].set_ylim((0, 1))
 
-    print 'running time is ', time.time() - start_time
+    print('running time is ', time.time() - start_time)

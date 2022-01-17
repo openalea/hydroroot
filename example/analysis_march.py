@@ -67,7 +67,7 @@ def read_data(data=data):
 
 def nb_root(g, l):
     length= {}
-    root = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+    root = next(g.component_roots_at_scale_iter(g.root, scale=g.max_scale()))
     dl = 1.e-4
 
     if 'mylength' in g.property_names():
@@ -206,9 +206,9 @@ for i in (1, 2, 4, 5, 7, 8):
         #init()
     for axfold in (1., ):
         for radfold in (1., ):
-            print 'run simu'
+            print('run simu')
             g, length, jv, intercept = run_simulation(plant_data, axfold, radfold)
-            print length, jv, intercept
+            print(length, jv, intercept)
                 #add(plant_id, length, axfold, radfold, jv, intercept)
 #    save('bench%d.txt'%plant_id)
 

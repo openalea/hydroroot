@@ -49,7 +49,7 @@ archi:
 
     #vertices length
     #unit: m
-    segment_length: 1.0e-4
+    segment_length: 1.0e-3
 
     #part of roots without any lateral root, distance from tip
     #float or list of float

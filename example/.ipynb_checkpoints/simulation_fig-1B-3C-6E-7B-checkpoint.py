@@ -11,7 +11,10 @@
 # Imports
 
 # VERSION = 2
-# F. Bauget 2021-12-14: removed unused import when migration to python 3 was done
+import copy
+from random import _hexlify, _urandom
+
+import pandas as pd
 import glob
 import argparse
 import tempfile, os
@@ -20,6 +23,9 @@ import openalea.plantgl.all as pgl
 from openalea.mtg import turtle as turt
 from IPython.display import Image, display
 
+from hydroroot import radius, markov
+from hydroroot.law import histo_relative_law
+from hydroroot.generator.measured_root import mtg_from_aqua_data
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters
 from hydroroot.display import get_root_visitor
@@ -100,7 +106,7 @@ def plot_order(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=N
     for vid in colors:
         if vid in shapes:
             shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(list(shapes.values()))
+    scene = pgl.Scene(shapes.values())
 
     pgl.Viewer.display(scene)
     if name is not None:
@@ -174,7 +180,7 @@ if __name__ == '__main__':
 
                 #prop_cmap: property to plot e.g.: for figure 1B prop_'order', for figure 3CD 'j'
                 # it could also be 'J_out' the axial flux
-                print(index, axfold)
+                print index, axfold
                 # prop_cmap = 'order'
 
                 # g has radius, here we set fictive radii just for visual comfort

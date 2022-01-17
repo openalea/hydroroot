@@ -207,8 +207,8 @@ if __name__ == '__main__':
 
     # predict the number of simulation run
     nb_steps = len(filename)
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
 
     psi_e = parameter.exp['psi_e']
@@ -274,8 +274,8 @@ if __name__ == '__main__':
             radfold = res.x[-1] # always the last one even if the only one
             axfold = res.x[0]
 
-            print "finished minimize ax, ar", res
-            print "*******************************************************************************"
+            print("finished minimize ax, ar", res)
+            print("*******************************************************************************")
         
         ## update the conductivities according to the first adjustment
         axial_data = list(axial(parameter.hydro['axial_conductance_data'], axfold))
@@ -341,13 +341,13 @@ if __name__ == '__main__':
             axial_data[1] = list(res.x)
             x = copy.deepcopy(res.x)
 
-            print "finished minimize Kx", res
+            print("finished minimize Kx", res)
 
             ## -1 radial k adjusted
             #######################
             resk0 = optimize.minimize(fun3, k0, method = 'Nelder-Mead')
 
-            print 'Simu, ', k0, resk0.fun, resk0.x[0], 'dk0 = ', (k0-resk0.x[0])**2., 'dKx = ', dKx
+            print('Simu, ', k0, resk0.fun, resk0.x[0], 'dk0 = ', (k0-resk0.x[0])**2., 'dKx = ', dKx)
 
             k0 = resk0.x[0]
         
@@ -366,7 +366,7 @@ if __name__ == '__main__':
     results['Jv (uL/s)'].append(Jv)
     results['Jexp (uL/s)'].append(parameter.exp['Jv'])
     
-    print primary_length, Jv
+    print(primary_length, Jv)
 
     ######################################
     ## Simulations with Kx and k adjusted
@@ -399,7 +399,7 @@ if __name__ == '__main__':
         results['Jv (uL/s)'].append(Jv)
         results['Jexp (uL/s)'].append(_Jv[count])
         count += 1
-        print index, primary_length, k0*0.1, _length, surface, Jv
+        print(index, primary_length, k0*0.1, _length, surface, Jv)
         
 
     dresults = pd.DataFrame(results, columns = columns)
@@ -420,4 +420,4 @@ if __name__ == '__main__':
         df = dresults
 
     if output is not None: df.to_csv(output, index = False)
-    print 'running time is ', time.time() - start_time
+    print('running time is ', time.time() - start_time)

@@ -66,8 +66,8 @@ if __name__ == '__main__':
 
     # predict the number of simulation run
     nb_steps = len(filename)
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
     columns = ['plant', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'total length (m)', 'surface (m2)', 'Jv (uL/s)']
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
                 j = df_exp[df_exp.arch == key].iloc[0].Jbase
                 break
         if j is None:
-            print '************ ', _archi_name, 'not in the data base'
+            print('************ ', _archi_name, 'not in the data base')
             break
         parameter.exp['Jv'] = j
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         results['Jv (uL/s)'].append(Jv)
 
     dr = pd.DataFrame(results, columns = columns)
-    print dr.loc[:, ['plant', 'total length (m)', 'surface (m2)', 'k (10-8 m/s/MPa)']]
+    print(dr.loc[:, ['plant', 'total length (m)', 'surface (m2)', 'k (10-8 m/s/MPa)']])
     if output is not None:
         dr.to_csv(output,  index = False)
 

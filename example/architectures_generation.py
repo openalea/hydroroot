@@ -15,7 +15,8 @@
 
 # VERSION = 2
 
-from random import _hexlify, _urandom
+from binascii import hexlify as _hexlify # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
+from os import urandom as _urandom # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
 
 import pandas as pd
 import time
@@ -162,7 +163,7 @@ def ref_length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform =
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
-    return int(long(_hexlify(_urandom(2500)), 16) % 100000000)
+    return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
 def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None):
     """
@@ -254,8 +255,8 @@ if __name__ == '__main__':
     nb_steps = run_nb * len(parameter.archi['branching_delay']) * len(parameter.output['axfold']) * \
                len(parameter.output['radfold']) * len(parameter.archi['nude_length']) * \
                len(parameter.archi['primary_length']) * len(filename)
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
 
     columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)', 'surface (m2)', 'Jv (uL/s)']
@@ -263,9 +264,9 @@ if __name__ == '__main__':
     for key in columns:
         results[key] = []
 
-    print 'seed', 'primary_length (m)', '_length (m)', 'surface (m2)', 'Jv (uL/s)'
+    print('seed', 'primary_length (m)', '_length (m)', 'surface (m2)', 'Jv (uL/s)')
     for i in range(run_nb):
-        print run_nb - i, count
+        print(run_nb - i, count)
         for primary_length in parameter.archi['primary_length']:
             for delta in parameter.archi['branching_delay']:
                 for nude_length in parameter.archi['nude_length']:
@@ -284,8 +285,8 @@ if __name__ == '__main__':
                     results['_length (m)'].append(_length)
                     results['surface (m2)'].append(surface)
                     results['Jv (uL/s)'].append(Jv)
-                    print _seed, primary_length, _length, surface, Jv
+                    print(_seed, primary_length, _length, surface, Jv)
     df = pd.DataFrame(results, columns = columns)
     df.to_csv(output, index = False)
     
-    print time.time() - start_time
+    print(time.time() - start_time)

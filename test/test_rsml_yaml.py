@@ -50,7 +50,7 @@ def root_creation(g, segment_length, ref_radius, order_decrease_factor):
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
-    v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+    v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
     primary_length = g.property('position')[v_base]
 
     return g, primary_length, _length, surface

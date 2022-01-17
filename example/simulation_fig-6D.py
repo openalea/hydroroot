@@ -66,10 +66,10 @@ if __name__ == '__main__':
     for iloop in range(2): # 1st for the root, 2d for cylinder because max_order set to 0 at the of the 1st pass
 
         nb_steps = len(parameter.output['axfold']) * len(parameter.output['radfold'])
-        print 'Simulation runs: ', nb_steps
-        print '#############################'
-        print 'figure 6-D'
-        print outputfilename
+        print('Simulation runs: ', nb_steps)
+        print('#############################')
+        print('figure 6-D')
+        print(outputfilename)
         j_relat = {}
         _columns = []
         _columns.append('ax')
@@ -93,7 +93,7 @@ if __name__ == '__main__':
             ref_radius = parameter.archi['ref_radius'])
 
         vertices_at_length = []
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
         n_max = max(axis(g,v_base))
 
         for l in seg_at_position:

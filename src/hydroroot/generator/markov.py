@@ -196,7 +196,7 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                         if real_lateral_length <= nb_vertices*decrease[current_order]:
                             lateral_length = real_lateral_length
                         else:
-                            print("WARNING: lateral length is too large ", lateral_length)
+                            print(("WARNING: lateral length is too large ", lateral_length))
                             lateral_length = nb_vertices*decrease[current_order]
 
 
@@ -219,7 +219,7 @@ def shuffle_axis(g=None, shuffle=False):
     max_scale = g.max_scale()
     if shuffle:
         #print 'entering axis shuffling'
-        v_base = g.component_roots_at_scale_iter(g.root, scale=max_scale).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale=max_scale))
         shuffling = {}
         shuffled = []
 
@@ -230,7 +230,7 @@ def shuffle_axis(g=None, shuffle=False):
             shuffling[v] = random.choice(axis)  # record new position for each subtree
 
         for v in traversal.post_order2(g,v_base):
-            if v in shuffling.keys() and v not in shuffled:
+            if v in list(shuffling.keys()) and v not in shuffled:
                 sub = g.sub_tree(v, copy=True)        # get subtree
                 g.remove_tree(v)                      # prune it from old position
                 newbranch = g.add_child_tree(shuffling[v], sub)  # insert subtree at previously determined position

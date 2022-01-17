@@ -1,6 +1,7 @@
 # Tests of the simulated architecture
 
-from hydroroot import markov, radius, length, flux
+from hydroroot import radius, length, flux
+from hydroroot.generator import markov # 21-12-14: FB __init__.py in src not doing job
 
 length_data = [0., 0.03, 0.05, 0.16], [0., 0., 0.01, 0.13]
 
@@ -13,7 +14,7 @@ def test_linear():
 
 def get_orders(g):
     orders = g.property('order')
-    max_order = max(orders.itervalues())
+    max_order = max(orders.values())
     order_dict = {order: sum(1 for v in orders if orders[v]==order) for order in range(max_order+1)}
     return order_dict
 

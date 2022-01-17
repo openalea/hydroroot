@@ -61,7 +61,7 @@ def test_archi_data(plant_id=8):
 
     def nb_root(g, l):
         length= {}
-        root = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+        root = next(g.component_roots_at_scale_iter(g.root, scale=g.max_scale()))
         dl = 1.e-4
 
         if 'mylength' in g.property_names():

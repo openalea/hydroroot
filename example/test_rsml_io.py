@@ -82,7 +82,7 @@ def root_creation(g):
     g, volume = radius.compute_volume(g)
 
 
-    v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+    v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
     primary_length = g.property('position')[v_base]
 
     return g, primary_length, _length, surface
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     resolution = g_c.graph_properties()['metadata']['resolution']
     unit = g_c.graph_properties()['metadata']['unit']
 
-    if unit not in rsml_units_to_metre.keys():
+    if unit not in list(rsml_units_to_metre.keys()):
         sys.exit('wrong unit in rsml file, unit must be one of the following: m, cm, mm, um, nm.')
 
     resolution *= rsml_units_to_metre[unit] # rsml file unit to meter
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     # flux calculation
     g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
 
-    print 'water flux from rsml file is ', Jv, ' uL/s'
+    print('water flux from rsml file is ', Jv, ' uL/s')
 
     export_mtg_to_rsml(g, "test_rsml_io.rsml", segment_length = parameter.archi['segment_length'])
     g_c = rsml.rsml2mtg("test_rsml_io.rsml")
@@ -154,8 +154,8 @@ if __name__ == '__main__':
     g2, primary_length2, _length2, surface2 = root_creation(g2)
     g2, Keq2, Jv2 = hydro_calculation(g2, axfold = axfold, radfold = radfold)
 
-    print 'water flux from exported-imported to rsml MTG is ', Jv, ' uL/s'
+    print('water flux from exported-imported to rsml MTG is ', Jv, ' uL/s')
     #
-    print 'difference in: primary_length, _length, surface, Keq, Jv are:', primary_length-primary_length2, _length-_length2, surface-surface2, Keq-Keq2, Jv-Jv2
+    print('difference in: primary_length, _length, surface, Keq, Jv are:', primary_length-primary_length2, _length-_length2, surface-surface2, Keq-Keq2, Jv-Jv2)
 
 

@@ -22,7 +22,7 @@ def check_flux(g, Jv_global):
 
     # Jv_global is the sum of radial fluxes
     j = g.property('j')
-    delta = sum(j.itervalues()) - Jv_global
+    delta = sum(j.values()) - Jv_global
 
     closed(delta)
 
@@ -149,7 +149,7 @@ def test_cut_and_flow():
     Keqs = g_cut.property('Keq')
     Jv_cut = Keqs[v_base] * (psi_e - psi_base)
 
-    print Jv_cut
+    print(Jv_cut)
     assert Jv_cut > Jv_global
 
 def check_length(g, length, segment_length):
