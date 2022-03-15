@@ -94,13 +94,14 @@ def plot_order(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=N
         o = g.property('order')[v]
         g.property('color')[v] = c[o]
 
-    shapes = dict( (sh.getId(),sh) for sh in scene)
-
+# F. Bauget 2022-03-15: WIP python 2  to 3
+    shapes = scene.todict()
     colors = g.property('color')
     for vid in colors:
         if vid in shapes:
-            shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(list(shapes.values()))
+            for sh in shapes[vid]:
+                sh.appearance =pgl.Material(colors[vid])
+    scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
 
     pgl.Viewer.display(scene)
     if name is not None:

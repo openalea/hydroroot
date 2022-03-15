@@ -73,7 +73,11 @@ def discretize(x, y, size=5e-2):
 
     m, M = min(x), max(x)
 
-    delta = (M - m) / float(size)
+    # F. Bauget 2022-03-15: python 2 to 3
+    #   - before in numpy.linspace the 3ed arguments was tranformed to int in the numpy routine
+    #   - now should be done before call
+    # delta = (M - m) / float(size)
+    delta = int((M - m) / float(size))
     points = np.linspace(m, M, delta).tolist()
 
     #points = [(m + i * size) for i in range(1, nb_class - 1)]

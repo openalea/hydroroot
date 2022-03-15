@@ -16,6 +16,7 @@ import argparse
 import time
 
 from scipy import optimize
+import matplotlib.pyplot as plt
 
 from hydroroot import flux, conductance
 from hydroroot.main import hydroroot_flow
@@ -404,8 +405,10 @@ if __name__ == '__main__':
 
     dresults = pd.DataFrame(results, columns = columns)
 
+    fig, ax = plt.subplots()
     ax = dresults.plot.scatter('cut length (m)', 'Jexp (uL/s)', c = 'black')
     dresults.plot.line('cut length (m)', 'Jv (uL/s)', c = 'purple', ax = ax)
+    plt.show()
 
     if Flag_Optim:
         optim_results  = {}
