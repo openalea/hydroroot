@@ -1,4 +1,6 @@
 # Tests of the simulated architecture
+import sys
+sys.path.insert(0, '../src')
 
 from hydroroot import radius, length, flux
 from hydroroot.generator import markov # 21-12-14: FB __init__.py in src not doing job

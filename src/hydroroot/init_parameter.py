@@ -88,7 +88,7 @@ class Parameters():
             'P_s': 0.,
             'Cse': 0.,
             'Ce': 0.,
-            'sigma': 1.}
+            'Sigma': 1.}
         self.exp = {
             'Jv': 0.1,
             'psi_e': 0.4,

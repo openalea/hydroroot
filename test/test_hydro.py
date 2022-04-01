@@ -1,3 +1,7 @@
+
+import sys
+sys.path.insert(0, '../src')
+
 from hydroroot.main import hydroroot as hydro
 from hydroroot import flux
 

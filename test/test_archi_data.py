@@ -4,6 +4,9 @@
 from openalea.deploy.shared_data import shared_data
 import pandas
 
+import sys
+sys.path.insert(0, '../src')
+
 import hydroroot
 from hydroroot.main import hydroroot_from_data
 from hydroroot.generator.measured_root import mtg_from_aqua_data # Added F. Bauget 2019-12-16
