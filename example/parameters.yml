@@ -11,7 +11,7 @@
 archi:
     #if read_architecture is true then architecture will be constructed from the file(s) given by input_dir and input_file
     #otherwise the architecture will be generated according to the parameters
-    read_architecture: True
+    read_architecture: False
 
     #Input architecture from scanned image (distance_from_base_(mm) \t lateral_root_length_(mm) \t order)
     #folder name
@@ -33,12 +33,12 @@ archi:
     #length of the primary root
     #float or list of float
     #unit: m
-    primary_length:
+    primary_length: 0.16
 
     #branching delay
     #float or list of float
     #unit: m
-    branching_delay:
+    branching_delay: 2.0e-3
 
     #branching variability
     #float between [0 ; 1], 0.25 means 25%
@@ -54,7 +54,7 @@ archi:
     #part of roots without any lateral root, distance from tip
     #float or list of float
     #unit: m
-    nude_length:
+    nude_length: 0.2
 
     #reference radius of the primary root
     #float
