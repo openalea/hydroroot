@@ -11,49 +11,34 @@ import rsml
 import argparse
 import sys
 
-from openalea.mtg import MTG, traversal
-from openalea.plantgl.all import Viewer
+from openalea.mtg import traversal
 
 from hydroroot import radius
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
 from hydroroot.hydro_io import export_mtg_to_rsml, import_rsml_to_discrete_mtg
-from hydroroot.display import plot as mtg_scene
+
+from shared_functions import radial, axial
 
 parameter = Parameters()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
-parser.add_argument("-op", "--optimize", help="optimize k value", action="store_true")
 args = parser.parse_args()
 filename = args.inputfile
-Flag_Optim = args.optimize
-if Flag_Optim is None: Flag_Optim = False
 parameter.read_file(filename)
-
-def radial(v = 92, acol = [], scale = 1):
-    xr = acol[0]  # at this stage kr constant so the same x than Ka
-    yr = [v * scale] * len(xr)
-
-    return xr, yr
-
-def axial(acol = [], scale = 1):
-    x, y = acol
-    y = [a * scale for a in y]
-
-    return x, y
 
 def root_creation(g):
     """
     Set MTG properties and perform some gemetrical calculation
-    
+
     The vertex radius properties is set.
     The following properties are computed: length, position, mylength, surface, volume, total length,
         primary root length
 
     :param:
         - `g` (MTG)
-        
+
     :return:
         `g`: MTG with the different properties set or computed (see comments above),
         `primary_length`: primary root length (m)
@@ -105,12 +90,23 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
     return g, Keq, Jv
 
-def plot(g, name=None, **kwds):
-    Viewer.display(mtg_scene(g, **kwds))
-    if name is not None:
-            Viewer.frameGL.saveImage(name)
-
 if __name__ == '__main__':
+    """"
+    Script for testing rsml i/o
+    run %run example_rsml_io parameters_test_rsml_io.yml
+    
+    - import 'data/arabidopsis-simple.rsml' file from https://rootsystemml.github.io/examples/arabidopsis_simple
+      into continuous mtg representation
+    - set the resolution according to the unit precised in the rsml, in Hydroroot lengths are in meter
+    - transform the continuous mtg to discrete mtg usable in Hydroroot according to resolution
+    - calculation of g properties (radius, mylength) and  flux
+    
+    - export discrete mtg to rsml
+    - re-import rsml to continuous mtg, transform the latter to discrete mtg
+    - re-do calculation of g properties (radius, mylength) and  flux
+    
+    - compare both calculations
+    """
     axfold = parameter.output['axfold'][0]
     radfold = parameter.output['radfold'][0]
 
@@ -125,7 +121,7 @@ if __name__ == '__main__':
     for f in parameter.archi['input_file']:
         filename = filename + (glob.glob(parameter.archi['input_dir'] + f))
 
-    # import rsml
+    # import rsml into continuous mtg representation
     g_c = rsml.rsml2mtg(filename[0])
     resolution = g_c.graph_properties()['metadata']['resolution']
     unit = g_c.graph_properties()['metadata']['unit']
@@ -135,6 +131,7 @@ if __name__ == '__main__':
 
     resolution *= rsml_units_to_metre[unit] # rsml file unit to meter
 
+    # continuous mtg to discrete mtg
     g = import_rsml_to_discrete_mtg(g_c, segment_length = parameter.archi['segment_length'], resolution = resolution)
 
     # calculation of g properties: radius, mylength, etc.
@@ -145,8 +142,11 @@ if __name__ == '__main__':
 
     print('water flux from rsml file is ', Jv, ' uL/s')
 
-    export_mtg_to_rsml(g, "test_rsml_io.rsml", segment_length = parameter.archi['segment_length'])
-    g_c = rsml.rsml2mtg("test_rsml_io.rsml")
+    # export g to rsml
+    export_mtg_to_rsml(g, "example_rsml_export.rsml", segment_length = parameter.archi['segment_length'])
+
+    # redo the import from rsml to discrete MTG from the exported one
+    g_c = rsml.rsml2mtg("example_rsml_export.rsml")
     resolution = g_c.graph_properties()['metadata']['resolution']
     unit = g_c.graph_properties()['metadata']['unit']
     resolution *= rsml_units_to_metre[unit] # rsml file unit to meter
@@ -158,4 +158,4 @@ if __name__ == '__main__':
     #
     print('difference in: primary_length, _length, surface, Keq, Jv are:', primary_length-primary_length2, _length-_length2, surface-surface2, Keq-Keq2, Jv-Jv2)
 
-
+    # use plot() from shared_functions to display g and g2

@@ -1,6 +1,4 @@
 # Tests of the simulated architecture
-import sys
-sys.path.insert(0, '../src')
 
 from hydroroot import radius, length, flux
 from hydroroot.generator import markov # 21-12-14: FB __init__.py in src not doing job
@@ -34,8 +32,8 @@ def test_markov(n=600, lr=0.1,  length=1e-4):
     """
     # topology
     g = markov.markov_binary_tree(nb_vertices=n, branching_variability=lr, seed=2)
-
-    order = {0:n, 1:3550, 2:1755}
+    # F. Bauget 2022-04-11: the markov_binary_tree has been changed so the values were not correct anymore
+    order = {0:n, 1:3571, 2:2577}
     check_mtg(g,order)
 
     return g
@@ -60,7 +58,8 @@ def test_markov_with_length_law(n=600, beta=0.298):
 
     g = markov.markov_binary_tree(nb_vertices=n, branching_variability=beta,
                                   length_law= law, seed=2)
-    order = {0: 600, 1: 1188}
+    # F. Bauget 2022-04-11: the markov_binary_tree has been changed so the values were not correct anymore
+    order = {0: 600, 1: 1134}
     check_mtg(g, order)
     return g
 
