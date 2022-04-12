@@ -87,7 +87,7 @@ def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
     for vid in colors:
         if vid in shapes:
             shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(shapes.values())
+    scene = pgl.Scene(list(shapes.values()))
 
     pgl.Viewer.display(scene)
     if name is not None:

@@ -116,7 +116,7 @@ radfold=1
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
-    return int(long(_hexlify(_urandom(2500)), 16)%100000000)
+    return int(int(_hexlify(_urandom(2500)), 16)%100000000)
 
 def my_run(primary_length, axfold=1., radfold=1., seed=None, ref_radius=ref_radius*2,  order_decrease_factor=0.8):
     """ Simulate Arabidopsis architecture
@@ -255,7 +255,7 @@ def main():
             g, axfold, radfold, _length, surface, Jv, i1, seed = my_run(primary_length=length)
 
             add(count, length, axfold, radfold, _length, surface, Jv, i1, seed)
-            print 'Simu, ', count
+            print('Simu, ', count)
 
     save(xls=True)
 
@@ -276,7 +276,7 @@ def reproduce(fn='input_seeds.txt'):
     for i in range(number_of_runs):
         length = r_length[i]
         seed = r_seed[i]
-        print "length, seed ", length, seed
+        print("length, seed ", length, seed)
         g, axfold, radfold, _length, surface, Jv, i1, seed = my_run(primary_length=length, seed=seed)
 
         add(i, length, axfold, radfold, _length, surface, Jv, i1, seed)

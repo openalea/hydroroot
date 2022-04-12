@@ -4,6 +4,9 @@
 from openalea.deploy.shared_data import shared_data
 import pandas
 
+import sys
+sys.path.insert(0, '../src')
+
 import hydroroot
 from hydroroot.main import hydroroot_from_data
 from hydroroot.generator.measured_root import mtg_from_aqua_data # Added F. Bauget 2019-12-16
@@ -61,7 +64,7 @@ def test_archi_data(plant_id=8):
 
     def nb_root(g, l):
         length= {}
-        root = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+        root = next(g.component_roots_at_scale_iter(g.root, scale=g.max_scale()))
         dl = 1.e-4
 
         if 'mylength' in g.property_names():

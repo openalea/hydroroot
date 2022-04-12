@@ -12,7 +12,7 @@
 
 # VERSION = 2
 
-from random import _hexlify, _urandom
+# F. Bauget 2021-12-14: removed unused import when migration to python 3 was done
 
 import sys
 import matplotlib.pyplot as plt
@@ -77,8 +77,8 @@ if __name__ == '__main__':
 
     # predict the number of simulation run
     nb_steps = len(dseeds)
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
     for i in range(5):
         results[i] = {}
@@ -179,4 +179,4 @@ if __name__ == '__main__':
         ax6[s].get_xaxis().set_visible(False)
         ax6[s].tick_params(axis = 'y', color = "orange")
 
-    print 'running time is ', time.time() - start_time
+    print('running time is ', time.time() - start_time)

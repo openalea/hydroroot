@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
     # predict the number of simulation run
     nb_steps = len(dseeds) * len(parameter.output['radfold']) * len(parameter.output['axfold'])
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
     columns = ['seed', 'primary_length (m)', 'k (10-8 m/s/MPa)', 'ax', 'length (m)', 'surface (m2)', 'Jv (uL/s)',
                'internode (m)', 'nude length (m)']
@@ -169,4 +169,4 @@ if __name__ == '__main__':
 
     dr = pd.merge(dresults, dresults2, how = 'outer')
     if output is not None: dr.to_csv(output, index = False)
-    print 'running time is ', time.time() - start_time
+    print('running time is ', time.time() - start_time)

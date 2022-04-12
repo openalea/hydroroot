@@ -12,15 +12,18 @@
 
 # VERSION = 2
 import copy
-from random import _hexlify, _urandom
+from binascii import hexlify as _hexlify # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
+from os import urandom as _urandom # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
 
 import pandas as pd
 
 from openalea.mtg import traversal
+from openalea.plantgl.all import Viewer
 
 from hydroroot import radius, markov
 from hydroroot.law import histo_relative_law
 from hydroroot.generator.measured_root import mtg_from_aqua_data
+from hydroroot.display import plot as mtg_scene
 
 # read architecture file
 def read_archi_data(fn):
@@ -137,7 +140,7 @@ def axial(acol = [], scale = 1):
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
-    return int(long(_hexlify(_urandom(2500)), 16) % 100000000)
+    return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
 def root_creation(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
@@ -206,7 +209,33 @@ def root_creation(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_lengt
     g, volume = radius.compute_volume(g)
 
     if df is not None:
-        v_base = g.component_roots_at_scale_iter(g.root, scale = g.max_scale()).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
         primary_length = g.property('position')[v_base]
 
     return g, primary_length, _length, surface, _seed
+
+def plot(g = None, filename=None, name=None, **kwds):
+    """
+    plot the MTG in 3d
+
+    :param:
+        g: MTG (None), if not None plot g
+        filename: string (None), if not None create g from the filename in aqua format
+        name: string (None) if not None save g as an image with file name = name
+        **kwds: has_radius=False, r_base=1.e-4, r_tip=5e-5,
+             visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
+             prune=None
+    """
+    # from IPython import get_ipython
+    #
+    # # ipython = get_ipython()
+    # ipython = None
+    # if ipython:
+    #     ipython.magic('gui qt')
+    if filename is not None:
+        df = read_archi_data(filename)
+        g, primary_length, _length, surface, _seed = root_creation(df = df)
+
+    Viewer.display(mtg_scene(g, **kwds))
+    if name is not None:
+            Viewer.frameGL.saveImage(name)

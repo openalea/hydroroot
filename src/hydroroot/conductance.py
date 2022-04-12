@@ -127,7 +127,7 @@ def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATE
     radius = g.property('radius_xylem')
     if not radius:
         full_radius = g.property('radius')
-        radius = dict( (vid,r*radius_scale) for vid,r in full_radius.iteritems())
+        radius = dict( (vid,r*radius_scale) for vid,r in full_radius.items())
     nb_xylem = g.property('nb_xylem')
     length= g.property('length')
     if not nb_xylem:
@@ -145,12 +145,12 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
     """
 
     spline = UnivariateSpline(x, y, s=s)
-    keys = g.property(prop_in).keys()
-    x_values = np.array(g.property(prop_in).values())
+    keys = list(g.property(prop_in).keys())
+    x_values = np.array(list(g.property(prop_in).values()))
 
     y_values = spline(x_values)
 
-    g.properties()[prop_out] = dict(zip(keys,y_values))
+    g.properties()[prop_out] = dict(list(zip(keys,y_values)))
 
     xx = np.linspace(0,1,1000)
     yy = spline(xx)
@@ -172,12 +172,12 @@ def fit_property_from_spline(g, spline, prop_in, prop_out):
     """
 
     #spline = UnivariateSpline(x, y, s=s)
-    keys = g.property(prop_in).keys()
-    x_values = np.array(g.property(prop_in).values())
+    keys = list(g.property(prop_in).keys())
+    x_values = np.array(list(g.property(prop_in).values()))
 
     y_values = spline(x_values)
 
-    g.properties()[prop_out] = dict(zip(keys, y_values))
+    g.properties()[prop_out] = dict(list(zip(keys, y_values)))
 
     return g
 
@@ -211,7 +211,7 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
     fit_property_from_spline(g, spline, prop_in, prop_out)
 
     if plot:
-        x_n = np.array(g.property(prop_in).values())
+        x_n = np.array(list(g.property(prop_in).values()))
         #y_n = np.array(g.property(prop_out).values())
 
         xx = np.linspace(min(x_n), max(x_n), 1000)

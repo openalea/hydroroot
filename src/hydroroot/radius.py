@@ -24,13 +24,13 @@ def cont_radius(g, r_base, r_tip):
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
 
-    base = g.component_roots_iter(g.root).next()
+    base = next(g.component_roots_iter(g.root))
     base = g.node(base)
     base.radius = r_base
 
     _tips = dict((vid, g.order(vid)) for vid in g.vertices_iter(scale = g.max_scale()) if g.is_leaf(vid))
     tips = {}
-    for tip,order in _tips.iteritems():
+    for tip,order in _tips.items():
         tips.setdefault(order, []).append(tip)
 
     max_order = max(tips)
@@ -64,13 +64,13 @@ def discont_radius(g, r_base, r_tip):
 
     assert (r_base>r_tip),"Base radius should be greater than tip radius"
 
-    base = g.component_roots_iter(g.root).next()
+    base = next(g.component_roots_iter(g.root))
     base = g.node(base)
     base.radius = r_base
 
     _tips = dict((vid, g.order(vid)) for vid in g.vertices_iter(scale = g.max_scale()) if not algo.sons(g,vid,EdgeType='<'))
     tips = {}
-    for tip,order in _tips.iteritems():
+    for tip,order in _tips.items():
         tips.setdefault(order, []).append(tip)
 
     max_order = max(tips)
@@ -106,7 +106,7 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     max_scale = g.max_scale()
     ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
 
-    base = g.component_roots_iter(g.root).next()
+    base = next(g.component_roots_iter(g.root))
 
     orders = algo.orders(g,scale=max_scale)
     max_order = max(orders)
@@ -116,7 +116,7 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
         radius_order[order] = ref_r*(d_factor**order)
 
     g_radius = g.properties()['radius'] = {}
-    for vid, order in orders.iteritems():
+    for vid, order in orders.items():
         g_radius[vid] = radius_order[order]
 
     #print 'exiting MTG radius setting'
@@ -175,7 +175,7 @@ def compute_surface(g):
     radius = g.property('radius')
     length = g.property('length')
     for vid in g.vertices_iter(scale = max_scale):
-        if radius.has_key(vid) and length.has_key(vid):
+        if vid in radius and vid in length:
             surf += 2 * pi * radius[vid] * length[vid]
     #print 'surface (sq. meters): ',surf
     #print 'leaving surface computation'
@@ -194,7 +194,7 @@ def compute_volume(g):
     radius = g.property('radius')
     length = g.property('length')
     for vid in g.vertices_iter(scale = max_scale):
-        if radius.has_key(vid) and length.has_key(vid):
+        if vid in radius and vid in length:
             volume += pi * (radius[vid]**2) * length[vid]
     #print 'volume (cube meters): ',volume
     #print 'leaving volume computation'
@@ -210,7 +210,7 @@ def compute_relative_position(g):
     position_measure = {}
     axis_length = {}
     length = g.property('length')
-    root_id = g.component_roots_at_scale_iter(g.root, scale=scale).next()
+    root_id = next(g.component_roots_at_scale_iter(g.root, scale=scale))
     for vid in traversal.post_order2(g, root_id):
         #sons = algo.sons(g,vid,EdgeType='<')
         sons = [cid for cid in g.children(vid) if g.edge_type(cid) == '<']
@@ -220,7 +220,7 @@ def compute_relative_position(g):
             axis_length[vid] = position[vid]
 
     relative_position = {}
-    for axis_id, _length in axis_length.iteritems():
+    for axis_id, _length in axis_length.items():
         _length = float(max(1, _length))
         for v in algo.local_axis(g,axis_id):
             relative_position[v] = position[v] / _length

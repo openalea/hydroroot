@@ -156,7 +156,7 @@ EXPOVARIATE = True
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
-    return int(long(_hexlify(_urandom(2500)), 16)%100000000)
+    return int(int(_hexlify(_urandom(2500)), 16)%100000000)
 
 def my_run(primary_length, k0=k0,
            axfold=1., radfold=1.,
@@ -334,8 +334,8 @@ def main():
 
     # predict the number of simulation run
     nb_steps = N * len(length_values) * len(deltas) * len(axfolds) * len(radfolds) * len(nudes)
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
     #to comment
     #return
@@ -356,8 +356,8 @@ def main():
 
                             add(count, plength, k0, axfold, radfold, delta, nude_length, _length, surface, Jv,
                                 i1,i2,i3,i4,i6,i8, seed, diff_law)
-                            print 'Simu, ', count
-                            print "DIFF LAW: ", diff_law
+                            print('Simu, ', count)
+                            print("DIFF LAW: ", diff_law)
 
     save(xls=False)
 
@@ -388,7 +388,7 @@ def reproduce(fn='181204testreproduce.txt'):
         delta = r_delta[i]
         nude_length = r_nude[i]
         seed = int(r_seed[i])
-        print "length, seed ", length, seed
+        print("length, seed ", length, seed)
         g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed, diff_law = my_run(primary_length=length,
                                                                     k0=k0,
                                                                     axfold=axfold,
@@ -424,8 +424,8 @@ def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
 
     number_of_runs = len(r_length)
     nb_steps = len(r_length)*len(k0values)*len(axfoldvalues)
-    print 'Simulation runs: ', nb_steps
-    print '#############################'
+    print('Simulation runs: ', nb_steps)
+    print('#############################')
 
     init()
 
@@ -438,7 +438,7 @@ def reproducekvariable(fn='180615reproduce300miscellaneous.txt'):
                 delta = r_delta[i]
                 nude_length = r_nude[i]
                 seed = int(r_seed[i])
-                print "length, seed ", length, seed
+                print("length, seed ", length, seed)
                 g, axfold, radfold, _length, surface, Jv, i1, i2, i3, i4, i6, i8, seed, diff_law = my_run(primary_length=length,
                                                                         k0=k0,
                                                                         axfold=axfold,

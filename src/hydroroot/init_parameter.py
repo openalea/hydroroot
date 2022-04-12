@@ -88,7 +88,7 @@ class Parameters():
             'P_s': 0.,
             'Cse': 0.,
             'Ce': 0.,
-            'sigma': 1.}
+            'Sigma': 1.}
         self.exp = {
             'Jv': 0.1,
             'psi_e': 0.4,
@@ -118,7 +118,7 @@ class Parameters():
             self.archi[pid] = parameter['archi'][pid]
         for pid in parameter['hydro']:
             self.hydro[pid] = parameter['hydro'][pid]
-        if 'solute' in parameter.keys(): # because not in the actual version
+        if 'solute' in list(parameter.keys()): # because not in the actual version
             for pid in parameter['solute']:
                 self.solute[pid] = parameter['solute'][pid]
         for pid in parameter['experimental']:

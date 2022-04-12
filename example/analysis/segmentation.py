@@ -26,7 +26,7 @@ mtgs = []
 #for genotype in ['col',]:# 'esk11', 'esk15']:#, 'irx34', 'pip2122']:
 
 def dump_mtg(g, length, type=TYPE):
-    print 'length is : ', length
+    print('length is : ', length)
     pass
 
 
@@ -69,7 +69,7 @@ length_values = np.arange(8, 15.5, 0.1).tolist()
 length_values = (12.,)
 for nb_time in range(30):
     for length in length_values:
-        print 'Simulation ', length
+        print('Simulation ', length)
         length = length/100.
         length_data = primary_length_law(length, type=TYPE)
 
@@ -99,7 +99,7 @@ for g, length in mtgs:
         i0, i1 = analysis.intercept(g, (4.5/100, 9.5/100))
 
         add(count, length, 1., k0, surface, volume, Jv_global, i0, i1)
-        print 'Simu, ', count
+        print('Simu, ', count)
         count += 1
 save()
 

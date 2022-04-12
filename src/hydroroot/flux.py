@@ -84,7 +84,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         length = self.length; invert_model = self.invert_model
 
         # Select the base of the root
-        v_base = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale=g.max_scale()))
 
         # Add properties
         g.add_property('Keq')
@@ -269,7 +269,7 @@ class RadialShuntFlux(Flux):
         b = self.b
 
         # Select the base of the root
-        v_base = g.component_roots_at_scale_iter(g.root, scale=g.max_scale()).next()
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale=g.max_scale()))
 
         # Add properties
         g.add_property('Keq')
@@ -564,7 +564,7 @@ def ramification_length_law(g, root=1, dl=1e-4):
                 ramif_length.append((length[v], length[rid]))
     ramif_length = list(reversed(ramif_length))
 
-    X, Y = zip(*ramif_length)
+    X, Y = list(zip(*ramif_length))
     X = np.array(X)
 
     X /= total_length

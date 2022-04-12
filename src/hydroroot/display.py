@@ -87,20 +87,25 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
     # Compute color from radius
     color.colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
 
-    shapes = dict( (sh.getId(),sh) for sh in scene)
-
+    # F. Bauget 2022-03-15: WIP python 2 to 3, got "AttributeError: 'Shape' object has no attribute 'getId'"
+    # shapes = dict( (sh.getId(),sh) for sh in scene)
+    shapes = scene.todict()
     colors = g.property('color')
     for vid in colors:
         if vid in shapes:
-            shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(shapes.values())
+            # shapes[vid].appearance = pgl.Material(colors[vid])
+            for sh in shapes[vid]:
+                sh.appearance = pgl.Material(colors[vid])
+    # scene = pgl.Scene(list(shapes.values()))
+    scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
+    # F. Bauget 2022-03-15
     return scene
 
 
 def my_colormap(g, property_name, cmap='jet',lognorm=True):
     prop = g.property(property_name)
-    keys = prop.keys()
-    values = np.array(prop.values())
+    keys = list(prop.keys())
+    values = np.array(list(prop.values()))
     #m, M = int(values.min()), int(values.max())
     _cmap = cm.get_cmap(cmap)
     norm = Normalize() if not lognorm else LogNorm()
@@ -110,7 +115,7 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True):
     colors = (_cmap(values)[:,0:3])*255
     colors = np.array(colors,dtype=np.int).tolist()
 
-    g.properties()['color'] = dict(zip(keys,colors))
+    g.properties()['color'] = dict(list(zip(keys,colors)))
 
 
 def my_colorbar(values, cmap, norm):

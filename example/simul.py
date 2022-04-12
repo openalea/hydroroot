@@ -182,12 +182,12 @@ def save(name='bench.txt'):
 count = 0
 for i in range(5):
     for length in (0.10, 0.12, 0.13, 0.14, 0.15):
-        print 'Lenght ', length
+        print('Lenght ', length)
         for axfold in (1., 4., 8.):
             count += 1
             init()
             for radfold in (1., 4., 8.):
-                print 'run simu'
+                print('run simu')
                 length, surface, volume, jv, intercepts = run_simulation(length, axfold, radfold)
                 add(length, axfold, radfold, surface, volume, jv, *intercepts)
             save('results160418/bench%d.txt'%count)

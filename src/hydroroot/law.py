@@ -43,7 +43,7 @@ def expovariate_law(data_xy, size=5e-2, scale_x=1e-2, scale_y=1e3, plot=False):
     xy = data_xy
     xy.sort(axis=0)
     xy = xy.tolist()
-    x, y = zip(*xy)  # Separate x and y coordiantes
+    x, y = list(zip(*xy))  # Separate x and y coordiantes
     x = np.array(x) * scale_x
     y = np.array(y) * scale_y
     x = x.tolist()
@@ -73,7 +73,11 @@ def discretize(x, y, size=5e-2):
 
     m, M = min(x), max(x)
 
-    delta = (M - m) / float(size)
+    # F. Bauget 2022-03-15: python 2 to 3
+    #   - before in numpy.linspace the 3ed arguments was tranformed to int in the numpy routine
+    #   - now should be done before call
+    # delta = (M - m) / float(size)
+    delta = int((M - m) / float(size))
     points = np.linspace(m, M, delta).tolist()
 
     #points = [(m + i * size) for i in range(1, nb_class - 1)]
@@ -90,7 +94,7 @@ def discretize(x, y, size=5e-2):
 
     zz = [(points[i], y) for i, y in enumerate(ys) if y]
 
-    return zip(*zz)
+    return list(zip(*zz))
 
 
 def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):

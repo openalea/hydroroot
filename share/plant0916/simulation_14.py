@@ -102,7 +102,7 @@ radfold=1
 
 def my_seed():
     """ Define my own seed function to capture the seed value. """
-    return int(long(_hexlify(_urandom(2500)), 16)%100000000)
+    return int(int(_hexlify(_urandom(2500)), 16)%100000000)
 
 def my_run(primary_length, axfold=1., radfold=1.):
     """ Simulate Arabidopsis architecture
@@ -221,7 +221,7 @@ for nb_time in range(10000):
         g, axfold, radfold, _length, surface, Jv, i1, seed= my_run(primary_length=length)
 
         add(count, primary_length, axfold, radfold, _length, surface, Jv, i1, seed)
-        print 'Simu, ', count
+        print('Simu, ', count)
 
 # 2. Save them for analysis
 # 3. Compute k0 such that, Jv(k0/10) = 1/3 Jv(k0)
