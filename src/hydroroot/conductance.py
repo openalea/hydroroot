@@ -93,7 +93,12 @@ def compute_k(g, k0 = 300.):
 
         - `g` - the RSA
         - `k0` - the radial conductance for one element of surface in microL/s.MPa.m**2
-        - `length` - the length of a segment
+
+    if k0 == 'k0': calculation using k0 from g.property('k0')
+    if k0 is a float: value used in calculation
+
+    k radial (microL/s.MPa) calculation:
+        k = 2 \pi r l k0 with l and r the segment length and radius
 
     """
     #print 'entering radial k fitting'
