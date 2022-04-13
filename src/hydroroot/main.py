@@ -108,7 +108,11 @@ def hydroroot_flow(
 
     Returns
     -------
-	- g (MTG): the MTG with 
+	- g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
+	            j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
+	            input and output of a MTG node
+	- Keq (float): the equivalent conductance of the whole root
+	- Jv_global (float): the outgoing flux at the root base
 
     """
     xa, ya = axial_conductivity_data

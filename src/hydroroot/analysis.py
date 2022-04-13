@@ -59,17 +59,18 @@ def intercept(g, dists, dl=1e-4, max_order=None):
 
     Parameters
     ----------
-    g: (MTG)
-    dists: (list of Float) list distances from the collet
-    max_order: (int) maximum order of considering roots
+        - g: (MTG)
+        - dists: (list of Float) list distances from the collet
+        - dl: (float) length of MTG segments
+        - max_order: (int) maximum order of considering roots
 
     Returns
     -------
-    intercepts: list of number of intercepts according to distances in dists
+        - intercepts: list of number of intercepts according to distances in dists
     """
 
 
-    intercepts = [nb_roots(g, x, max_order=max_order) for x in dists]
+    intercepts = [nb_roots(g, x, dl = dl, max_order=max_order) for x in dists]
     return intercepts
 
 
