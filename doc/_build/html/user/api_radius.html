@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common algorithms &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="common algorithms" href="api_read_file.html" />
+    <link rel="prev" title="common algorithms" href="api_main.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api_analysis.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_conductance.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_curve.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_display.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_flux.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_generator_markov.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_generator_measured_root.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_hydro_io.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_law.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_length.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_main.html">common algorithms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_read_file.html">common algorithms</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>common algorithms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_radius.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-hydroroot.radius">
+<span id="common-algorithms"></span><h1>common algorithms<a class="headerlink" href="#module-hydroroot.radius" title="Permalink to this headline"></a></h1>
+<p>and the radius of each xylem pipe.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.compute_length">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">compute_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#compute_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.compute_length" title="Permalink to this definition"></a></dt>
+<dd><p>Set the length of each vertex of the MTG</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.compute_relative_position">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">compute_relative_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#compute_relative_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.compute_relative_position" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the position of each segment relative to the axis bearing it.
+Add the properties “position” and “relative_position” to the MTG.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.compute_surface">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">compute_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#compute_surface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.compute_surface" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the total surface of the MTG (in square meters)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.compute_volume">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">compute_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#compute_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.compute_volume" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Compute the total volume of the MTG (in cubic meters)</dt><dd><p>If there is a varying volume the equation is rather:
+.. math:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">V</span> <span class="o">=</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>rac{pi h}{3}(R_1^2+R_2^2+R_1 R_2)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.cont_radius">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">cont_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_tip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#cont_radius"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.cont_radius" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the radius of each segment of a root system.</p>
+<p>Set radius for elements of a mtg with an increase rate computed from
+given base and tip radius in a continuous way.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.discont_radius">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">discont_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_tip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#discont_radius"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.discont_radius" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the radius of each segment of a root system.</p>
+<p>Set radius for elements of a mtg with an increase rate computed
+from the length of the longest axis and its base and tip radius.</p>
+<p>Radius can be discontinuous e.g. for a young/small lateral on an old root,
+the young root radius is very small initially compared to the old one.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.radius.ordered_radius">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.radius.</span></span><span class="sig-name descname"><span class="pre">ordered_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_decrease_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/radius.html#ordered_radius"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.radius.ordered_radius" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the radius of each segment of a root system.</p>
+<p>Set radius for elements of a mtg with fixed decrease between each order.</p>
+<p>ref_radius: reference radius of the primary root (in m)
+order_decrease_factor: radius decrease factor applied when increasing order</p>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/6d0639b79ceb4000bac67565eea76842/radius.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/radius.py</span></code></a>.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_main.html" class="btn btn-neutral float-left" title="common algorithms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_read_file.html" class="btn btn-neutral float-right" title="common algorithms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

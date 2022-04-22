@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common algorithms &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+<!--        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>-->
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="common algorithms" href="api_curve.html" />
+    <link rel="prev" title="common algorithms" href="api_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api_analysis.html">common algorithms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_curve.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_display.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_flux.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_generator_markov.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_generator_measured_root.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_hydro_io.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_law.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_length.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_main.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_radius.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_read_file.html">common algorithms</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>common algorithms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_conductance.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-hydroroot.conductance">
+<span id="common-algorithms"></span><h1>common algorithms<a class="headerlink" href="#module-hydroroot.conductance" title="Permalink to this headline"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.compute_K">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">compute_K</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#compute_K"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.compute_K" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the conductance in dimension <span class="math notranslate nohighlight">\([L^3 P^{-1} T^{-1}]\)</span> from the experimental one which is in <span class="math notranslate nohighlight">\([L^4 P^{-1} T^{-1}]\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>g (MTG) : the root architecture</p></li>
+<li><p>scale_factor (float) : a factor used for sensitivity analysis</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG) : with the property K calculated from property K_exp and the length of the vertex</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>In each vertex K = K_exp * scale_factor / vertex_length</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.compute_K_from_Poiseuille">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">compute_K_from_Poiseuille</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_xylem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#compute_K_from_Poiseuille"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.compute_K_from_Poiseuille" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the axial conductances (K) in a MTG according to Poiseuille law.</p>
+<p>The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
+and on the length of a root segment.</p>
+<p>radius_scale allows to compute the radius of a xylem pipe from the radius of a root segment.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.compute_K_from_laws">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">compute_K_from_laws</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#compute_K_from_laws"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.compute_K_from_laws" title="Permalink to this definition"></a></dt>
+<dd><p>Deprecated
+Compute the axial conductance from empirical laws (hard coded) according to the distance from the tip and to the
+root type, either seminal, crown or lateral</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>g (MTG)</p></li>
+</ul>
+</dd>
+</dl>
+<p>set property K</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.compute_k">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">compute_k</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#compute_k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.compute_k" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the radial conductances (k) of each segment of the MTG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>g (MTG) : the RSA</p></li>
+<li><p>k0 (float) or (string): the radial conductance for one element of surface in <span class="math notranslate nohighlight">\(micronL/s.MPa.m^2\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<p>if k0 == ‘k0’: calculation using k0 from g.property(‘k0’)
+if k0 is a float: value used in calculation</p>
+<dl class="simple">
+<dt>k radial (microL/s.MPa) calculation:</dt><dd><p>k = 2 pi r l k0 with l and r the segment length and radius</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.fit_K">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">fit_K</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#fit_K"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.fit_K" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.fit_property">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">fit_property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#fit_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.fit_property" title="Permalink to this definition"></a></dt>
+<dd><p>Fit a 1D spline from x, y data.</p>
+<p>Retrieve the values from the prop_in of the MTG.
+And evaluate the spline to compute the property ‘prop_out’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.fit_property_from_csv">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">fit_property_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csvdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#fit_property_from_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.fit_property_from_csv" title="Permalink to this definition"></a></dt>
+<dd><p>Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary</p>
+<p>Retrieve the values it will be applied to from the prop_in of the MTG.
+And evaluate the spline to compute the property ‘prop_out’</p>
+<p>Toggle plot option to visualize the spline fit</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.fit_property_from_spline">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">fit_property_from_spline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#fit_property_from_spline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.fit_property_from_spline" title="Permalink to this definition"></a></dt>
+<dd><p>compute a property from another one using a spline transformation.</p>
+<p>Retrieve the values from the prop_in of the MTG.
+And evaluate the spline to compute the property ‘prop_out’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.poiseuille">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">poiseuille</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viscosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#poiseuille"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.poiseuille" title="Permalink to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Deprecated
+Compute a conductance of a xylem element based on their radius and length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>radius (float) : (m) radius of a xylem tube</p></li>
+</ul>
+</dd>
+</dl>
+<p>length (float) : (m) length of a xylem element</p>
+<p>viscosity (float) : (Pa.s) dynamic viscosity of the liquid</p>
+<dl class="simple">
+<dt>The poiseuille formula is:</dt><dd><p>:math:` conductance =</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl>
+<dt>rac{pi r^4}{8 mu L }`</dt><dd><blockquote>
+<div><p>with <span class="math notranslate nohighlight">\(r\)</span> the radius of a pipe,
+<span class="math notranslate nohighlight">\(\mu\)</span> the viscosity of the liquid,
+<span class="math notranslate nohighlight">\(L\)</span> the length of the pipe.</p>
+</div></blockquote>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Poiseuille">http://en.wikipedia.org/wiki/Poiseuille</a></p>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/af4a4cd63bb392d81e1e281173acc3ef/conductance.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/conductance.py</span></code></a>.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_analysis.html" class="btn btn-neutral float-left" title="common algorithms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_curve.html" class="btn btn-neutral float-right" title="common algorithms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

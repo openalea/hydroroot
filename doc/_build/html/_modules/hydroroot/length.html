@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hydroroot.length &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_analysis.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_conductance.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_curve.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_display.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_flux.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_markov.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_measured_root.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_hydro_io.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_law.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_length.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_main.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_radius.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_read_file.html">common algorithms</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>hydroroot.length</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hydroroot.length</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">UnivariateSpline</span>
+
+<span class="kn">from</span> <span class="nn">.read_file</span> <span class="kn">import</span> <span class="n">readCSVFile</span>
+
+
+<div class="viewcode-block" id="fit_length"><a class="viewcode-back" href="../../user/api_length.html#hydroroot.length.fit_length">[docs]</a><span class="k">def</span> <span class="nf">fit_length</span><span class="p">(</span><span class="n">csvdata</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="s1">&#39;1e-4&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Fit a 1D spline from (x, y) csv extracted data.</span>
+
+<span class="sd">    Retrieve the values it will be applied to from the prop_in of the MTG.</span>
+<span class="sd">    And evaluate the spline to compute the property &#39;prop_out&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">csvdata</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">csvdata</span> <span class="o">=</span> <span class="n">readCSVFile</span><span class="p">(</span><span class="n">csvdata</span><span class="p">)</span>
+    <span class="n">x_name</span> <span class="o">=</span> <span class="n">csvdata</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y_name</span> <span class="o">=</span> <span class="n">csvdata</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">fit_law</span><span class="p">(</span><span class="n">csvdata</span><span class="p">[</span><span class="n">x_name</span><span class="p">],</span> <span class="n">csvdata</span><span class="p">[</span><span class="n">y_name</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fit_law"><a class="viewcode-back" href="../../user/api_length.html#hydroroot.length.fit_law">[docs]</a><span class="k">def</span> <span class="nf">fit_law</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">scale</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">scale</span><span class="p">)</span>
+
+        <span class="c1">#print &quot;DEBUG: &quot;, scale, x, y</span>
+    <span class="n">spline</span> <span class="o">=</span> <span class="n">UnivariateSpline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">spline</span></div>
+
+<div class="viewcode-block" id="diff"><a class="viewcode-back" href="../../user/api_length.html#hydroroot.length.diff">[docs]</a><span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">law1</span><span class="p">,</span> <span class="n">ref_law</span><span class="p">):</span>
+    <span class="n">knots</span> <span class="o">=</span> <span class="n">law1</span><span class="o">.</span><span class="n">get_knots</span><span class="p">()</span>
+
+    <span class="n">interval_def</span> <span class="o">=</span> <span class="p">(</span><span class="n">knots</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">knots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">integral1</span> <span class="o">=</span> <span class="n">law1</span><span class="o">.</span><span class="n">integral</span><span class="p">(</span><span class="o">*</span><span class="n">interval_def</span><span class="p">)</span>
+    <span class="n">integral_ref</span> <span class="o">=</span> <span class="n">ref_law</span><span class="o">.</span><span class="n">integral</span><span class="p">(</span><span class="o">*</span><span class="n">interval_def</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">integral1</span><span class="o">-</span><span class="n">integral_ref</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

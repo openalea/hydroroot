@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hydroroot.generator.measured_root &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_analysis.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_conductance.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_curve.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_display.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_flux.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_generator_markov.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_generator_measured_root.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_hydro_io.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_law.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_length.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_main.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_radius.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user/api_read_file.html">common algorithms</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>hydroroot.generator.measured_root</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hydroroot.generator.measured_root</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">openalea.mtg</span> <span class="kn">import</span> <span class="n">MTG</span><span class="p">,</span> <span class="n">fat_mtg</span>
+<span class="kn">from</span> <span class="nn">openalea.mtg.traversal</span> <span class="kn">import</span> <span class="n">post_order2</span>
+<span class="kn">from</span> <span class="nn">openalea.mtg</span> <span class="kn">import</span> <span class="n">algo</span>
+
+<span class="n">SUPERIOR_ORDER</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="mtg_builder"><a class="viewcode-back" href="../../../user/api_generator_measured_root.html#hydroroot.generator.measured_root.mtg_builder">[docs]</a><span class="k">def</span> <span class="nf">mtg_builder</span><span class="p">(</span>
+    <span class="n">primary_length</span><span class="p">,</span>
+    <span class="n">primary_length_data</span><span class="p">,</span>
+    <span class="n">lateral_length_data</span><span class="p">,</span>
+    <span class="n">segment_length</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+    <span class="n">branching_variability</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">branching_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">length_law</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">nude_tip_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">order_max</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a MTG from length laws.</span>
+
+<span class="sd">    The first law is the length of the primary root.</span>
+<span class="sd">    The second law is the length of the ramification.</span>
+
+<span class="sd">    The primary root is of length &#39;total_length&#39;.</span>
+<span class="sd">    It is discretized following the law length_base.</span>
+
+<span class="sd">    All the variables are expressed in meters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">length_base</span> <span class="o">=</span> <span class="n">primary_length_data</span>
+    <span class="n">length_lateral</span> <span class="o">=</span> <span class="n">lateral_length_data</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">MTG</span><span class="p">()</span>
+    <span class="n">rid</span> <span class="o">=</span> <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+    <span class="c1"># Primary root</span>
+
+    <span class="c1"># g.node(vid).tip_length = total_length</span>
+    <span class="n">prev_len</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">ramifs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Create the primary axis</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">len_base</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">length_base</span><span class="p">):</span>
+        <span class="k">while</span> <span class="n">len_base</span><span class="o">-</span><span class="n">prev_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">prev_len</span> <span class="o">+=</span> <span class="n">segment_length</span>
+            <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span><span class="o">=</span><span class="n">prev_len</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span><span class="o">=</span><span class="n">len_base</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">prev_len</span> <span class="o">=</span> <span class="n">len_base</span>
+        <span class="k">if</span> <span class="n">length_lateral</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="n">ramifs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">length_lateral</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">vid</span><span class="p">))</span>
+
+    <span class="c1"># Create lateral axis</span>
+    <span class="k">for</span> <span class="n">length_ramif</span><span class="p">,</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">ramifs</span><span class="p">:</span>
+        <span class="n">len_tip</span> <span class="o">=</span> <span class="n">length_ramif</span>
+        <span class="c1"># print &#39;length &#39;, len_tip</span>
+        <span class="n">_root_id</span> <span class="o">=</span> <span class="n">cid</span>
+        <span class="n">parent_base</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">cid</span><span class="p">)</span><span class="o">.</span><span class="n">base_length</span>
+        <span class="n">prev_len</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">len_tip</span> <span class="o">-</span> <span class="n">prev_len</span> <span class="o">&gt;</span><span class="mf">0.</span><span class="p">:</span>
+            <span class="c1">#print count</span>
+            <span class="n">count</span><span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">prev_len</span> <span class="o">+=</span> <span class="n">segment_length</span>
+            <span class="n">edget</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span> <span class="k">if</span> <span class="n">cid</span> <span class="o">==</span> <span class="n">_root_id</span> <span class="k">else</span> <span class="s1">&#39;&lt;&#39;</span>
+            <span class="n">cid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="n">edget</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span><span class="o">=</span><span class="n">prev_len</span><span class="o">+</span><span class="n">parent_base</span><span class="p">,</span>
+                            <span class="n">length</span><span class="o">=</span><span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1">########################################################</span>
+    <span class="c1"># Compute position_index: distance to tip in nb vertices</span>
+    <span class="n">position_index</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">properties</span><span class="p">()[</span><span class="s1">&#39;position_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">post_order2</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">rid</span><span class="p">):</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">position_index</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">parent</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">edge_type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>
+                <span class="n">position_index</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span><span class="o">=</span> <span class="n">pi</span><span class="o">+</span><span class="mi">1</span>
+
+
+    <span class="c1">##################</span>
+    <span class="c1"># Compute higher order of ramification</span>
+    <span class="n">anchors</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># list of branching points where lateral roots will be &quot;grafted&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">delayed_markov</span><span class="p">(</span><span class="n">timer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; markov chain with a delay between ramification &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">timer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">branching_delay</span><span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">timer</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span><span class="n">timer</span>
+
+    <span class="k">def</span> <span class="nf">create_randomized_delayed_axis</span><span class="p">(</span><span class="n">nid</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">anchors</span><span class="o">=</span><span class="n">anchors</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; create an axis of length n using the delayed markov</span>
+<span class="sd">            and randomized the id of the branching points in anchors</span>
+<span class="sd">            around the theoretical branching positions</span>
+
+<span class="sd">        :Parameters:</span>
+<span class="sd">            - nid: root node for the axis</span>
+<span class="sd">            - n : number of vertices for this axis</span>
+<span class="sd">            - anchors: future ramification points on this axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">shuffled_axis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">branch</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">delayed_markov</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">branch</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">delayed_markov</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="n">axis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">branch</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">shuffled_axis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">branch</span><span class="p">,</span><span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># shift (1-branching_stability) branching points</span>
+            <span class="c1"># at max (1-branching_stability)*branching delay away from</span>
+            <span class="c1"># theoretical branching position</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">axis</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>   <span class="c1"># read &#39;axis&#39; only to avoid treating the same branching point after each shift</span>
+                <span class="k">if</span> <span class="mi">1</span> <span class="p">:</span> <span class="c1">#random.random() &lt; branching_variability :</span>
+                    <span class="n">var</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">branching_variability</span><span class="o">*</span><span class="n">branching_delay</span><span class="p">))</span>
+                    <span class="n">shift</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">var</span><span class="p">,</span><span class="n">var</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;shift &#39;</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="c1"># shift occurs only if the target is not branched already or outside the axis</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">)</span><span class="o">&lt;</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">:</span>
+                        <span class="n">b</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+                        <span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ramif</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">shuffled_axis</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">nid</span><span class="o">.</span><span class="n">order</span>
+            <span class="n">nid</span> <span class="o">=</span> <span class="n">nid</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">)</span>
+            <span class="n">nid</span><span class="o">.</span><span class="n">position_index</span> <span class="o">=</span> <span class="n">position</span>
+            <span class="k">if</span> <span class="n">ramif</span> <span class="p">:</span>
+                <span class="n">anchors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nid</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_randomized_delayed_axis</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">anchors</span><span class="o">=</span><span class="n">anchors</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; create an axis of length n using the delayed markov</span>
+<span class="sd">            and randomized the id of the branching points in anchors</span>
+<span class="sd">            around the theoretical branching positions</span>
+
+<span class="sd">        :Parameters:</span>
+<span class="sd">            - nid: root node for the axis</span>
+<span class="sd">            - n : number of vertices for this axis</span>
+<span class="sd">            - anchors: future ramification points on this axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_axis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">algo</span><span class="o">.</span><span class="n">descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">vid</span><span class="p">,</span><span class="n">RestrictedTo</span><span class="o">=</span><span class="s1">&#39;SameAxis&#39;</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_axis</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;AXIS &#39;</span><span class="p">,</span> <span class="n">_axis</span><span class="p">)</span>
+        <span class="n">nid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">vid</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">nid</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span>
+
+        <span class="n">axis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">shuffled_axis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">branch</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">delayed_markov</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">branch</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">delayed_markov</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="n">axis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">branch</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">shuffled_axis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">branch</span><span class="p">,</span><span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># shift (1-branching_stability) branching points</span>
+            <span class="c1"># at max (1-branching_stability)*branching delay away from</span>
+            <span class="c1"># theoretical branching position</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">axis</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>   <span class="c1"># read &#39;axis&#39; only to avoid treating the same branching point after each shift</span>
+                <span class="k">if</span> <span class="mi">1</span> <span class="p">:</span> <span class="c1">#random.random() &lt; branching_variability :</span>
+                    <span class="n">var</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">branching_variability</span><span class="o">*</span><span class="n">branching_delay</span><span class="p">))</span>
+                    <span class="n">shift</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">var</span><span class="p">,</span><span class="n">var</span><span class="p">)</span>
+                    <span class="c1"># shift occurs only if the target is not branched already or outside the axis</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">)</span><span class="o">&lt;</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">:</span>
+                        <span class="n">b</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+                        <span class="n">shuffled_axis</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">shift</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">ramif</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shuffled_axis</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ramif</span> <span class="p">:</span>
+
+                <span class="n">aid</span> <span class="o">=</span> <span class="n">_axis</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">nid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">aid</span><span class="p">)</span>
+                <span class="n">anchors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nid</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">SUPERIOR_ORDER</span><span class="p">:</span>
+        <span class="c1"># Update the ramification of order 1</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">edge_type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ORDER: &#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">order</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                <span class="n">update_randomized_delayed_axis</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ANCHORS &#39;</span><span class="p">,</span> <span class="n">anchors</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="n">anchors</span><span class="p">:</span>   <span class="c1"># while they are branching point left</span>
+            <span class="n">nid</span> <span class="o">=</span> <span class="n">anchors</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># take next branching point</span>
+            <span class="k">if</span> <span class="n">nid</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">nid</span><span class="p">,</span> <span class="n">nid</span><span class="o">.</span><span class="n">position_index</span><span class="p">)</span>
+            <span class="n">position_index</span> <span class="o">=</span> <span class="n">nid</span><span class="o">.</span><span class="n">position_index</span> <span class="c1"># distance to the tip</span>
+            <span class="c1">#print position_index</span>
+            <span class="k">if</span> <span class="n">nid</span><span class="o">.</span><span class="n">order</span> <span class="o">&lt;</span> <span class="n">order_max</span><span class="p">:</span>  <span class="c1"># check if maximal branching order was reached</span>
+
+                <span class="c1"># if there is a length law, use it to compute lateral root length at this position</span>
+                <span class="k">if</span> <span class="n">length_law</span><span class="p">:</span>
+                    <span class="n">lateral_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length_law</span><span class="p">(</span><span class="n">position_index</span><span class="p">))</span>
+                <span class="k">else</span> <span class="p">:</span> <span class="c1"># standard lateral root length - can&#39;t be longer than the bearing axis remaining branching length (remaining length - nude tip length)</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">algo</span><span class="o">.</span><span class="n">descendants</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">nid</span><span class="o">.</span><span class="n">_vid</span><span class="p">,</span><span class="n">RestrictedTo</span><span class="o">=</span><span class="s1">&#39;SameAxis&#39;</span><span class="p">)))</span>
+                    <span class="c1">#n = random.randint(1, max(n-nude_tip_length,1))</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">nude_tip_length</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">lateral_length</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+
+                <span class="c1"># create axis of appropriate length</span>
+                <span class="k">if</span> <span class="n">lateral_length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># branching_variability also apply to the length of LR</span>
+                    <span class="n">var</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lateral_length</span><span class="o">*</span><span class="n">branching_variability</span><span class="p">)</span>
+                    <span class="n">lateral_length</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">lateral_length</span><span class="o">-</span><span class="n">var</span><span class="p">),</span> <span class="n">lateral_length</span><span class="o">+</span><span class="n">var</span><span class="p">)</span>
+                    <span class="c1"># Create the first  node of the branching point and the corresponding axis</span>
+                    <span class="n">cid</span> <span class="o">=</span> <span class="n">nid</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="n">nid</span><span class="o">.</span><span class="n">order</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">edge_type</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">)</span>
+                    <span class="c1">#print &quot;pid length&quot;, nid, lateral_length</span>
+                    <span class="n">create_randomized_delayed_axis</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span> <span class="n">lateral_length</span><span class="p">)</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">fat_mtg</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;branching_delay &#39;</span><span class="p">,</span> <span class="n">branching_delay</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;max_order&#39;</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="mtg_from_aqua_data"><a class="viewcode-back" href="../../../user/api_generator_measured_root.html#hydroroot.generator.measured_root.mtg_from_aqua_data">[docs]</a><span class="k">def</span> <span class="nf">mtg_from_aqua_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">segment_length</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Added F. Bauget 2019-12-19</span>
+<span class="sd">        reconstruct MTG from file in format used by aquaporin team</span>
+<span class="sd">        maximum order is 2</span>
+
+<span class="sd">        Author: C. Pradal</span>
+<span class="sd">        Modified: F. Bauget</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ==========</span>
+<span class="sd">            - df: pandas dataframe, 3 columns [&#39;db&#39;,&#39;lr&#39;,&#39;order&#39;], db and lr are length in m</span>
+<span class="sd">            - segment_length: length of the vertices, default 1.e-4 in m</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        =======</span>
+<span class="sd">            - g: MTG with the following properties set: edge_type, label, base_length, length</span>
+
+<span class="sd">         the format is: 3 columns separated by tab</span>
+<span class="sd">         * 1st col: &quot;db&quot; distance in m from base on the parent root where starts the lateral root</span>
+<span class="sd">         * 2nd col: &quot;lr&quot; length in m of the corresponding lateral root</span>
+<span class="sd">         * 3d col: &quot;order&quot; = 1 if parent root is the primary root, = 1-n if the parent root is a lateral root that starts at the node n on the parent root</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">MTG</span><span class="p">()</span>
+    <span class="n">rid</span> <span class="o">=</span> <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="n">rnid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">rid</span><span class="p">)</span>
+    <span class="n">rnid</span><span class="o">.</span><span class="n">base_length</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">rnid</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span>
+    <span class="n">rnid</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span>
+    <span class="n">rnid</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Primary root</span>
+    <span class="n">prev_len</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">ramifs</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># variable (nb racine (1 first), index entry) [(index vertice node, lenght lat )]</span>
+
+    <span class="n">df_order</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">]</span>  <span class="c1"># array with 1st root</span>
+    <span class="n">length_base</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df_order</span><span class="p">:</span> <span class="c1"># F. Bauget 2020-11-02 : added the possibility to set real radii</span>
+        <span class="n">PR_radius</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
+        <span class="n">rnid</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">PR_radius</span>
+
+    <span class="c1">#    path = [1]</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">length_base</span><span class="p">:</span>
+        <span class="n">len_base</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">db</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="k">while</span> <span class="n">len_base</span> <span class="o">-</span> <span class="n">prev_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># we add segment of segment_length till the next vertice =&gt; no lateral root yet so the edge_type is &#39;&lt;&#39;</span>
+            <span class="n">prev_len</span> <span class="o">+=</span> <span class="n">segment_length</span>
+            <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df_order</span><span class="p">:</span> <span class="c1"># F. Bauget 2020-11-02 : added the possibility to set real radii</span>
+                <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span> <span class="o">=</span> <span class="n">prev_len</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">,</span>
+                                  <span class="n">order</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">,</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">PR_radius</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span> <span class="o">=</span> <span class="n">prev_len</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">,</span>
+                                  <span class="n">order</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">)</span>
+        <span class="c1"># Modification Decamber 2019by Fabrice: problem was that two following vertice may have the same base_length causing wrong g.property(&#39;position&#39;) recalculation in the conductance calculation</span>
+        <span class="c1"># did not pass test_reconstruct_from_aqua_data in test_archi_data.py</span>
+        <span class="c1"># vid = g.add_child(vid, edge_type=&#39;&lt;&#39;, label=&#39;S&#39;, base_length=len_base, length=segment_length, order=0)</span>
+        <span class="c1"># prev_len = len_base # the last added vertice may be &gt; than the first node so we change len_base which is to big</span>
+        <span class="n">len_lateral</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">lr</span>
+        <span class="k">if</span> <span class="n">len_lateral</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df_order</span><span class="p">:</span> <span class="c1"># F. Bauget 2020-11-02 : added the possibility to set real radii</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>  <span class="c1"># 1: PR, count: countieme RL</span>
+                <span class="n">ramifs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vid</span><span class="p">,</span> <span class="n">len_lateral</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>  <span class="c1"># randomly added, to sort it sorted(ramifs)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">count</span><span class="p">])</span>  <span class="c1"># 1: PR, count: countieme RL</span>
+                <span class="n">ramifs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vid</span><span class="p">,</span> <span class="n">len_lateral</span><span class="p">))</span>  <span class="c1"># randomly added, to sort it sorted(ramifs)</span>
+
+    <span class="c1"># F. Bauget 2020-06-11 : error in order which is the lateral order or the number of edges + between root and the</span>
+    <span class="c1">#                        vertices on the lateral of this order</span>
+    <span class="n">_order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">ramifs</span><span class="p">:</span>
+        <span class="n">ramifs</span> <span class="o">=</span> <span class="n">add_branching</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ramifs</span> <span class="o">=</span> <span class="n">ramifs</span><span class="p">,</span> <span class="n">Order</span> <span class="o">=</span> <span class="n">_order</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">)</span>
+        <span class="n">_order</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># ramifs = add_branching(g, df, ramifs = ramifs, Order = 1, segment_length = segment_length)</span>
+    <span class="c1">#</span>
+    <span class="c1"># ramifs = add_branching(g, df, ramifs = ramifs, Order = 3, segment_length = segment_length)</span>
+    <span class="k">return</span> <span class="n">g</span></div>
+
+<div class="viewcode-block" id="add_branching"><a class="viewcode-back" href="../../../user/api_generator_measured_root.html#hydroroot.generator.measured_root.add_branching">[docs]</a><span class="k">def</span> <span class="nf">add_branching</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ramifs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Order</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; F. Bauget 2019-12-19</span>
+<span class="sd">    add branching of a given order on the previous order</span>
+<span class="sd">    linked to mtg_from_aqua_data</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        - g: MTG</span>
+<span class="sd">        - df: pandas dataframe, 3 columns [&#39;db&#39;,&#39;lr&#39;,&#39;order&#39;], db and lr are length in m</span>
+<span class="sd">        - ramifs: dict with a list (Order, nth lateral root), and a dict [vid, lr] vid is the vertice index on the</span>
+<span class="sd">                    parent root from which the lateral of length lr starts</span>
+<span class="sd">        - Order: int the order of the new branching</span>
+<span class="sd">        - segment_length: float length in m of the vertices</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        - new_ramifs: dict to used as the ramifs parameter for a new call of add_branching</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_ramifs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">len_base</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># count = 0  # F. Bauget 2020-06-11 : comment same date below</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">ramifs</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span> <span class="c1"># F. Bauget 2020-11-02</span>
+            <span class="n">vid</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">ramifs</span><span class="p">[</span><span class="n">path</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vid</span><span class="p">,</span> <span class="n">lr</span> <span class="o">=</span> <span class="n">ramifs</span><span class="p">[</span><span class="n">path</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># vid is the vertice index on the parent root from which the lateral of length lr starts</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+        <span class="n">df_order</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="n">order</span><span class="p">]</span>
+        <span class="n">length_base</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">order</span>
+
+        <span class="n">len_base</span> <span class="o">=</span> <span class="n">lr</span>
+
+        <span class="n">prev_len</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">_root_id</span> <span class="o">=</span> <span class="n">vid</span>
+        <span class="n">parent_base</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">vid</span><span class="p">)</span><span class="o">.</span><span class="n">base_length</span>
+
+        <span class="k">if</span> <span class="n">df_order</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">len_base</span> <span class="o">-</span> <span class="n">prev_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">prev_len</span> <span class="o">+=</span> <span class="n">segment_length</span>
+                <span class="n">edge_type</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span> <span class="k">if</span> <span class="n">_root_id</span> <span class="o">==</span> <span class="n">vid</span> <span class="k">else</span> <span class="s1">&#39;&lt;&#39;</span>
+                <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df_order</span><span class="p">:</span> <span class="c1"># F. Bauget 2020-11-02 : added the possibility to set real radii</span>
+                    <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span> <span class="o">=</span> <span class="n">parent_base</span> <span class="o">+</span> <span class="n">prev_len</span><span class="p">,</span>
+                                  <span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">,</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">r</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span> <span class="o">=</span> <span class="n">parent_base</span> <span class="o">+</span> <span class="n">prev_len</span><span class="p">,</span>
+                                  <span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># F. Bauget 2020-06-11 : this is the count of laterals on a root so at each new root with lateral should be reset to 0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">length_base</span><span class="p">:</span>
+                <span class="n">len_base</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">edge_type</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span> <span class="k">if</span> <span class="n">_root_id</span> <span class="o">==</span> <span class="n">vid</span> <span class="k">else</span> <span class="s1">&#39;&lt;&#39;</span>
+                <span class="k">while</span> <span class="n">len_base</span> <span class="o">-</span> <span class="n">prev_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">prev_len</span> <span class="o">+=</span> <span class="n">segment_length</span>
+                    <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df_order</span><span class="p">:</span>  <span class="c1"># F. Bauget 2020-11-02 : added the possibility to set real radii</span>
+                        <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span> <span class="o">=</span> <span class="n">parent_base</span> <span class="o">+</span> <span class="n">prev_len</span><span class="p">,</span>
+                                          <span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">,</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">r</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">vid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">vid</span><span class="p">,</span> <span class="n">edge_type</span> <span class="o">=</span> <span class="n">edge_type</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="n">base_length</span> <span class="o">=</span> <span class="n">parent_base</span> <span class="o">+</span> <span class="n">prev_len</span><span class="p">,</span>
+                                          <span class="n">length</span> <span class="o">=</span> <span class="n">segment_length</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">Order</span><span class="p">,</span> <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="p">)</span>
+                    <span class="n">edge_type</span> <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span>
+                <span class="c1">#Modification December 2019 by Fabrice: problem was that two following vertice may have the same base_length causing wrong g.property(&#39;position&#39;) recalculation in the conductance calculation</span>
+                <span class="c1"># did not pass test_reconstruct_from_aqua_data in test_archi_data.py</span>
+                <span class="c1"># vid = g.add_child(vid, edge_type=&#39;&lt;&#39;, label=&#39;S&#39;, base_length=parent_base+len_base+segment_length, length=segment_length, order=1, code=code)</span>
+                <span class="c1"># prev_len = len_base</span>
+                <span class="n">len_lateral</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">lr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">len_lateral</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="s1">&#39;radius&#39;</span> <span class="ow">in</span> <span class="n">df_order</span><span class="p">:</span> <span class="c1"># F. Bauget 2020-11-02 : added the possibility to set real radii</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="n">df_order</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
+                        <span class="n">p</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">)),</span> <span class="n">count</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>  <span class="c1"># 1: PR, count: countieme RL</span>
+                        <span class="n">ramifs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vid</span><span class="p">,</span> <span class="n">len_lateral</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>  <span class="c1"># randomly added, to sort it sorted(ramifs)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">p</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">)),</span> <span class="n">count</span><span class="p">])</span>
+                        <span class="n">new_ramifs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vid</span><span class="p">,</span> <span class="n">len_lateral</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">new_ramifs</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

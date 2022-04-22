@@ -11,6 +11,16 @@ import pylab
 
 
 def compute_K_from_laws(g):
+    """
+    Deprecated
+    Compute the axial conductance from empirical laws (hard coded) according to the distance from the tip and to the
+    root type, either seminal, crown or lateral
+
+    :parameters:
+        - g (MTG)
+
+    set property K
+    """
     K={}
     segment_length = 1e-4
     seminal_axial_conductivity_law = lambda x: 2135.05*x + 21338.63
@@ -39,14 +49,15 @@ def compute_K(g, scale_factor=1.):
     # Fabrice 2020-01-17: this calculation was done hydroroot.flux.run but that meant that the MTG was changed at each
     #                       flux calculation which is not relevant the MTG properties have to be fixed
     """
-    Compute the conductance in dimension [L^3 P^(-1) T^(-1)] from the experimental one which is in [L^4 P^(-1) T^(-1)]
+    Compute the conductance in dimension :math:`[L^3 P^{-1} T^{-1}]` from the experimental one which is in :math:`[L^4 P^{-1} T^{-1}]`
 
     :parameters:
-        - 'g' (MTG) - the root architecture
-        - CONSTANT (float) - a factor used for sensitivity analysis
-    :return: g
+        - g (MTG) : the root architecture
+        - scale_factor (float) : a factor used for sensitivity analysis
+    :return:
+        - g (MTG) : with the property K calculated from property K_exp and the length of the vertex
 
-    In each vertex K = K_exp * CONSTANT / vertex_length
+    In each vertex K = K_exp * scale_factor / vertex_length
     """
     length = g.property('length')
     K_exp = g.property('K_exp')
@@ -61,18 +72,15 @@ def compute_K(g, scale_factor=1.):
 
 def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
     """
+    Deprecated
     Compute a conductance of a xylem element based on their radius and length.
     
-    Parameters
-    ==========
-    radius : float (m)
-        radius of a xylem tube
+    :parameters:
+        - radius (float) : (m) radius of a xylem tube
 
-    length: float (m)
-        length of a xylem element
+    length (float) : (m) length of a xylem element
 
-    viscosity : float (Pa.s)
-        dynamic viscosity of the liquid
+    viscosity (float) : (Pa.s) dynamic viscosity of the liquid
     
     The poiseuille formula is:
         :math:` conductance = \frac{\pi r^4}{8 \mu L }` 
@@ -86,13 +94,12 @@ def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
 
 
 def compute_k(g, k0 = 300.):
-    """ Compute the radial conductances (k) of each segment of the MTG.
+    """
+    Compute the radial conductances (k) of each segment of the MTG.
 
-    Parameters
-    ==========
-
-        - `g` - the RSA
-        - `k0` - the radial conductance for one element of surface in microL/s.MPa.m**2
+    :parameters:
+        - g (MTG) : the RSA
+        - k0 (float) or (string): the radial conductance for one element of surface in :math:`micronL/s.MPa.m^2`
 
     if k0 == 'k0': calculation using k0 from g.property('k0')
     if k0 is a float: value used in calculation
@@ -119,9 +126,11 @@ def compute_k(g, k0 = 300.):
 
 def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATED
     # Fabrice 2020-01-17: changed the function name from "compute_K" to "compute_K_from_Poiseuille" because this name
-    #                     is now used to calculate the real conductance in [L^3 P^(-1) T^(-1)] from the experimental one
-    #                     in [L^4 P^(-1) T^(-1)]
-    """ Compute the axial conductances (K) in a MTG according to Poiseuille law.
+    #                     is now used to calculate the real conductance in [L^3 P^{-1} T^{-1}] from the experimental one
+    #                     in [L^4 P^{-1} T^{-1}]
+    """
+    Deprecated
+    Compute the axial conductances (K) in a MTG according to Poiseuille law.
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
     and on the length of a root segment.
@@ -143,7 +152,9 @@ def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATE
     return g
 
 def fit_property(g, x, y, prop_in, prop_out, s=3.): 
-    """ Fit a 1D spline from x, y data.
+    """
+    Deprecated
+    Fit a 1D spline from x, y data.
 
     Retrieve the values from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
@@ -170,10 +181,16 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
 
 
 def fit_property_from_spline(g, spline, prop_in, prop_out): 
-    """ compute a property from another one using a spline transformation.
+    """
+    compute a property from another one using a spline transformation.
 
     Retrieve the values from the prop_in of the MTG.
-    And evaluate the spline to compute the property 'prop_out'
+    And evaluate the spline to compute the property prop_out
+
+    :parameters:
+        - g (MTG)
+        - spline (class scipy.interpolate.UnivariateSpline) : 1-D smoothing spline fit to a given set of data points
+        - prop_in (string) : the property data
     """
 
     #spline = UnivariateSpline(x, y, s=s)
@@ -188,7 +205,9 @@ def fit_property_from_spline(g, spline, prop_in, prop_out):
 
 
 def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False, direct_input=None):
-    """ Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
+    """
+    Deprecated
+    Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
 
     Retrieve the values it will be applied to from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
@@ -237,6 +256,9 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
 
 
 def fit_K(g, s=0.):   # DEPRECATED
+    """
+    Deprecated
+    """
     x = np.linspace(0.,1.,100)
     y = np.linspace(50, 500, 100)+100*np.random.random(100)-50
 

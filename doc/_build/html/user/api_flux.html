@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>common algorithms &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="common algorithms" href="api_generator_markov.html" />
+    <link rel="prev" title="common algorithms" href="api_display.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api_analysis.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_conductance.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_curve.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_display.html">common algorithms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_generator_markov.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_generator_measured_root.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_hydro_io.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_law.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_length.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_main.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_radius.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_read_file.html">common algorithms</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>common algorithms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_flux.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="module-hydroroot.flux">
+<span id="common-algorithms"></span><h1>common algorithms<a class="headerlink" href="#module-hydroroot.flux" title="Permalink to this headline"></a></h1>
+<p>Flux computation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="hydroroot.flux.Flux">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">Flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CONSTANT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_and_flow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#Flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.Flux" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Compute the water potential and fluxes at each vertex of the MTG.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hydroroot.flux.Flux.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#Flux.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.Flux.run" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the water potential and fluxes of each segments</p>
+<dl class="simple">
+<dt>For each vertex of the root, compute :</dt><dd><ul class="simple">
+<li><p>the water potential (<span class="math notranslate nohighlight">\(\psi^{        ext{out}}\)</span>) at the base;</p></li>
+<li><p>the water flux (<cite>J</cite>) at the base;</p></li>
+<li><p>the lateral water flux (<cite>j</cite>) entering the segment.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Algorithm</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>The algorithm has two stages:</dt><dd><ul class="simple">
+<li><p>First, on each segment, an equivalent conductance is computed in post_order (children before parent).</p></li>
+<li><p>Finally, the water flux and potential are computed in pre order (parent then children).</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="hydroroot.flux.RadialShuntFlux">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">RadialShuntFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#RadialShuntFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.RadialShuntFlux" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydroroot.flux.Flux" title="hydroroot.flux.Flux"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydroroot.flux.Flux</span></code></a></p>
+<p>Compute the water potential and fluxes at each vertex of the MTG.</p>
+<p>On each vertex, the topology of the radial resistance network
+has one direct shortcut to the parent. The shortcut has two new parameters a and b.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hydroroot.flux.RadialShuntFlux.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#RadialShuntFlux.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.RadialShuntFlux.run" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the water potential and fluxes of each segments</p>
+<dl class="simple">
+<dt>For each vertex of the root, compute :</dt><dd><ul class="simple">
+<li><p>the water potential (<span class="math notranslate nohighlight">\(\psi^{        ext{out}}\)</span>) at the base;</p></li>
+<li><p>the water flux (<cite>J</cite>) at the base;</p></li>
+<li><p>the lateral water flux (<cite>j</cite>) entering the segment.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Algorithm</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>The algorithm has two stages:</dt><dd><ul class="simple">
+<li><p>First, on each segment, an equivalent conductance is computed in post_order (children before parent).</p></li>
+<li><p>Finally, the water flux and potential are computed in pre order (parent then children).</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.flux.cut">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">cut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#cut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.cut" title="Permalink to this definition"></a></dt>
+<dd><p>Cut the architecture at a given length <cite>cut_length</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><cite>g</cite> (MTG) - the root architecture</p></li>
+<li><p><cite>cut_length</cite> (float, m) - length at which the architecture is cut from collar.</p></li>
+<li><p>‘segment_length’ (float, mm) - length of the vertices</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a href="#id1"><span class="problematic" id="id2">`</span></a>g`(MTG) - the architecture after the cut process. This is a copy.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Example:</dt>
+<dd class="field-odd"><p>g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.flux.cut_and_set_conductance">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">cut_and_set_conductance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#cut_and_set_conductance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.cut_and_set_conductance" title="Permalink to this definition"></a></dt>
+<dd><p>Cut the architecture at a given length <cite>cut_length</cite>, and set to the axial conductance value the radial
+conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><cite>g</cite> (MTG) - the root architecture</p></li>
+<li><p><cite>cut_length</cite> (float, m) - length at which the architecture is cut from collar.</p></li>
+<li><p>‘threshold’ (float, mm) - length threshold to select the segments to remove in segments_at_length()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a href="#id3"><span class="problematic" id="id4">`</span></a>g`(MTG) - the architecture after the cut process. This is a copy.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Example:</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).</dt><dd><p>k = K at the cut tips</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.flux.flux">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.101325</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CONSTANT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shunt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_and_flow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.flux" title="Permalink to this definition"></a></dt>
+<dd><p>flux computes water potential and fluxes at each vertex of the MTG <cite>g</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><cite>g</cite> (MTG) - the root architecture</p></li>
+<li><p><cite>Jv</cite> (float) - water flux at the root base in microL/s</p></li>
+<li><p><cite>psi_e</cite> - hydric potential outside the roots (pressure chamber) in MPa</p></li>
+<li><p><cite>psi_base</cite> - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa</p></li>
+<li><p><cite>invert_model</cite> - when false, distribute output flux within the root ; when true, compute the output flux for the given root and conditions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Optional Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><cite>k</cite> (dict) - lateral conductance</p></li>
+<li><p><cite>K</cite> (dict) - axial conductance</p></li>
+<li><p><cite>shunt</cite> (bool) : use the RadialShunt Flux (True) or the classical one (False)</p></li>
+<li><p><cite>a</cite> : relative factor to the main radial path conductivity.</p></li>
+<li><p><cite>b</cite> : relative factor to the shortcut path conductivity.</p></li>
+<li><dl class="simple">
+<dt>‘cut_and_flow (bool): deprecated, used before to differentiate the Keq calculation at the tips to simulate</dt><dd><p>cut and flow experiment.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt class="field-odd">Example:</dt>
+<dd class="field-odd"><p>my_flux = flux(g)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.flux.ramification_length_law">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">ramification_length_law</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#ramification_length_law"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.ramification_length_law" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the length of the ramified axes along the main axis.</p>
+<p>X is the distance to tip along the main axis
+Y is the length of the ramification</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.flux.segments_at_length">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.flux.</span></span><span class="sig-name descname"><span class="pre">segments_at_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/flux.html#segments_at_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.flux.segments_at_length" title="Permalink to this definition"></a></dt>
+<dd><p>Returns all the segments intercepted at a given length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>g: MTG</p></li>
+<li><p>l: length</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>number of segment</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/efeead2a7c5ea76c34a4b5acb4e015ad/flux.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/flux.py</span></code></a>.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_display.html" class="btn btn-neutral float-left" title="common algorithms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_generator_markov.html" class="btn btn-neutral float-right" title="common algorithms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
