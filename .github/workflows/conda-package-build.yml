@@ -2,9 +2,9 @@ name: build_publish_anaconda
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     
 jobs:
   build-and-publish:
@@ -17,7 +17,7 @@ jobs:
         os: [ ubuntu-latest]
         python-minor-version: [9]
         isMaster:
-          - ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/dev') }}
+          - ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/dev') }}
         exclude:
           - isMaster: false
             os: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       uses: haya14busa/action-cond@v1
       id: publish
       with:
-        cond: ${{ contains(github.ref, 'master') || startsWith(github.ref, 'refs/heads/v') }}
+        cond: ${{ contains(github.ref, 'main') || startsWith(github.ref, 'refs/heads/v') }}
         if_true: 'true'
         if_false: 'false'
     - name: Build and Publish
