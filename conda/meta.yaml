@@ -23,7 +23,7 @@ requirements:
     - openalea.mtg
     - numpy
     - scipy
-    - pandas > 0.17
+    - pandas >0.17
     - RSML
 
 test:
