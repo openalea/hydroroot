@@ -31,7 +31,7 @@ test:
     - pytest
   
   imports:
-    - openalea.hydroroot
+    - hydroroot
   source_files:
     - test/**
     - test/data/**
