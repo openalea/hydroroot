@@ -10,7 +10,7 @@ source:
 build:
   noarch: python
   preserve_egg_dir: True
-  number: 0
+  number: 1
   script: {{PYTHON}} setup.py install #--single-version-externally-managed --record=record.txt
 
 requirements:
@@ -27,6 +27,7 @@ requirements:
     - pandas >0.17
     - RSML
     - pyyaml
+    - path
 
 test:
   requires:
@@ -40,7 +41,7 @@ test:
     - test/data/**
   commands:
     - cd test
-    - pytest -v --ignore=test_rsml_yaml.py
+    - pytest -v
 
 about:
   home: {{ data.get('url') }}
