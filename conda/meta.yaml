@@ -20,11 +20,13 @@ requirements:
     - openalea.deploy
   run:
     - python >=3.6
+    - openalea.deploy
     - openalea.mtg
     - numpy
     - scipy
     - pandas >0.17
     - RSML
+    - yaml
 
 test:
   requires:
@@ -32,6 +34,7 @@ test:
   
   imports:
     - hydroroot
+  
   source_files:
     - test/**
     - test/data/**
