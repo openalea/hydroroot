@@ -20,24 +20,27 @@ requirements:
     - openalea.deploy
   run:
     - python >=3.6
+    - openalea.deploy
     - openalea.mtg
     - numpy
     - scipy
     - pandas >0.17
     - RSML
+    - pyyaml
 
 test:
   requires:
     - pytest
   
   imports:
-    - openalea.hydroroot
+    - hydroroot
+  
   source_files:
     - test/**
     - test/data/**
   commands:
     - cd test
-    - pytest -v 
+    - pytest -v --ignore=test_rsml_yaml.py
 
 about:
   home: {{ data.get('url') }}

@@ -60,7 +60,7 @@ setup(
     # (you can provide an exclusion dictionary named exclude_package_data to remove parasites).
     # alternatively to global inclusion, list the file to include   
     #package_data = {'' : ['*.pyd', '*.so'],},
-
+    share_dirs = {'share': 'share'},
     # postinstall_scripts = ['',],
 
     # Declare scripts and wralea as entry_points (extensions) of your package 
