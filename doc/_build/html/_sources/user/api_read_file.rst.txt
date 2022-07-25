@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.read_file
 
-common algorithms
+read_file
 ===============================================
 .. automodule:: hydroroot.read_file
     :members:

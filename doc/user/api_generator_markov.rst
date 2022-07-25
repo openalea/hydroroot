@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.generator.markov
 
-common algorithms
+generator markov
 ===============================================
 .. automodule:: hydroroot.generator.markov
     :members:

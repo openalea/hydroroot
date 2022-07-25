@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.radius
 
-common algorithms
+radius
 ===============================================
 .. automodule:: hydroroot.radius
     :members:

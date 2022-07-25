@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.flux
 
-common algorithms
+flux
 ===============================================
 .. automodule:: hydroroot.flux
     :members:

@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.hydro_io
 
-common algorithms
+hydro_io
 ===============================================
 .. automodule:: hydroroot.hydro_io
     :members:

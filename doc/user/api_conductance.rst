@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.conductance
 
-common algorithms
+conductance
 ===============================================
 .. automodule:: hydroroot.conductance
     :members:

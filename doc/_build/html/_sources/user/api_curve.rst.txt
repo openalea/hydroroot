@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.curve
 
-common algorithms
+curve
 ===============================================
 .. automodule:: hydroroot.curve
     :members:

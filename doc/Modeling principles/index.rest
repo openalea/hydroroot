@@ -1,0 +1,8 @@
+.. vim: syntax=rst
+
+========
+Modeling
+========
+
+.. toctree::
+    Modeling principles.rest

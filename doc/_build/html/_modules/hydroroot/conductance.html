@@ -36,19 +36,19 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_analysis.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_conductance.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_curve.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_display.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_flux.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_markov.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_measured_root.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_hydro_io.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_law.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_length.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_main.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_radius.html">common algorithms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/api_read_file.html">common algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_analysis.html">analysis API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_conductance.html">conductance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_curve.html">curve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_display.html">display</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_flux.html">flux</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_law.html">law</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_length.html">length</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_radius.html">radius</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_read_file.html">read_file</a></li>
 </ul>
 
         </div>
@@ -206,7 +206,9 @@
     <span class="c1"># Fabrice 2020-01-17: changed the function name from &quot;compute_K&quot; to &quot;compute_K_from_Poiseuille&quot; because this name</span>
     <span class="c1">#                     is now used to calculate the real conductance in [L^3 P^{-1} T^{-1}] from the experimental one</span>
     <span class="c1">#                     in [L^4 P^{-1} T^{-1}]</span>
-    <span class="sd">&quot;&quot;&quot; Compute the axial conductances (K) in a MTG according to Poiseuille law.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deprecated</span>
+<span class="sd">    Compute the axial conductances (K) in a MTG according to Poiseuille law.</span>
 
 <span class="sd">    The conductance depends on the radius of each xylem pipe, the number of xylem pipes,</span>
 <span class="sd">    and on the length of a root segment.</span>
@@ -228,7 +230,9 @@
     <span class="k">return</span> <span class="n">g</span></div>
 
 <div class="viewcode-block" id="fit_property"><a class="viewcode-back" href="../../user/api_conductance.html#hydroroot.conductance.fit_property">[docs]</a><span class="k">def</span> <span class="nf">fit_property</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">prop_in</span><span class="p">,</span> <span class="n">prop_out</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">3.</span><span class="p">):</span> 
-    <span class="sd">&quot;&quot;&quot; Fit a 1D spline from x, y data.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deprecated</span>
+<span class="sd">    Fit a 1D spline from x, y data.</span>
 
 <span class="sd">    Retrieve the values from the prop_in of the MTG.</span>
 <span class="sd">    And evaluate the spline to compute the property &#39;prop_out&#39;</span>
@@ -255,10 +259,16 @@
 
 
 <div class="viewcode-block" id="fit_property_from_spline"><a class="viewcode-back" href="../../user/api_conductance.html#hydroroot.conductance.fit_property_from_spline">[docs]</a><span class="k">def</span> <span class="nf">fit_property_from_spline</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">spline</span><span class="p">,</span> <span class="n">prop_in</span><span class="p">,</span> <span class="n">prop_out</span><span class="p">):</span> 
-    <span class="sd">&quot;&quot;&quot; compute a property from another one using a spline transformation.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    compute a property from another one using a spline transformation.</span>
 
 <span class="sd">    Retrieve the values from the prop_in of the MTG.</span>
-<span class="sd">    And evaluate the spline to compute the property &#39;prop_out&#39;</span>
+<span class="sd">    And evaluate the spline to compute the property prop_out</span>
+
+<span class="sd">    :parameters:</span>
+<span class="sd">        - g (MTG)</span>
+<span class="sd">        - spline (class scipy.interpolate.UnivariateSpline) : 1-D smoothing spline fit to a given set of data points</span>
+<span class="sd">        - prop_in (string) : the property data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1">#spline = UnivariateSpline(x, y, s=s)</span>
@@ -273,7 +283,9 @@
 
 
 <div class="viewcode-block" id="fit_property_from_csv"><a class="viewcode-back" href="../../user/api_conductance.html#hydroroot.conductance.fit_property_from_csv">[docs]</a><span class="k">def</span> <span class="nf">fit_property_from_csv</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">csvdata</span><span class="p">,</span> <span class="n">prop_in</span><span class="p">,</span> <span class="n">prop_out</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">direct_input</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deprecated</span>
+<span class="sd">    Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary</span>
 
 <span class="sd">    Retrieve the values it will be applied to from the prop_in of the MTG.</span>
 <span class="sd">    And evaluate the spline to compute the property &#39;prop_out&#39;</span>
@@ -322,6 +334,9 @@
 
 
 <div class="viewcode-block" id="fit_K"><a class="viewcode-back" href="../../user/api_conductance.html#hydroroot.conductance.fit_K">[docs]</a><span class="k">def</span> <span class="nf">fit_K</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>   <span class="c1"># DEPRECATED</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deprecated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">100</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">-</span><span class="mi">50</span>
 

@@ -1,0 +1,87 @@
+.. code:: ipython3
+
+    import sys; print('Python %s on %s' % (sys.version, sys.platform))
+    sys.path.extend(['../src', '../test', '../example'])
+
+
+.. parsed-literal::
+
+    Python 3.8.12 | packaged by conda-forge | (default, Jan 30 2022, 23:42:07) 
+    [GCC 9.4.0] on linux
+
+
+.. code:: ipython3
+
+    import pandas 
+    from shared_functions import *
+
+The Hydroroot generator of architecture is described in
+(``Boursiac et al., 2022 <https://doi.org/10.1093/plphys/kiac281>``\ \_).
+It uses length distribution law for laterals, specific to a given
+species, to generate realistic architecture. Here we use the length laws
+determinated for Col0 arabidopsis.
+
+.. code:: ipython3
+
+    s = my_seed() # create a seed for the markov generator or give one
+    length_data = [] # length law used to generate arabidopsis realistic architecture
+    for filename in ['data/length_LR_order1_160615.csv','data/length_LR_order2_160909.csv']:
+        df = pandas.read_csv(filename, sep = ';', header = 1, names = ('LR_length_mm', 'relative_distance_to_tip'))
+        df.sort_values(by = 'relative_distance_to_tip', inplace = True)
+        length_data.append(df)
+
+We generate the MTG with some specific parameters: + primary_length:
+length of the primary root + delta: the average distance between lateral
+branching + branching_variability: the variability of the branching
+distance around delta + nude_length: distance from the tip without any
+laterals + order_max: the maximum order of laterals
+
+.. code:: ipython3
+
+    g = generate_g(seed = s, length_data = length_data, branching_variability = 0.25,
+                   delta = 2e-3, nude_length = 2e-3, primary_length = 0.13, segment_length = 1e-4, order_max = 4)
+
+Setting some properties needed for the calculation
+
+.. code:: ipython3
+
+    g = radius.ordered_radius(g, 7.0e-5, 0.7) # set the radius of the primary root to 70 um, and to 70*0.7^d to lateral of order d
+    g = radius.compute_length(g, length=1.0e-4) # set the length of each element
+    g = radius.compute_relative_position(g) # calculation of properties used in the model see compute_relative_position doc
+
+Some conductance data versus distance to tip
+
+.. code:: ipython3
+
+    k_radial_data=([0, 0.2],[300.0,300.0])
+    K_axial_data=([0, 0.2],[3.0e-5,4.0e-4])
+
+Flux and equivalent conductance calculation, for a root in an external
+hydroponic medium at 0.4 MPa, its base at 0.1 MPa, and with the
+conductances set above.
+
+.. code:: ipython3
+
+    from hydroroot.main import hydroroot_flow
+
+.. code:: ipython3
+
+    g, keq, jv = hydroroot_flow(g, psi_e = 0.4, psi_base = 0.1, 
+                                axial_conductivity_data = K_axial_data, radial_conductivity_data = k_radial_data)
+
+.. code:: ipython3
+
+    print(keq,jv)
+
+
+.. parsed-literal::
+
+    0.019525346120251346 0.0058576038360754045
+
+
+Display the local water uptake heatmap in 3D
+
+.. code:: ipython3
+
+    %gui qt
+    plot(g, prop_cmap='j') # j is the radial flux in ul/s

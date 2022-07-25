@@ -1,16 +1,7 @@
-###############################################################################
-# Date: 2021-06-18
-# F. Bauget
-#   Use of HydroRoot to compute architecture or to construct it from texte file
-#   Display them with a colormap based on a MTG property ('j', 'order', etc.)
-#       argument --prop passed through command line
-#   If order chosen then display root with a color according to there order
-###############################################################################
+"""
+Some wrapper functions just to simplified, a little, some scripts in example
+"""
 
-######
-# Imports
-
-# VERSION = 2
 import copy
 from binascii import hexlify as _hexlify # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
 from os import urandom as _urandom # F. Bauget 2021-12-14  # "from random import _hexlify, _urandom"
@@ -80,8 +71,10 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 
     nb_vertices = int(primary_length / segment_length)
 
+    # to build the length law functions below for the laterals we take as reference length the maximum of lateral length
     length_max_secondary = length_data[0].LR_length_mm.max() * 1e-3  # in m
 
+    # function giving the lateral length according to its position: length=law_order1[x]
     law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
     law_order2 = length_law(length_data[1], scale_x = length_max_secondary / 100., scale = segment_length)
 
@@ -100,7 +93,8 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 ###############################################################################
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'expo'):
     """
-    Creation of the function giving the lateral length according to its position on the parent branch
+    Function giving the lateral length according to its position on the parent branch, the data is discretized in intervals
+    of same size here 5% of parent root length
 
     :param pd: DataFrame - DataFrame with the laterals length law
     :param scale_x: float (0.01) - x scale by default transform x in % to real value
@@ -116,6 +110,7 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'ex
     # size of the windows: 5%
     size = 5. * scale_x
 
+    # the uniform distribution correspond to Boursiac2022, there are 2 other choices see histo_relative_law
     _length_law = histo_relative_law(x, y,
                                      size = size,
                                      scale_x = scale_x,
@@ -142,7 +137,7 @@ def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
-def root_creation(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
+def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
                   ref_radius = 7.0e-5):
     """
@@ -226,15 +221,9 @@ def plot(g = None, filename=None, name=None, **kwds):
              visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
              prune=None
     """
-    # from IPython import get_ipython
-    #
-    # # ipython = get_ipython()
-    # ipython = None
-    # if ipython:
-    #     ipython.magic('gui qt')
     if filename is not None:
         df = read_archi_data(filename)
-        g, primary_length, _length, surface, _seed = root_creation(df = df)
+        g, primary_length, _length, surface, _seed = root_builder(df = df)
 
     Viewer.display(mtg_scene(g, **kwds))
     if name is not None:

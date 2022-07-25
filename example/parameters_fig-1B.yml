@@ -11,7 +11,7 @@
 archi:
     #if read_architecture is true then architecture will be constructed from the file(s) given by input_dir and input_file
     #otherwise the architecture will be generated according to the parameters
-    read_architecture: True
+    read_architecture: False
 
     #Input architecture from scanned image (distance_from_base_(mm) \t lateral_root_length_(mm) \t order)
     #folder name

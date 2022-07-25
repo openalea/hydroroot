@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.length
 
-common algorithms
+length
 ===============================================
 .. automodule:: hydroroot.length
     :members:

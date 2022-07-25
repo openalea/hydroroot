@@ -128,7 +128,9 @@ def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATE
     # Fabrice 2020-01-17: changed the function name from "compute_K" to "compute_K_from_Poiseuille" because this name
     #                     is now used to calculate the real conductance in [L^3 P^{-1} T^{-1}] from the experimental one
     #                     in [L^4 P^{-1} T^{-1}]
-    """ Compute the axial conductances (K) in a MTG according to Poiseuille law.
+    """
+    Deprecated
+    Compute the axial conductances (K) in a MTG according to Poiseuille law.
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
     and on the length of a root segment.
@@ -150,7 +152,9 @@ def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATE
     return g
 
 def fit_property(g, x, y, prop_in, prop_out, s=3.): 
-    """ Fit a 1D spline from x, y data.
+    """
+    Deprecated
+    Fit a 1D spline from x, y data.
 
     Retrieve the values from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
@@ -177,10 +181,16 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
 
 
 def fit_property_from_spline(g, spline, prop_in, prop_out): 
-    """ compute a property from another one using a spline transformation.
+    """
+    compute a property from another one using a spline transformation.
 
     Retrieve the values from the prop_in of the MTG.
-    And evaluate the spline to compute the property 'prop_out'
+    And evaluate the spline to compute the property prop_out
+
+    :parameters:
+        - g (MTG)
+        - spline (class scipy.interpolate.UnivariateSpline) : 1-D smoothing spline fit to a given set of data points
+        - prop_in (string) : the property data
     """
 
     #spline = UnivariateSpline(x, y, s=s)
@@ -195,7 +205,9 @@ def fit_property_from_spline(g, spline, prop_in, prop_out):
 
 
 def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False, direct_input=None):
-    """ Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
+    """
+    Deprecated
+    Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
 
     Retrieve the values it will be applied to from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
@@ -244,6 +256,9 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
 
 
 def fit_K(g, s=0.):   # DEPRECATED
+    """
+    Deprecated
+    """
     x = np.linspace(0.,1.,100)
     y = np.linspace(50, 500, 100)+100*np.random.random(100)-50
 

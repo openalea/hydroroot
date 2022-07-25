@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.generator.measured_root
 
-common algorithms
+generator_measured_root
 ===============================================
 .. automodule:: hydroroot.generator.measured_root
     :members:

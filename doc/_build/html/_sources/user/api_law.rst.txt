@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.law
 
-common algorithms
+law
 ===============================================
 .. automodule:: hydroroot.law
     :members:

@@ -91,7 +91,7 @@ if __name__ == '__main__':
         delta = dseeds.delta[id]
         nude_length = dseeds.nude_length[id]
 
-        g, primary_length, _length, surface, _seed = root_creation(primary_length = primary_length, seed = seed,
+        g, primary_length, _length, surface, _seed = root_builder(primary_length = primary_length, seed = seed,
             delta = delta, nude_length = nude_length, df = None, segment_length = parameter.archi['segment_length'],
             length_data = parameter.archi['length_data'],  branching_variability = parameter.archi['branching_variability'],
             order_max = parameter.archi['order_max'], order_decrease_factor = parameter.archi['order_decrease_factor'],
@@ -136,7 +136,7 @@ if __name__ == '__main__':
             delta = dseeds.delta[id]
             nude_length = dseeds.nude_length[id]
 
-            g, primary_length, _length, surface, _seed = root_creation(primary_length = primary_length, seed = seed,
+            g, primary_length, _length, surface, _seed = root_builder(primary_length = primary_length, seed = seed,
                 delta = delta, nude_length = nude_length, df = None, segment_length = parameter.archi['segment_length'],
                 length_data = parameter.archi['length_data'],  branching_variability = parameter.archi['branching_variability'],
                 order_max = parameter.archi['order_max'], order_decrease_factor = parameter.archi['order_decrease_factor'],

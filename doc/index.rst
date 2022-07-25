@@ -9,7 +9,9 @@ Welcome to HydroRoot's documentation!
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
-
+		   
+   usage.rst
+   ./user/api_init_parameter.rst
    ./user/api_analysis.rst
    ./user/api_conductance.rst
    ./user/api_curve.rst

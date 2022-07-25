@@ -165,7 +165,7 @@ def my_seed():
     """ Define my own seed function to capture the seed value. """
     return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
-def root_creation(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None):
+def root_builder(primary_length, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None):
     """
     creation of an mtg with properties like radius and vertex length set.
 
@@ -272,7 +272,7 @@ if __name__ == '__main__':
                 for nude_length in parameter.archi['nude_length']:
                     _seed = my_seed()
                     count += 1
-                    g, primary_length, _length, surface, intercepts, _seed = root_creation(
+                    g, primary_length, _length, surface, intercepts, _seed = root_builder(
                         primary_length = primary_length,
                         seed = _seed,
                         delta = delta,

@@ -130,6 +130,19 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
       - First, discretize the X values in different intervals of size `size`.
       - Compute the histogram from the set of points include in each interval.
       - Return a function that compute a value in a given histogram
+
+    :parameters:
+        -x: (list of float) - abscissa
+        -y: (list of float) - values
+        -size: (float) - the size of the discretization
+        -scale_x: (float) - factor to x
+        -scale_y: (float) - factor to y
+        -scale: (float) - the vertices length to transform lengths to nb of vertices
+        -plot: unused
+        -uniform: (string or boolean) - determine the way the data will be explored to return a length associated to a
+                  position expo (expovariate), False (select randomly a value from data), anything else (random value between
+                  min and max)
+    :return:
     """
 
     x = np.array(x) * scale_x

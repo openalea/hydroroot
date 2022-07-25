@@ -12,7 +12,7 @@ def closed(delta, eps=1e-14, txt=''):
     else:
         assert abs(delta) < eps, txt
 
-def root_creation(g, segment_length, ref_radius, order_decrease_factor):
+def root_builder(g, segment_length, ref_radius, order_decrease_factor):
     """
     Set MTG properties and perform some gemetrical calculation
 
@@ -82,7 +82,7 @@ def test_rsml():
     g = import_rsml_to_discrete_mtg(g_c, segment_length = segment_length, resolution = resolution)
     
     # calculation of g properties: radius, mylength, etc.
-    g, primary_length, _length, surface = root_creation(g, segment_length, ref_radius, order_decrease_factor)
+    g, primary_length, _length, surface = root_builder(g, segment_length, ref_radius, order_decrease_factor)
 
     export_mtg_to_rsml(g, "test_rsml_io.rsml", segment_length = segment_length)
     g_c = rsml.rsml2mtg("test_rsml_io.rsml")
@@ -90,7 +90,7 @@ def test_rsml():
     unit = g_c.graph_properties()['metadata']['unit']
     resolution *= rsml_units_to_metre[unit] # rsml file unit to meter
     g2 = import_rsml_to_discrete_mtg(g_c, segment_length = segment_length, resolution = resolution)
-    g2, primary_length2, _length2, surface2 = root_creation(g2, segment_length, ref_radius, order_decrease_factor)
+    g2, primary_length2, _length2, surface2 = root_builder(g2, segment_length, ref_radius, order_decrease_factor)
 
     diff = abs(_length2 - _length + surface - surface2 + primary_length - primary_length2)
 

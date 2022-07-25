@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hydroroot.init_parameter &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_analysis.html">analysis API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_conductance.html">conductance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_curve.html">curve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_display.html">display</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_flux.html">flux</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_law.html">law</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_length.html">length</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_main.html">main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_radius.html">radius</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/api_read_file.html">read_file</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>hydroroot.init_parameter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hydroroot.init_parameter</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python2</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Dec  3 10:45:01 2019</span>
+
+<span class="sd">@author: F. Bauget</span>
+
+<span class="sd">Work in progress</span>
+
+<span class="sd">Parameters class:</span>
+<span class="sd">    init: set the default values</span>
+<span class="sd">    Methods: read_file read the Yaml configuration file containing the model parameters into a Class.</span>
+<span class="sd">            Calls other methods to perform some initialization</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># F. Bauget 2021-05-04: added solute parameters</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+
+<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../../user/api_init_parameter.html#hydroroot.init_parameter.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Init Parameters class. Set setting default values and structure</span>
+<span class="sd">    Parameters contains 5 dictionaries grouping inputs in 5 gategories:</span>
+<span class="sd">        -   archi: all inputs related to the architecture generation or reconstruction</span>
+<span class="sd">                *  read_architecture: Bool, True = read the architecture from a data (i.e. reconstructed MTG)</span>
+<span class="sd">                *  input_dir:  string, input directory of the architecture file</span>
+<span class="sd">                *  input_file: list of string,  architecture files</span>
+<span class="sd">                *  seed: integer or list of integer, seed for the Markov generator, if none seed is generated</span>
+<span class="sd">                *  length_file: list of strings, files name (included relative path) containing data used to calculate </span>
+<span class="sd">                            length laws for the laterals generation</span>
+<span class="sd">                *  length_data: float data containing in the files above</span>
+<span class="sd">                *  primary_length: float or list of float, length of the primary root</span>
+<span class="sd">                *  branching_delay: float or list of float, average distance between to branching</span>
+<span class="sd">                *  branching_variability: float, add variability in the delay</span>
+<span class="sd">                *  order_max: integer, maximum laterals order </span>
+<span class="sd">                *  segment_length: float, length of the vertices</span>
+<span class="sd">                *  nude_length: float or list of float, length from the tip without any branching</span>
+<span class="sd">                *  ref_radius: float, radius of the primary root</span>
+<span class="sd">                *  order_decrease_factor: float, decrease factor apply to the radius to account for its decrease </span>
+<span class="sd">                            with lateral order</span>
+<span class="sd">        - hydro: inputs related to the hydrodynamics</span>
+<span class="sd">                *  k0: float, the radial conductivity</span>
+<span class="sd">                *  axial_conductance_data: list of 2 list of float, the axial conductance vs distance from the tip</span>
+<span class="sd">        - solute: inputs related to solutes transport eather permating or not</span>
+<span class="sd">                *  J_s: float, active pumping rate</span>
+<span class="sd">                *  P_s: float, permeability coefficient</span>
+<span class="sd">                *  Cse: float, concentration of permeating solutes</span>
+<span class="sd">                *  Ce: float, concentration of non-permeating solutes</span>
+<span class="sd">                *  sigma: float, reflextion coefficient</span>
+<span class="sd">        - exp: inputs related to the experimental conditions and measurements</span>
+<span class="sd">                *  jv: float, measured flux at the base</span>
+<span class="sd">                *  psi_e: float, water potential surrounding the root</span>
+<span class="sd">                *  psi_base: float, water potential at the base</span>
+<span class="sd">        - output: inputs related to the simulations and its output</span>
+<span class="sd">                *  radfold: float or list of float, in factor to k0</span>
+<span class="sd">                *  axfold: float or list of float, in factor to axial_conductance_data</span>
+<span class="sd">                *  intercepts: list of float, distance from base to calculate the number of intercepts</span>
+<span class="sd">                *  run_nb: int, number of simulation with the same set of input</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># default values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archi</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;read_architecture&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;input_dir&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;input_file&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;seed&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;length_file&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;data/length*order2*.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;data/length*order2*.csv&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;length_data&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;primary_length&#39;</span><span class="p">:</span> <span class="mf">0.13</span><span class="p">,</span>
+            <span class="s1">&#39;branching_delay&#39;</span><span class="p">:</span> <span class="mf">2e-3</span><span class="p">,</span>
+            <span class="s1">&#39;branching_variability&#39;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+            <span class="s1">&#39;order_max&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s1">&#39;segment_length&#39;</span><span class="p">:</span> <span class="mf">1.e-4</span><span class="p">,</span>
+            <span class="s1">&#39;nude_length&#39;</span><span class="p">:</span> <span class="mf">0.021</span><span class="p">,</span>
+            <span class="s1">&#39;ref_radius&#39;</span><span class="p">:</span> <span class="mf">7.0e-5</span><span class="p">,</span>
+            <span class="s1">&#39;order_decrease_factor&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hydro</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;k0&#39;</span><span class="p">:</span> <span class="mf">92.0</span><span class="p">,</span>
+            <span class="s1">&#39;axial_conductance_data&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.18</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="mf">2.9e-4</span><span class="p">,</span> <span class="mf">34.8e-4</span><span class="p">,</span> <span class="mf">147.4e-4</span><span class="p">,</span> <span class="mf">200.3e-4</span><span class="p">,</span> <span class="mf">292.6e-4</span><span class="p">,</span> <span class="mf">262.5e-4</span><span class="p">,</span> <span class="mf">511.1e-4</span><span class="p">]]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solute</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;J_s&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+            <span class="s1">&#39;P_s&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+            <span class="s1">&#39;Cse&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+            <span class="s1">&#39;Ce&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+            <span class="s1">&#39;Sigma&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Jv&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s1">&#39;psi_e&#39;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+            <span class="s1">&#39;psi_base&#39;</span><span class="p">:</span> <span class="mf">0.101325</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;radfold&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">&#39;axfold&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">&#39;intercepts&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.045</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">],</span>
+            <span class="s1">&#39;run_nb&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<div class="viewcode-block" id="Parameters.read_file"><a class="viewcode-back" href="../../user/api_init_parameter.html#hydroroot.init_parameter.Parameters.read_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the input yaml file and perform some initialization</span>
+<span class="sd">            see init_calculation</span>
+<span class="sd">        :param filename: the input yaml file with the parameters</span>
+<span class="sd">        :return:</span>
+<span class="sd">        -  itself</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># read the file as a dictionary</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">parameter</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">Loader</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+
+        <span class="c1"># pass the parameters to the class</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;archi&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;archi&#39;</span><span class="p">][</span><span class="n">pid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;hydro&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hydro</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;hydro&#39;</span><span class="p">][</span><span class="n">pid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;solute&#39;</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">parameter</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span> <span class="c1"># because not in the actual version</span>
+            <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;solute&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;solute&#39;</span><span class="p">][</span><span class="n">pid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;experimental&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;experimental&#39;</span><span class="p">][</span><span class="n">pid</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="n">pid</span><span class="p">]</span>
+
+        <span class="c1"># transform the parameters as list if needed</span>
+        <span class="c1"># at this stage allow to launch a set of simulations for different set</span>
+        <span class="c1"># see def parameters_to_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;primary_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;primary_length&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;branching_delay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;branching_delay&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;nude_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;nude_length&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;intercepts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;intercepts&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;radfold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;radfold&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;axfold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;axfold&#39;</span><span class="p">])</span>
+
+        <span class="c1"># few initializations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_calculation</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Parameters.init_calculation"><a class="viewcode-back" href="../../user/api_init_parameter.html#hydroroot.init_parameter.Parameters.init_calculation">[docs]</a>    <span class="k">def</span> <span class="nf">init_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set self.archi[&#39;length_data&#39;] by reading the two files self.archi[&#39;length_file&#39;]</span>
+<span class="sd">        Set the seed to None if seed is not an integer nor a list of integer</span>
+<span class="sd">        :return:</span>
+<span class="sd">        -  itself</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># set the data used to calculate the length laws</span>
+        <span class="c1"># column names in the length law files</span>
+        <span class="n">col_names</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;LR_length_mm&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_distance_to_tip&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;length_file&#39;</span><span class="p">]:</span>
+            <span class="n">d_path</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">pd</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">d_path</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">)</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span> <span class="o">=</span> <span class="s1">&#39;relative_distance_to_tip&#39;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;length_data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="c1"># F. Bauget 2020-04-06 : case where seeds are given in a file</span>
+            <span class="n">d_path</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">lineList</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">d_path</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lineList</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="c1">#set seed to None if not integer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Parameters.parameters_to_list"><a class="viewcode-back" href="../../user/api_init_parameter.html#hydroroot.init_parameter.Parameters.parameters_to_list">[docs]</a>    <span class="k">def</span> <span class="nf">parameters_to_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        transform parameter to a list</span>
+<span class="sd">            *   in the yaml file it is possible to use the following syntaxe &quot;range(start, end, step)&quot;</span>
+<span class="sd">                then a test checks this syntax and the corresponding list is calculated</span>
+<span class="sd">            *   if it is a float or integer, then it is transform to a list of one single element</span>
+<span class="sd">        :param parameter: the parameter to transform to a list</span>
+<span class="sd">        :return:</span>
+<span class="sd">        -</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">parameter</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">parameter</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;range(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">parameter</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">var</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">parameter</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">var</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">var</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">var</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="p">:</span>
+                <span class="n">parameter</span> <span class="o">=</span> <span class="p">[</span><span class="n">parameter</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">parameter</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

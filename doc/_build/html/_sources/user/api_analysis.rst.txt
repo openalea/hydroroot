@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.analysis
 
-common algorithms
+analysis API
 ===============================================
 .. automodule:: hydroroot.analysis
     :members:

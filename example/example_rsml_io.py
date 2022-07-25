@@ -28,7 +28,7 @@ args = parser.parse_args()
 filename = args.inputfile
 parameter.read_file(filename)
 
-def root_creation(g):
+def root_builder(g):
     """
     Set MTG properties and perform some gemetrical calculation
 
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     g = import_rsml_to_discrete_mtg(g_c, segment_length = parameter.archi['segment_length'], resolution = resolution)
 
     # calculation of g properties: radius, mylength, etc.
-    g, primary_length, _length, surface = root_creation(g)
+    g, primary_length, _length, surface = root_builder(g)
 
     # flux calculation
     g, Keq, Jv = hydro_calculation(g, axfold = axfold, radfold = radfold)
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     unit = g_c.graph_properties()['metadata']['unit']
     resolution *= rsml_units_to_metre[unit] # rsml file unit to meter
     g2 = import_rsml_to_discrete_mtg(g_c, segment_length = parameter.archi['segment_length'], resolution = resolution)
-    g2, primary_length2, _length2, surface2 = root_creation(g2)
+    g2, primary_length2, _length2, surface2 = root_builder(g2)
     g2, Keq2, Jv2 = hydro_calculation(g2, axfold = axfold, radfold = radfold)
 
     print('water flux from exported-imported to rsml MTG is ', Jv, ' uL/s')

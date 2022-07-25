@@ -237,7 +237,7 @@ if __name__ == '__main__':
         axfold = parameter.output['axfold'][0]
         radfold = parameter.output['radfold'][0]
 
-        g_cut['tot'], primary_length, _length, surface, seed = root_creation(df = df, segment_length = parameter.archi['segment_length'],
+        g_cut['tot'], primary_length, _length, surface, seed = root_builder(df = df, segment_length = parameter.archi['segment_length'],
             order_decrease_factor = parameter.archi['order_decrease_factor'], ref_radius = parameter.archi['ref_radius'])
 
         g_cut['tot'], Keq, Jv = hydro_calculation(g_cut['tot'])

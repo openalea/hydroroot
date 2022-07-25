@@ -1,6 +1,6 @@
 .. currentmodule:: hydroroot.main
 
-common algorithms
+main
 ===============================================
 .. automodule:: hydroroot.main
     :members:
