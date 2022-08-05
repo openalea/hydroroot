@@ -32,7 +32,7 @@ from IPython.display import Image, display
 from hydroroot import radius
 from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters
-from hydroroot.display import get_root_visitor
+from hydroroot.display import get_root_visitor, my_colormap, plot
 from hydroroot.conductance import axial, radial
 
 results = {}
@@ -74,86 +74,6 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
     return g, Keq, Jv_global
 
-def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prop_cmap='radius', cmap='jet',lognorm=None,
-         prune=None, name=None):
-    """
-    Display the architecture in plantGL Viewer with roots colors according to the property chosen
-    :param g: MTG()
-    :param has_radius: Boolean (False) - True use the radius property values, calculate them otehrwise according to r_base and r_tip
-    :param r_base: float (1e-4) - if has_radius is False, the radius at the base of a root whatever its order (mm)
-    :param r_tip: float (5e-5) - if has_radius is False, the radius at the tip of a root whatever its order (mm)
-    :param prop_cmap: string ('radius') - the property name used for the color map
-    :param cmap: string ('jet') - the name of the matplotlib colormap to use
-    :param lognorm: Boolean (False) - True: log-normalised, normalised otherwise
-    :param prune: float (None) - distance from the base of the primary after which the root is not displayed
-    :param name: string (None) - if not None, the name of the saved file
-    :return:
-    """
-    g = g1.copy() # because we may change the radius if we want
-    visitor = get_root_visitor(prune=prune)
-
-    # changing radius just for display
-    r_base, r_tip = float(r_base), float(r_tip)
-    if not has_radius:
-        radius.discont_radius(g,r_base=r_base, r_tip=r_tip)
-
-    turtle = turt.PglTurtle()
-    turtle.down(180)
-    scene = turt.TurtleFrame(g, visitor=visitor, turtle=turtle, gc=False)
-
-    # Compute color from radius
-    if type(lognorm) is bool:
-        color.colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
-    else:
-        my_colormap_not_normed(g,prop_cmap, cmap=cmap)
-
-    shapes = dict( (sh.getId(),sh) for sh in scene)
-
-    colors = g.property('color')
-    for vid in colors:
-        if vid in shapes:
-            shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(list(shapes.values()))
-
-    pgl.Viewer.display(scene)
-    if name is not None:
-            pgl.Viewer.frameGL.saveImage(name)
-
-def my_colormap_not_normed(g, property_name, cmap='jet'):
-    # F. Bauget 2020-04-01 : not normed colormap
-    prop = g.property(property_name)
-    keys = list(prop.keys())
-    values = np.array(list(prop.values()))
-    _cmap = cm.get_cmap(cmap)
-
-    colors = (_cmap(values)[:,0:3])*255
-    colors = np.array(colors,dtype=np.int).tolist()
-
-    g.properties()['color'] = dict(list(zip(keys,colors)))
-
-def my_plot_with_bar(g, prop, lognorm = None):
-    import matplotlib as mpl
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    values = np.array(list(g.property(prop).values()))
-    plot(g, prop_cmap = prop, lognorm = lognorm)
-
-    if type(lognorm) is bool:
-        vmin = values.vmin()
-        vmax = values.max()
-    else:
-        vmin = 0.0
-        vmax = 1.0
-
-    fig, ax = plt.subplots(figsize = (6, 1))
-    fig.subplots_adjust(bottom = 0.5)
-    cmap = mpl.cm.jet
-    norm = mpl.colors.Normalize(vmin = vmin, vmax = vmax)
-    cb1 = mpl.colorbar.ColorbarBase(ax, cmap = cmap, norm = norm, orientation = 'horizontal')
-    cb1.set_label(prop)
-    fig.show()
-
 if __name__ == '__main__':
     j_relat = {}
     seg_at_position = [1, 20, 40, 65, 100, 120, 125, 130, 135, 140, 145, 150, 155]  # distance from tip
@@ -182,7 +102,6 @@ if __name__ == '__main__':
     j_relat['base'] = []
 
     count2 = 0
-
 
     for seed in _seeds:
         primary_length = _primary_length[count2]
@@ -254,7 +173,8 @@ if __name__ == '__main__':
                 print(' ax = ', axfold)
                 # g has radius, here we set fictive radii just for visual comfort
                 alpha = 0.2  # radius in millimeter identical for all orders
-                plot(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat', lognorm = None)
+                g1 = g.copy() # because the radii are changed
+                plot(g1, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat', lognorm = None)
                 pgl.Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
                 fn = tempfile.mktemp(suffix = '.png')
                 pgl.Viewer.saveSnapshot(fn)

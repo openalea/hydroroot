@@ -1,11 +1,18 @@
 import random
 import numpy as np
 
+from binascii import hexlify as _hexlify
+from os import urandom as _urandom
+
 from openalea.mtg import *
 from openalea.mtg import algo
 from openalea.mtg import traversal
+from hydroroot.law import length_law
 #from random import choice
 
+def my_seed():
+    """ generate my own seed function to capture the seed value. """
+    return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
 def linear(n=5):
     """
@@ -239,3 +246,41 @@ def shuffle_axis(g=None, shuffle=False):
     return g
 
 
+def generate_g(seed = None, length_data = None, branching_variability = 0.25,
+               delta = 2e-3, nude_length = 2e-3, primary_length = 0.13, segment_length = 1e-4, order_max = 4):
+    """generate a MTG according to the input parameters using length_data (mendatory) for the branching
+
+    :Parameters:
+        - seed: (int) the seed for the random generator in the markof chain
+        - length_data: (Dataframe) pandas dataframe columns names 'LR_length_mm', 'relative_distance_to_tip' sorted by 'relative_distance_to_tip'
+        - branching_variability: (float) probability of ramification at exact mean branching position
+        - branching_delay: (float) reference distance between successive branching axis
+        - nude_length: (float) length at root tip with no ramification
+        - primary_length: (float) primary root length
+        - segment_length: (float) length of the vertices, default 1.e-4
+        - order_max: (int) maximum lateral roots order
+
+    :Returns:
+        - g: MTG with the following properties set: edge_type, label, position
+    """
+
+    # nude length and branching delay in terms of number of vertices
+    nb_nude_vertices = int(nude_length / segment_length)
+    branching_delay = int(delta / segment_length)
+
+    nb_vertices = int(primary_length / segment_length)
+
+    length_max_secondary = length_data[0].LR_length_mm.max() * 1e-3  # in m
+
+    law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
+    law_order2 = length_law(length_data[1], scale_x = length_max_secondary / 100., scale = segment_length)
+
+    g = markov_binary_tree(
+        nb_vertices = nb_vertices,
+        branching_variability = branching_variability,
+        branching_delay = branching_delay,
+        length_law = [law_order1, law_order2],
+        nude_tip_length = nb_nude_vertices,
+        order_max = order_max,
+        seed = seed)
+    return g

@@ -22,10 +22,13 @@ from IPython.display import Image, display
 
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters
-from hydroroot.display import get_root_visitor
-from hydroroot.display import plot as mtg_scene
+from hydroroot.display import get_root_visitor, mtg_scene, plot
+from hydroroot import radius
+from hydroroot.generator.markov import my_seed,generate_g
+from hydroroot.generator.measured_root import mtg_from_aqua_data
+from hydroroot.read_file import read_archi_data
+from hydroroot.conductance import axial, radial
 
-from shared_functions import *
 
 ################################################
 # get the model parameters, the length laws are
@@ -61,6 +64,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 
 def plot_order(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
     """
+    It is a copy of hydroroot.display.plot but the colors for the root according their order are hardcoded
     Display the architecture in plantGL Viewer with roots colors according to there order
     The radius property may be changed for display purpose.
     The MTG g1 stay unmodified
@@ -104,26 +108,6 @@ def plot_order(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=N
     scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
 
     pgl.Viewer.display(scene)
-    if name is not None:
-            pgl.Viewer.frameGL.saveImage(name)
-
-
-def plot(g, name=None, **kwds):
-    """
-    Display the architecture in plantGL Viewer with roots colors according to the property chosen
-    :param g: MTG()
-    :param name: string - if not None, the name of the saved file
-    :param kwds: parameters of hydroroot.display.plot()
-        - has_radius: Boolean (False) - True use the radius property values, calculate them otehrwise according to r_base and r_tip
-        - r_base: float (1e-4) - if has_radius is False, the radius at the base of a root whatever its order (mm)
-        - r_tip: float (5e-5) - if has_radius is False, the radius at the tip of a root whatever its order (mm)
-        - prune: float (None) - distance from the base of the primary after which the root is not displayed
-        - prop_cmap: string ('radius') - the property name used for the color map
-        - cmap: string ('jet') - the name of the matplotlib colormap to use
-        - lognorm: Boolean (False) - True: log-normalised, normalised otherwise
-    :return:
-    """
-    pgl.Viewer.display(mtg_scene(g, **kwds))
     if name is not None:
             pgl.Viewer.frameGL.saveImage(name)
 
@@ -185,6 +169,8 @@ if __name__ == '__main__':
                     plot(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = prop)
                 else:
                     plot_order(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
+
+                # for display in the notebook, comment to display in the 3D viewer
                 pgl.Viewer.widgetGeometry.setSize(450, 600) # set the picture size in px
                 fn = tempfile.mktemp(suffix='.png')
                 pgl.Viewer.saveSnapshot(fn)

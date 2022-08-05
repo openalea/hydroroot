@@ -65,7 +65,8 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
          visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
          prune=None):
     """
-    Exemple:
+    Deprecated look at
+    Exemple: mtg_scene
 
         >>> from openalea.plantgl.all import *
         >>> s = plot()
@@ -101,8 +102,53 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
     # F. Bauget 2022-03-15
     return scene
 
+def mtg_scene(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
+         visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
+         min = None, max = None, prune=None):
+    """
+    hydroroot.display.plot modified to use my_colormap where min-max can be imposed
 
-def my_colormap(g, property_name, cmap='jet',lognorm=True):
+    :Parameters:
+		- g: (MTG)
+		- has_radius: (boolean) True use of g.property('radius'), False radii are calculated
+		- r_base: (float) radius of the base (m) used for radius calculation if has_radius = True
+		- r_tip: (float) radius of the tip (m) used for radius calculation if has_radius = True
+		- visitor: Turtle going through the architecture see get_root_visitor
+		- prop_cmap: property used for the color map
+		- cmap: matplotlib color map
+		- lognorm: True log scale normalization, False normal normalization used for color map
+		- prune: (float) - distance from base after witch the MTG is no longer read
+
+    :return: 
+		- scene a plantgl Scene
+    """
+    if visitor is None:
+        visitor = get_root_visitor(prune=prune)
+
+    r_base, r_tip = float(r_base), float(r_tip)
+
+    if not has_radius:
+        discont_radius(g,r_base=r_base, r_tip=r_tip)
+
+    turtle = turt.PglTurtle()
+    turtle.down(180)
+    scene = turt.TurtleFrame(g, visitor=visitor, turtle=turtle, gc=False)
+
+    # Compute color from radius
+    my_colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm, min = min, max = max)
+
+    shapes = scene.todict()
+    colors = g.property('color')
+    for vid in colors:
+        if vid in shapes:
+            for sh in shapes[vid]:
+                sh.appearance = pgl.Material(colors[vid])
+
+    scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
+
+    return scene
+
+def my_colormap_old(g, property_name, cmap='jet',lognorm=True):
     prop = g.property(property_name)
     keys = list(prop.keys())
     values = np.array(list(prop.values()))
@@ -117,6 +163,36 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True):
 
     g.properties()['color'] = dict(list(zip(keys,colors)))
 
+def my_colormap(g, property_name, cmap='jet',lognorm=True, min = None, max = None):
+    # F. Bauget 2022-07-26: the previous function my_colormap_old modified with the addition of min and max argument
+    """
+    Compute a color property based on a given property and a colormap.
+    openalea.mtg.plantframe.color.colormap modified to add the possibility to fix the min-max for normalization
+    and so the possibility to compare two MTG with different min-max but the same colormap
+    :Parameters:
+    	- g: (MTG)
+    	- property_name: (string) - the property to display with  the heatmap
+    	- cmap: (string) - the heatmap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
+    	- lognorm: (boolean) - False linear normalization, log normalization otherwise
+    	- min: (float) - the minimum used for normalization
+    	- max: (float) - the maximum used for normalization
+    :Returns:
+        - g (MTG) with the property 'color' set
+    """
+
+    prop = g.property(property_name)
+    keys = list(prop.keys())
+    values = np.array(list(prop.values()))
+
+    _cmap = color.get_cmap(cmap)
+    norm = Normalize(vmin = min, vmax = max) if not lognorm else LogNorm(vmin = min, vmax = max)
+    values = norm(values)
+
+    colors = (_cmap(values)[:,0:3])*255
+    colors = np.array(colors,dtype=np.int).tolist()
+
+    g.properties()['color'] = dict(list(zip(keys,colors)))
+    return g
 
 def my_colorbar(values, cmap, norm):
     fig = pyplot.figure(figsize=(8,3))

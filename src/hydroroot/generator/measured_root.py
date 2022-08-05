@@ -379,3 +379,4 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                         p = tuple(['-'.join(map(str, path)), count])
                         new_ramifs.setdefault(p, []).append((vid, len_lateral))
     return new_ramifs
+

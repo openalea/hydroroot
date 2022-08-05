@@ -192,3 +192,31 @@ def reference_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3):
     return length.fit_law(X, means, ext=2)
 
 
+def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'expo', size = 5):
+    """
+    Build the function giving the lateral length according to its position on the parent branch
+
+    :Parameters:
+    	- pd: DataFrame - DataFrame with the laterals length law
+    	- scale_x: float (0.01) - x scale by default transform x in % to real value
+    	- scale_y: float (1.0) - any possible scale factor on y
+    	- scale: float (1e-4) - the segment length (m)
+    	- uniform: boolean or string (False) - if False use randomly an exact data point, True use a uniform distribution
+            between the minimum and the maximum of the data LR_length_mm, if 'expo', use an expovariate law
+    :Returns:
+        - a function giving the lateral length according to its position
+    """
+    x = pd.relative_distance_to_tip.tolist()
+    y = pd.LR_length_mm.tolist()
+
+    # size of the windows: in %
+    size *= scale_x
+
+    _length_law = histo_relative_law(x, y,
+                                     size = size,
+                                     scale_x = scale_x,
+                                     scale_y = 1.e-3 * scale_y,
+                                     scale = scale,
+                                     plot = False,
+                                     uniform = uniform)
+    return _length_law

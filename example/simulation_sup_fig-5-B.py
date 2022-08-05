@@ -14,6 +14,7 @@ import argparse
 import time
 import glob
 import tempfile, os
+import pandas as pd
 
 import openalea.plantgl.all as pgl
 from openalea.mtg import turtle as turt
@@ -21,8 +22,10 @@ from IPython.display import Image, display
 
 from hydroroot.init_parameter import Parameters
 from hydroroot.display import get_root_visitor
-
-from shared_functions import *
+from hydroroot import radius
+from hydroroot.read_file import read_archi_data
+from hydroroot.generator.markov import generate_g
+from hydroroot.generator.measured_root import mtg_from_aqua_data
 
 results = {}
 Jv_global = 1.0
@@ -48,6 +51,7 @@ parameter.read_file(filename)
 
 def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
     """
+    It is a copy of hydroroot.display.plot but the colors for the root according their order are hardcoded
     Display the architecture in plantGL Viewer with roots colors according to there order
     The radius property may be changed for display purpose.
     The MTG g1 stay unmodified
@@ -81,13 +85,14 @@ def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
         o = g.property('order')[v]
         g.property('color')[v] = c[o]
 
-    shapes = dict( (sh.getId(),sh) for sh in scene)
-
+    # F. Bauget 2022-07-27: python 2 to 3
+    shapes = scene.todict()
     colors = g.property('color')
     for vid in colors:
         if vid in shapes:
-            shapes[vid].appearance = pgl.Material(colors[vid])
-    scene = pgl.Scene(list(shapes.values()))
+            for sh in shapes[vid]:
+                sh.appearance =pgl.Material(colors[vid])
+    scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
 
     pgl.Viewer.display(scene)
     if name is not None:
@@ -111,7 +116,7 @@ if __name__ == '__main__':
     os.unlink(fn)
     display(img)
 
-    dseeds = pd.read_csv('data_figures/sup-fig-3-B.csv')
+    dseeds = pd.read_csv('data_figures/sup-fig-5-B.csv')
 
     for id in dseeds.index:
         seed = dseeds.seed[id]

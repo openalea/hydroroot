@@ -14,10 +14,12 @@ import glob
 import argparse
 import sys
 
-from hydroroot.main import hydroroot_flow
-from hydroroot.init_parameter import Parameters
+import pandas as pd
 
-from shared_functions import *
+from hydroroot.main import hydroroot_flow, root_builder
+from hydroroot.init_parameter import Parameters
+from hydroroot.conductance import radial, axial
+from hydroroot.read_file import read_archi_data
 
 ################################################
 # get the model parameters, the length laws are
@@ -97,7 +99,7 @@ if __name__ == '__main__':
             break
         parameter.exp['Jv'] = j
 
-        g, primary_length, _length, surface, seed = root_creation(df = df, segment_length = parameter.archi['segment_length'],
+        g, primary_length, _length, surface, seed = root_builder(df = df, segment_length = parameter.archi['segment_length'],
             order_decrease_factor = parameter.archi['order_decrease_factor'], ref_radius = parameter.archi['ref_radius'])
 
         axial_data = parameter.hydro['axial_conductance_data']

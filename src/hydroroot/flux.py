@@ -472,6 +472,7 @@ def segments_at_length(g, l, root=1, dl=1e-4):
 
 def cut(g, cut_length, threshold=1e-4):
     # Added Fabrice 2020-01-17: segment_length in parameters list
+    # F. Bauget 2022-07-25: added properties deletion
     """Cut the architecture at a given length `cut_length`.
 
         :Parameters:
@@ -484,7 +485,8 @@ def cut(g, cut_length, threshold=1e-4):
 
         :Example::
 
-            g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).
+            g_cut = cut(g, 0.09) # Cut g at 9cm. For example, remove the 2 last cm of a root architecture of 11 cm (primary length).
+            and all the properties associated with them
     """
     # vids = segments_at_length(g, cut_length)
     vids = segments_at_length(g, cut_length, dl = threshold)
@@ -496,6 +498,9 @@ def cut(g, cut_length, threshold=1e-4):
         #    to avoid "RuntimeError: maximum recursion depth exceeded"
         for vtx_id in post_order2(g, v):
             g_cut.remove_vertex(vtx_id)
+            for _property in g_cut.properties():
+                if vtx_id in g_cut.property(_property):
+                    del g_cut.property(_property)[vtx_id]
 
     return g_cut
 
