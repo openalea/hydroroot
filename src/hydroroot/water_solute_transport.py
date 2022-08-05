@@ -1,10 +1,11 @@
 import math
 import numpy as np
-from scipy import constants, sparse
+from scipy import constants #, sparse
+from scipy.sparse import csc_matrix, linalg
 from openalea.mtg import traversal
 
 def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0.0, Cse = 0.0, dP = None,
-                         Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None):
+                         Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
     """
     the system of equation under matrix form is solved using a Newton-Raphson schemes so at each step a system A dx = b
     is solved using:
@@ -27,6 +28,8 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0
     	- data: (numpy array) - 1D the array with the non-zero elements of the matrix system
     	- row: (numpy array) - 1D the array with the row indices of data
     	- col: (numpy array) - 1D the array with the column indices of data
+    	- C_base: (float) - Boundary condition at the root base, if None use the Neumann boundary condition on
+    	the concentration dC=0, if not None use the Dirichlet boundary condition C = C_base
     :Returns: 
         - g, dx, data, row, col
     """
@@ -67,6 +70,7 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0
     # Select the base of the root
     v_base = 1  # it has to be = 1 here because based on first index == 1
     nid = 0
+    if C_base is None: C_base = C[v_base]  # boundary condition at the root base
     m = 20 * n - 12  # -12 because of the coefficients outside the matrix at the boundaries
     ############
     # row and col indexes should be calculated once
@@ -191,8 +195,8 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0
 
         if v == v_base:
             p_parent = Pbase
-            C_parent = C[v]  # dC/dx=0 => Cp=C[1] and amount to theta[v] = 0
-            theta[v] = 1.0
+            C_parent = C_base # C[v]  # dC/dx=0 => Cp=C[1] or C[1] = C_base
+            # theta[v] = 1.0 # F. Bauget 2022-08-03
             Cpeg_parent = Cpeg[v]
         else:
             p_parent = p_in[parent]
@@ -326,9 +330,9 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0
                 b[3 * v - 2] += K[v] * (p_ext - p_in[v]) * (theta_ext * Cse + (1 - theta_ext) * C[v])  # idem
                 b[3 * v - 1] += K[v] * (p_ext - p_in[v]) * (theta_ext * Ce + (1 - theta_ext) * Cpeg[v])  # idem
 
-    A = sparse.csc_matrix((data, (row, col)), shape = (3 * n, 3 * n))
+    A = csc_matrix((data, (row, col)), shape = (3 * n, 3 * n))
 
-    solve = sparse.linalg.splu(A)
+    solve = linalg.splu(A)
     dx = solve.solve(b)
 
     for v in g.vertices_iter(scale = 1):
@@ -359,7 +363,7 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0
 
 def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0,
                                                    Ps = 0.0, Cse = 0.0, dP = None,
-                                                   Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None):
+                                                   Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
     """
     As pressure_calculation without non-permeating solutes
     the system of equation under matrix form is solved using a Newton-Raphson schemes so at each step a system A dx = b
@@ -367,7 +371,7 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
         solve = sparse.linalg.splu(A)
         dx = solve.solve(b)
     dx is the delta changes of the variables: pressure, permeating solutes concentration
-    A = sparse.csc_matrix((data, (row, col)), shape = (3 * n, 3 * n))
+    A = sparse.csc_matrix((data, (row, col)), shape = (2 * n, 2 * n)), one equation less than pressure_calculation
 
     :Parameters:
     	- g: (MTG)
@@ -382,7 +386,9 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
     	- data: (numpy array) - 1D the array with the non-zero elements of the matrix system
     	- row: (numpy array) - 1D the array with the row indices of data
     	- col: (numpy array) - 1D the array with the column indices of data
-    :Returns: 
+    	- C_base: (float) - Boundary condition at the root base, if None use the Neumann boundary condition on
+    	the concentration dC=0, if not None use the Dirichlet boundary condition C = C_base
+    :Returns:
         - g, dx, data, row, col
     """
 
@@ -411,6 +417,7 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
 
     # Select the base of the root
     v_base = 1  # it has to be = 1 here because based on firts index == 1
+    if C_base is None: C_base = C[v_base] # boundary condition at the root base
     nid = 0
     if data is None:
         # constant Matrix elements calculated only once, is data is None not a lot faster
@@ -505,8 +512,8 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
 
         if v == v_base:
             p_parent = Pbase
-            C_parent = C[v]  # dC/dx=0 => Cp=C[1] and amount to theta[v] = 0
-            theta[v] = 1.0
+            C_parent = C_base # C[v]  # dC/dx=0 => Cp=C[1] or C[1] = C_base
+            # theta[v] = 1.0 # F. Bauget 2022-08-03
         else:
             p_parent = p_in[parent]
             C_parent = C[parent]
@@ -565,9 +572,9 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
                 b[2 * v - 2] += K[v] * p_ext  # += because it is -Gp
                 b[2 * v - 1] += K[v] * (p_ext - p_in[v]) * (theta_ext * Cse + (1 - theta_ext) * C[v])  # idem
 
-    A = sparse.csc_matrix((data, (row, col)), shape = (2 * n, 2 * n))
+    A = csc_matrix((data, (row, col)), shape = (2 * n, 2 * n))
 
-    solve = sparse.linalg.splu(A)
+    solve = linalg.splu(A)
     dx = solve.solve(b)
 
     for v in g.vertices_iter(scale = 1):
@@ -591,8 +598,8 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
 
     return g, dx, data, row, col
 
-def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps = 0.0, Cse = 0.0,
-                         Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None):
+def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps = 0.0, Cse = 0.0, dP = None,
+                              Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
     """
     As pressure_calculation with drag term in the solute transport equation
     the system of equation under matrix form is solved using a Newton-Raphson schemes so at each step a system A dx = b
@@ -600,7 +607,7 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps 
         solve = sparse.linalg.splu(A)
         dx = solve.solve(b)
     dx is the delta changes of the variables: pressure, permeating solutes concentration
-    A = sparse.csc_matrix((data, (row, col)), shape = (3 * n, 3 * n))
+    A = sparse.csc_matrix((data, (row, col)), shape = (2 * n, 2 * n))
 
     :Parameters:
     	- g: (MTG)
@@ -615,6 +622,8 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps 
     	- data: (numpy array) - 1D the array with the non-zero elements of the matrix system
     	- row: (numpy array) - 1D the array with the row indices of data
     	- col: (numpy array) - 1D the array with the column indices of data
+    	- C_base: (float) - Boundary condition at the root base, if None use the Neumann boundary condition on
+    	the concentration dC=0, if not None use the Dirichlet boundary condition C = C_base
     :Returns: 
         - g, dx, data, row, col
     """
@@ -633,12 +642,16 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps 
     theta = g.property('theta') # 1 if Pin >= Pout, 0 otherwise
 
     sigmaRT = sigma * constants.R * Temp * 1.0e3 # if C in mol/microL *1e9, and P in MPa *1e-6 => *1e3
-    p_ext = Pe
+    if dP is None:
+        p_ext = Pe
+    else:
+        p_ext = Pbase + dP
     Pi_e_peg = osmotic_p_peg(Ce, unit_factor = 8.0e6) # from mol/microL to g/g
     psi_ext = p_ext - sigmaRT * Cse + Pi_e_peg # subtract the osmotic pressure
 
     # Select the base of the root
     v_base = 1 # it has to be = 1 here because based on firts index == 1
+    if C_base is None: C_base = C[v_base] # boundary condition at the root base
     nid = 0
     if data is None:
         #constant Matrix elements calculated only once
@@ -732,8 +745,8 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps 
 
         if v == v_base:
             p_parent = Pbase
-            C_parent = C[v] # dC/dx=0 => Cp=C[1]
-            theta[v] = 1.0
+            C_parent = C_base # C[v]  # dC/dx=0 => Cp=C[1] or C[1] = C_base
+            # theta[v] = 1.0 # F. Bauget 2022-08-03
         else:
             p_parent = p_in[parent]
             C_parent = C[parent]
@@ -781,21 +794,14 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps 
             b[2*v-2] += K[cid] * p_in[cid] # += because it is -Gp
             b[2*v-1] += K[cid] * (p_in[cid] - p_in[v]) * (theta[cid] * C[cid] + (1 - theta[cid]) * C[v]) #idem
 
-    A = sparse.csc_matrix((data, (row, col)), shape=(2*n, 2*n))
-    # A = sparse.csr_matrix((data, (row, col)), shape=(2*n, 2*n))
+    A = csc_matrix((data, (row, col)), shape=(2*n, 2*n))
 
-    solve = sparse.linalg.splu(A)
+    solve = linalg.splu(A)
     dx = solve.solve(b)
 
-    # dx2 = dx.copy()
-    # dx = sparse.linalg.spsolve(A,b, use_umfpack=True)
-    # dx = sparse.linalg.bicgstab(A, b)[0]
-    # dx[abs(dx) < 1.e-5] = 0
     for v in g.vertices_iter(scale=1):
         p_in[v] = p_in[v] + dx[2*v-2]
         C[v] = C[v] + dx[2*v-1]
-        # if C[v] < 0.: C[v] = 0.
-        # dx2[2 * v - 1] *= 1.0e9 # to mol/m3
 
 
     for v in g.vertices_iter(scale=1):

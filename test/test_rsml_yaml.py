@@ -101,7 +101,7 @@ def test_yaml():
     # F. Bauget 2021-06-11: test yaml file reading
 
     parameter = Parameters()
-    parameter.read_file('parameters_test_yaml.yml')
+    parameter.read_file('data/parameters_test_yaml.yml')
 
     boolflag = (parameter.archi['branching_delay'] == [0.001])
     boolflag = (parameter.archi['branching_variability'] == 0.25)

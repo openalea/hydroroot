@@ -310,7 +310,7 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     :Returns:
         g: MTG with the different properties set or computed (see comments above),
         primary_length: primary root length (output for generated mtg)
-        _length: total root length
+        total_length: total root length
         surface: total root surface
         intercepts: nb of intercepts at a given distance from base
         _seed: the seed used in the generator
@@ -346,8 +346,8 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
         _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
     g.properties()['mylength'] = _mylength
 
-    # _length is the total length of the RSA (sum of the length of all the segments)
-    _length = g.nb_vertices(scale = 1) * segment_length
+    # total_length is the total length of the RSA (sum of the length of all the segments)
+    total_length = g.nb_vertices(scale = 1) * segment_length
     g, surface = radius.compute_surface(g)
     g, volume = radius.compute_volume(g)
 
@@ -355,4 +355,4 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
         v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
         primary_length = g.property('position')[v_base]
 
-    return g, primary_length, _length, surface, _seed
+    return g, primary_length, total_length, surface, _seed

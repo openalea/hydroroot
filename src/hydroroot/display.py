@@ -61,12 +61,13 @@ def get_root_visitor(prune=None, factor = 1.0e4):
         #n.color = random.random()
     return root_visitor
 
-def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
+def plot_old(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
          visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
          prune=None):
     """
-    Deprecated look at
-    Exemple: mtg_scene
+    the name was confusing
+    Deprecated look at mtg_scene
+    Exemple:
 
         >>> from openalea.plantgl.all import *
         >>> s = plot()
@@ -101,6 +102,25 @@ def plot(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
     scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
     # F. Bauget 2022-03-15
     return scene
+
+def plot(g = None, min=None, max=None, name=None, cmap = 'jet', **kwds):
+    """
+    plot a MTG in 3D given in argument or from a file
+
+    :param g: (MTG) - the mtg to plot
+    :param min: (float) - the minimum used for normalization
+    :param max: (float) - the maximum used for normalization
+    :param name: (string) - if not None save the plot to name
+    :param cmap:  (string) - the heatmap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
+    :param kwds: has_radius=False, r_base=1.e-4, r_tip=5e-5,
+             visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
+             prune=None
+    :return:
+    """
+
+    pgl.Viewer.display(mtg_scene(g, min = min, max = max, cmap = cmap, **kwds))
+    if name is not None:
+        pgl.Viewer.frameGL.saveImage(name)
 
 def mtg_scene(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
          visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
@@ -163,7 +183,7 @@ def my_colormap_old(g, property_name, cmap='jet',lognorm=True):
 
     g.properties()['color'] = dict(list(zip(keys,colors)))
 
-def my_colormap(g, property_name, cmap='jet',lognorm=True, min = None, max = None):
+def my_colormap(g, property_name, cmap='jet',lognorm = False, min = None, max = None):
     # F. Bauget 2022-07-26: the previous function my_colormap_old modified with the addition of min and max argument
     """
     Compute a color property based on a given property and a colormap.
@@ -173,7 +193,7 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True, min = None, max = Non
     	- g: (MTG)
     	- property_name: (string) - the property to display with  the heatmap
     	- cmap: (string) - the heatmap name (https://matplotlib.org/stable/tutorials/colors/colormaps.html)
-    	- lognorm: (boolean) - False linear normalization, log normalization otherwise
+    	- lognorm: (boolean) - if None no normalization, if False linear normalization, if True log normalization
     	- min: (float) - the minimum used for normalization
     	- max: (float) - the maximum used for normalization
     :Returns:
@@ -185,9 +205,12 @@ def my_colormap(g, property_name, cmap='jet',lognorm=True, min = None, max = Non
     values = np.array(list(prop.values()))
 
     _cmap = color.get_cmap(cmap)
-    norm = Normalize(vmin = min, vmax = max) if not lognorm else LogNorm(vmin = min, vmax = max)
-    values = norm(values)
-
+    if lognorm == False: # explecitly == False
+        norm = Normalize(vmin = min, vmax = max)
+        values = norm(values)
+    elif lognorm == True: # explecitly == True
+        norm = LogNorm(vmin = min, vmax = max)
+        values = norm(values)
     colors = (_cmap(values)[:,0:3])*255
     colors = np.array(colors,dtype=np.int).tolist()
 
