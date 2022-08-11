@@ -5,19 +5,22 @@ It may adjust parameters on either Jv(P), cnf or both data.
 
 Remark:
     - Use input data see below
-    - Use mainy global variables
 
 Usage:
-    %run adjustment_K_k_Js_Ps.py [-h] [-o OUTPUTFILE] [-op] [-v] [-d DATA] inputfile
+    %run adjustment_K_k_Js_Ps.py [-h] [-o OUTPUTFILE] [-op [OPTIMIZE [OPTIMIZE ...]]] [-v] [-d DATA] inputfile
 
-        positional arguments:
-            inputfile             yaml input file
-        optional arguments:
-            -h, --help            show this help message and exit
-            -o , --outputfile     output csv file (default: out.csv)
-            -op, --optimize       parameters adjustment (default: False)
-            -v, --verbose         display parameter values during adjustment (default: False)
-            -d , --data           data to fit: cnf, JvP or all (default: all)
+    positional arguments:
+      inputfile             yaml input file
+    optional arguments:
+      -h, --help            show this help message and exit
+      -o OUTPUTFILE, --outputfile OUTPUTFILE
+                            output csv file (default: out.csv)
+      -op [OPTIMIZE [OPTIMIZE ...]], --optimize [OPTIMIZE [OPTIMIZE ...]]
+                            parameters to optimize, space separated strings, K k
+                            Ps Js sigma Klr klr, (default: K k Ps Js)
+      -v, --verbose         display parameter values during adjustment (default:
+                            False)
+      -d [DATA], --data [DATA] data to fit: cnf, JvP or all (default: all)
 
 Inputs:
     - yaml file given in command line argument
@@ -94,13 +97,18 @@ parameter = Parameters()
 parser = argparse.ArgumentParser(description='run direct simulation of water-solute HydroRoot, or adjust parameters on Jv(P) or Cut and flow or both data.')
 parser.add_argument("inputfile", help="yaml input file")
 parser.add_argument("-o", "--outputfile", default = 'out.csv', help="output csv file (default: out.csv)")
-parser.add_argument("-op", "--optimize", default = False, help="parameters adjustment (default: False)", action="store_true")
+parser.add_argument("-op", "--optimize", help="parameters to optimize, space separated strings, K k Ps Js sigma Klr klr, "
+                                              "(default: K k Ps Js)", nargs='*')
 parser.add_argument("-v", "--verbose", default = False, help="display parameter values during adjustment (default: False)", action="store_true")
-parser.add_argument("-d", "--data", default = 'all', help="data to fit: cnf, JvP or all (default: all)")
+parser.add_argument("-d", "--data", help="data to fit: cnf, JvP or all (default: all)", default = 'all', const = 'all', nargs='?')
 args = parser.parse_args()
 filename = args.inputfile
 output = args.outputfile
 Flag_Optim = args.optimize
+if Flag_Optim is None:
+    Flag_Optim = [] # if -op not passed then we have an empty lits
+elif len(Flag_Optim) == 0:
+    Flag_Optim = ['K', 'k', 'Js', 'Ps']  # if -op is passed without string
 Flag_verbose = args.verbose
 Flag_data_to_use = args.data
 parameter.read_file(filename)
@@ -109,13 +117,15 @@ parameter.read_file(filename)
 # Some Global boolean Flags: Flags I don't change often could be passed by command line
 ###############################################################################
 
-Flag_radius = True  # True if radii furnished in architecture file used them, otherwise use ref_radius and so on from yaml file
-Flag_Optim_K = True  # optimize axial conductance K
+Flag_radius = True  # True if radii furnished in architecture file used them, other wise use ref_radius and so on
+Flag_Optim_K = ('K' in Flag_Optim)  # optimize axial conductance K
 Flag_Constraint = False  # use constraint dK_constraint on 1st derivative dK/dx of K
-Flag_Optim_Klr = False  # optimize axial conductance of laterals Klr if <> than PR
-Flag_Optim_klr = False  # optimize radial conductivity of laterals klr if <> than PR
-Flag_Optim_Js = Flag_Optim_Ps = True  # optimize pumping rate Js and permeability
-Flag_Optim_k = True  # optimize radial conductivity k
+Flag_Optim_Klr = ('Klr' in Flag_Optim)  # optimize axial conductance of laterals Klr if <> than PR
+Flag_Optim_klr = ('klr' in Flag_Optim)  # optimize radial conductivity of laterals klr if <> than PR
+Flag_Optim_Js = ('Js' in Flag_Optim)    # optimize pumping rate Js
+Flag_Optim_Ps = ('Ps' in Flag_Optim)  # optimize permeability
+Flag_Optim_k = ('k' in Flag_Optim)  # optimize radial conductivity k
+Flag_Optim_sigma = ('sigma' in Flag_Optim)
 Flag_w_Lpr = False  # set weight to  1.0 / len(list_DP)
 Flag_w_cnf = False  # set weight to  len(cut_n_flow_length)
 
@@ -196,13 +206,16 @@ def fun(x):
         kpr = _x[ikpr]
     else:
         kpr = k[0]
-
+    if Flag_Optim_sigma:
+        sigma = _x[isig]
+    else:
+        sigma = Sigma
     # set new K and k in the MTG
     g = set_K_and_k(g_cut, axial_data, kpr, axial_lr = _axial_lr, k_lr = klr, nr = Nb_of_roots,
                         nl = len(cut_n_flow_length))
     # run simulation Jv(P) and CnF
-    JvP, F_JvP, C = Jv_P_calculation(g, Sigma, Js, Ps)
-    JvCnf, F_JvCnF, C = Jv_cnf_calculation(g, Sigma, Js, Ps)
+    JvP, F_JvP, C = Jv_P_calculation(g, sigma, Js, Ps)
+    JvCnf, F_JvCnF, C = Jv_cnf_calculation(g, sigma, Js, Ps)
 
     F = F_JvP + F_JvCnF
     if Flag_verbose: print('{:0.3e}'.format(F), ' '.join('{:0.3e}'.format(i) for i in _x))
@@ -248,10 +261,14 @@ def fun_JvP_only(x):
     else:
         kpr = k[0]
 
+    if Flag_Optim_sigma:
+        sigma = _x[isig]
+    else:
+        sigma = Sigma
     # set new K and k in the MTG
     g = set_K_and_k(g_cut, axial_data, kpr, axial_lr = _axial_lr, k_lr = klr, nr = Nb_of_roots, nl = len(cut_n_flow_length))
     # run simulation Jv(P)
-    JvP, F, C = Jv_P_calculation(g, Sigma, Js, Ps)
+    JvP, F, C = Jv_P_calculation(g, sigma, Js, Ps)
 
     if Flag_verbose: print('{:0.3e}'.format(F), ' '.join('{:0.3e}'.format(i) for i in _x))
 
@@ -295,10 +312,14 @@ def fun_cnf_only(x):
     else:
         kpr = k[0]
 
+    if Flag_Optim_sigma:
+        sigma = _x[isig]
+    else:
+        sigma = Sigma
     # set new K and k in the MTG
     g = set_K_and_k(g_cut, axial_data, kpr, axial_lr = _axial_lr, k_lr = klr, nr = Nb_of_roots, nl = len(cut_n_flow_length))
     # run simulation Jv(P)
-    JvCnf, F, C = Jv_cnf_calculation(g, Sigma, Js, Ps)
+    JvCnf, F, C = Jv_cnf_calculation(g, sigma, Js, Ps)
 
     if Flag_verbose: print('{:0.3e}'.format(F), ' '.join('{:0.3e}'.format(i) for i in _x))
 
@@ -363,8 +384,10 @@ def Jv_P_calculation(g, sigma, Js, Ps):
     data=None
     row=None
     col=None
+    C_base = C_base_ini
     for idP in range(len(list_DP)):
         Jv = 0.0
+        JCbase = 0.0
         for ig in range(Nb_of_roots):
             g[0, ig] = flux.flux(g[0, ig], psi_e = psi_base + list_DP[idP], psi_base = psi_base, invert_model = True)
             g[0, ig] = init_some_MTG_properties(g[0, ig], tau = Js, Cini = Cini, t = 1)
@@ -377,7 +400,8 @@ def Jv_P_calculation(g, sigma, Js, Ps):
             # Fdx > eps see below
             while Fdx > eps:
                 g[0, ig], dx, data, row, col = pressure_calculation_no_non_permeating_solutes(g[0, ig], sigma = sigma, tau = Js, Ce = Ce,
-                                                                   Pe = parameter.exp['psi_e'], Pbase = parameter.exp['psi_base'], Ps = Ps, Cse = Cse, dP = list_DP[idP])
+                                                                   Pe = parameter.exp['psi_e'], Pbase = parameter.exp['psi_base'],
+                                                                   Ps = Ps, Cse = Cse, dP = list_DP[idP], C_base = 0.0)
                 Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
                 JvP[idP, ig] = g[0, ig].property('J_out')[1]
                 if abs(JvP[idP, ig] - Jv_old) < 1.0e-4:
@@ -390,8 +414,9 @@ def Jv_P_calculation(g, sigma, Js, Ps):
             Jv += JvP[idP, ig]
 
             C[idP, ig] = copy.deepcopy(g[0, ig].property('C'))
-        F += w_Lpr * (Jv - list_Jext[idP])**2.0
-
+            if Jv >= 0.0: JCbase += JvP[idP, ig] * C[idP, ig][1]
+        F += w_Lpr * (Jv - list_Jext[idP])**2.0 #/ S_g[0]**2.0 #/ float(len(list_DP)) #/ list_Jext[idP]**2.0
+        if JCbase > 0.0: C_base = JCbase / Jv
     return JvP, F, C
 
 def Jv_cnf_calculation(g, sigma, Js, Ps):
@@ -416,6 +441,8 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
     C = {}
     F = 0.0
     Jv = 0.0
+    C_base = C_base_ini
+    JCbase = 0.0
     data = row = col = None
     for ig in range(Nb_of_roots):
         g[ic, ig] = flux.flux(g[ic, ig], psi_e = psi_base + DP_cnf[ic], psi_base = psi_base, invert_model = True)
@@ -447,10 +474,13 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
 
         Jv += JvCnf[ic, ig]
         C[ic, ig] = copy.deepcopy(g[ic, ig].property('C'))
+        if Jv >= 0.0: JCbase += JvCnf[ic, ig] * C[ic, ig][1]
     F += w_cnf * (Jv - Jexp[ic]) ** 2.0  # / S_g[ic]**2.0 #/ float(len(cut_n_flow_length) + 1) #/ Jexp[ic]**2.0
+    if JCbase > 0.0: C_base = JCbase / Jv
 
     for ic in range(1, len(cut_n_flow_length) + 1):
         Jv = 0.0
+        JCbase = 0.0
         data = row = col = None
         for ig in range(Nb_of_roots):
             g[ic, ig] = flux.flux(g[ic, ig], psi_e = psi_base + DP_cnf[ic], psi_base = psi_base, invert_model = True)
@@ -479,7 +509,9 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
 
             Jv += JvCnf[ic, ig]
             C[ic, ig] = copy.deepcopy(g[ic, ig].property('C'))
+            if Jv >= 0.0: JCbase += JvCnf[ic, ig] * C[ic, ig][1]
         F += w_cnf * (Jv - Jexp[ic]) ** 2.0  # / S_g[ic]**2.0 #/ float(len(cut_n_flow_length) + 1) #/ Jexp[ic]**2.0
+        if JCbase > 0.0: C_base = JCbase / Jv
 
     return JvCnf, F, C
 
@@ -566,6 +598,7 @@ if __name__ == '__main__':
     Cpeg_ini = Ce # initialization non-permeating solute concentration into the xylem vessels: not 0.0 because more num instability
     Sigma = parameter.solute['Sigma'] # reflection coefficient, fixed in this script
     Pi_e_peg = osmotic_p_peg(Ce, unit_factor = 8.0e6)  # from Ce mol/microL to g/g, external osmotic pressure of non-permeating in MPa
+    C_base_ini = 0.0
 
     data = None
     row = None
@@ -737,7 +770,7 @@ if __name__ == '__main__':
             if Flag_Optim_K:
                 for var in axial_data[1]:
                     xini_list.append(var)
-                ix += len(axial_data[1])  # becarefull for axial_data and axial_lr the indices will be use as end of list interval selection => +1
+                ix += len(axial_data[1])  # be careful for axial_data and axial_lr the indices will be use as end of list interval selection => +1
             iKpr = int(ix)
 
             if Flag_Optim_Klr:
@@ -770,6 +803,16 @@ if __name__ == '__main__':
                 bnds.append(kbnds)
                 ix += 1
                 iklr = int(ix)
+            if Flag_Optim_sigma:
+                xini_list.append(Sigma)
+                if Sigma>0.0:
+                    b = 1.0/Sigma
+                else:
+                    b = 1.0
+                bnds.append((0.0, b))
+                ix += 1
+                isig = int(ix)
+
             xini = np.array(xini_list)
             x = np.ones(len(xini)) # the array of parameter that will be optimized, equal unity because we optimize the
                                    # the parameters normalized by their initial value
@@ -830,6 +873,9 @@ if __name__ == '__main__':
                 k[1] = None
             if Flag_Optim_k:
                 k[0] = _x[ikpr]
+
+            if Flag_Optim_sigma:
+                Sigma = _x[isig]
 
             print(res.x)
 
@@ -916,6 +962,7 @@ if __name__ == '__main__':
 
     # some plots
     ############
+    plt.ion()
     fig, axs = plt.subplots(2, 2)
 
     dr=pd.DataFrame()

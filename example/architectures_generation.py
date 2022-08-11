@@ -13,7 +13,7 @@ import argparse
 
 from hydroroot.conductance import radial
 from hydroroot.main import hydroroot_flow, root_builder
-from hydroroot.init_parameter import Parameters  # import work in progress for reading init file
+from hydroroot.init_parameter import Parameters
 
 results = {}
 

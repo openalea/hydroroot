@@ -7,19 +7,18 @@ Remark:
     - Use mainy global variables
 
 Usage:
-    %run adjustment_K_k_Js_Ps.py [-h] [-o OUTPUTFILE] [-op] [-v] [-d DATA] inputfile
-
+    %run adjustment_K_and_k.py [-h] [-o OUTPUTFILE] [-op] inputfile
         positional arguments:
-            inputfile             yaml input file
+          inputfile             yaml input file
         optional arguments:
-            -h, --help            show this help message and exit
-            -o , --outputfile     output csv file (default: out.csv)
-            -op, --optimize       parameters adjustment (default: False)
+          -h, --help            show this help message and exit
+          -o OUTPUTFILE, --outputfile OUTPUTFILE
+                                output csv file
+          -op, --optimize       optimize K and k
 
 Inputs:
     - yaml file given in command line argument
-    - data/arabido_data.csv: may be changed see begining of main, csv file containing data of cut and flow data of with
-            the following columns:
+    - data/arabido_data.csv: see beginning of the main part, csv file containing the cut and flow data with the following columns:
             - arch: sample name that must be contained in the 'input_file' of the yaml file
             - Jbase: flux of the full root
             - J1, ..., Jn: columns containing the flux values of 1st cut, 2d cut, etc.
@@ -41,6 +40,8 @@ Outputs:
         - if Flag_Optim add the following: 'x', 'K 1st', 'K optimized'
                                             the initial and adjusted K(x)
 
+example:
+    - see notebook boursiac2022 Figure 2-B: '%run adjustment_K_and_k.py parameters_fig-2-B.yml -op'
 """
 
 import numpy as np
@@ -286,7 +287,7 @@ if __name__ == '__main__':
                 flux.segments_at_length(g_cut['tot'], cut_length, dl = parameter.archi['segment_length'])
             g_cut[str(cut_length)] = \
                 flux.cut_and_set_conductance(g_cut['tot'], cut_length, parameter.archi['segment_length'])
-            g_cut[str(cut_length)], surface = radius.compute_surface(g_cut[str(cut_length)])
+            # g_cut[str(cut_length)], surface = radius.compute_surface(g_cut[str(cut_length)])
 
         axial_data = list(conductance.axial(parameter.hydro['axial_conductance_data'], axfold))
 

@@ -6,10 +6,7 @@
 #   The factor axfold on axial data and radfold on radial k given in the parameter yaml file are used
 ###############################################################################
 
-######
-# Imports
 
-# VERSION = 2
 
 import numpy as np
 import argparse
@@ -17,7 +14,6 @@ import sys
 import pandas as pd
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters

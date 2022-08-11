@@ -35,9 +35,11 @@ parameter = Parameters()
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
 parser.add_argument("-o", "--outputfile", help="output csv file")
+parser.add_argument("-n", "--nrecord", help="every nth record", default = 1, const = 1, nargs = '?', type = int)
 args = parser.parse_args()
 filename = args.inputfile
 output = args.outputfile
+nrecord = args.nrecord
 parameter.read_file(filename)
 
 def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None, cut_and_flow = False):
@@ -61,9 +63,9 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
 if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
-    # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # Complete set
-    dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # 10 times shortest usefull for run time reduction
-
+    dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # Complete set
+    # dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # 10 times shortest usefull for run time reduction
+    dseeds = dseeds[dseeds.index % nrecord == 0] # Selects every nth raw starting from 0
 
     # if a seed is given in the parameters.yml file then restrict to this seed
     if parameter.archi['seed'][0] is not None:

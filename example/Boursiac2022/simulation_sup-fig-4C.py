@@ -1,3 +1,11 @@
+###############################################################################
+# Date: 2022-08-11
+# F. Bauget
+#   Use of HydroRoot to compute architecture or to construct it from text file
+#   perform simulation with s radial conductivity as a step function see
+#   hydroroot.conductance.radial_step
+#   display a 3D representation with the radial flux j
+###############################################################################
 
 import glob
 import argparse

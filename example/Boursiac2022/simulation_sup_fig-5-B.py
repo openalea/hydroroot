@@ -1,14 +1,12 @@
 ###############################################################################
 # Date: 2021-06-18
 # F. Bauget
-#   Use of HydroRoot to compute architecture or to construct it from texte file
+#   Use of HydroRoot to compute architecture or to construct it from text file
+#   No hydraulic calculation done
 #   Display root with a color according to there order
 ###############################################################################
 
-######
-# Imports
 
-# VERSION = 2
 
 import argparse
 import time

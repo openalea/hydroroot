@@ -1,17 +1,12 @@
 ###############################################################################
 # Date: 2021-06-18
 # F. Bauget
-#   Use of HydroRoot to compute architecture or to construct it from texte file
+#   Use of HydroRoot to compute architecture or to construct it from text file
 #   Display them with a colormap based on a MTG property ('j', 'order', etc.)
 #       argument --prop passed through command line
 #   If order chosen then display root with a color according to there order
 ###############################################################################
 
-######
-# Imports
-
-# VERSION = 2
-# F. Bauget 2021-12-14: removed unused import when migration to python 3 was done
 import glob
 import argparse
 import tempfile, os
@@ -22,7 +17,7 @@ from IPython.display import Image, display
 
 from hydroroot.main import hydroroot_flow
 from hydroroot.init_parameter import Parameters
-from hydroroot.display import get_root_visitor, mtg_scene, plot
+from hydroroot.display import get_root_visitor, plot
 from hydroroot import radius
 from hydroroot.generator.markov import my_seed,generate_g
 from hydroroot.generator.measured_root import mtg_from_aqua_data
@@ -170,7 +165,7 @@ if __name__ == '__main__':
                 else:
                     plot_order(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
 
-                # for display in the notebook, comment to display in the 3D viewer
+                ## for display in the notebook, comment to display in the 3D viewer
                 pgl.Viewer.widgetGeometry.setSize(450, 600) # set the picture size in px
                 fn = tempfile.mktemp(suffix='.png')
                 pgl.Viewer.saveSnapshot(fn)

@@ -7,10 +7,7 @@
 #   The factor axfold on axial data and radfold on radial k given in the parameter yaml file are used
 ###############################################################################
 
-######
-# Imports
 
-# VERSION = 2
 
 import sys
 import argparse
@@ -66,8 +63,7 @@ if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
     # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # full set
-    dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # short subset
-    # dseeds = pd.read_csv('data/test.csv')
+    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv') # short subset
 
     # predict the number of simulation run
     nb_steps = len(dseeds) * len(parameter.output['radfold']) * len(parameter.output['axfold'])
@@ -93,7 +89,7 @@ if __name__ == '__main__':
             length_data = parameter.archi['length_data'],  branching_variability = parameter.archi['branching_variability'],
             order_max = parameter.archi['order_max'], order_decrease_factor = parameter.archi['order_decrease_factor'],
             ref_radius = parameter.archi['ref_radius'])
-            
+
 
         for axfold in parameter.output['axfold']:
             g, Keq, Jv = hydro_calculation(g, axfold = axfold, k_radial = k0)
@@ -107,7 +103,7 @@ if __name__ == '__main__':
             results['internode (m)'].append(dseeds.delta[id])
             results['nude length (m)'].append(dseeds.nude_length[id])
 
-            
+
             count += 1
             progress = float(count) / nb_steps
             # print progress*100, ' %'

@@ -1,14 +1,11 @@
 ###############################################################################
 # Date: 2021-06-18
 # F. Bauget
-#   Use of HydroRoot to determinate the radial conductivity k on the set of
-#   architecture given in the yaml file
+#   Use of HydroRoot to determinate the radial conductivity k for a set of
+#   architecture given in the yaml file and according to the flux measurements
+#   given in the csv file 'data/arabido_data.csv'
 ###############################################################################
 
-######
-# Imports
-
-# VERSION = 2
 
 import glob
 import argparse
