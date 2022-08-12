@@ -1,0 +1,50 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: openalea.hydroroot
+  version: {{ data.get('version') }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  preserve_egg_dir: True
+  number: 1
+  script: {{PYTHON}} setup.py install #--single-version-externally-managed --record=record.txt
+
+requirements:
+  build:
+    - python {{PY_VER}}
+    - setuptools
+    - openalea.deploy
+  run:
+    - python >=3.6
+    - openalea.deploy
+    - openalea.mtg
+    - numpy
+    - scipy
+    - pandas >0.17
+    - RSML
+    - pyyaml
+    - path
+
+test:
+  requires:
+    - pytest
+  
+  imports:
+    - hydroroot
+  
+  source_files:
+    - test/**
+    - test/data/**
+  commands:
+    - cd test
+    - pytest -v
+
+about:
+  home: {{ data.get('url') }}
+  license: CeCILL-C
+  summary: {{ data.get('description') }}
+
