@@ -6,25 +6,20 @@
 #   The factor axfold on axial data and radfold on radial k given in the parameter yaml file are used
 ###############################################################################
 
-######
-# Imports
 
-# VERSION = 2
 
 import numpy as np
 import argparse
 import sys
+import pandas as pd
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
-from hydroroot.main import hydroroot_flow
+from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters
-
-from shared_functions import *
+from hydroroot.conductance import axial, radial
 
 results = {}
-Jv_global = 1.0
 
 ################################################
 # get the model parameters, the length laws are
@@ -50,7 +45,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     k_radial_data = radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
-    g, Keq, Jv_global = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
+    g, Keq, Jv = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
                                        k0 = k_radial,
                                        Jv = parameter.exp['Jv'],
                                        psi_e = parameter.exp['psi_e'],
@@ -58,7 +53,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
                                        axial_conductivity_data = Kexp_axial_data,
                                        radial_conductivity_data = k_radial_data)
 
-    return g, Keq, Jv_global
+    return g, Keq, Jv
 
 if __name__ == '__main__':
 
@@ -106,7 +101,7 @@ if __name__ == '__main__':
     if output is not None: dresults.to_csv(output, index = False)
 
     fig = plt.figure()
-    ax = Axes3D(fig)
+    ax = plt.subplot(111, projection="3d") #Axes3D(fig)
     ax.set_title('figure 6-A')
     y = np.array(dresults['ax'])
     x = np.array(dresults['k (10-8 m/s/MPa)'])
@@ -118,11 +113,11 @@ if __name__ == '__main__':
 
     ax2 = dresults.plot.scatter('ax', 'Jv (uL/s)', c='black')
     ax2.set_ylim([0, 0.03])
-    ax2.set_title('supplemental figure 4-A')
+    ax2.set_title('supplemental figure 6-A')
     dresults[dresults['k (10-8 m/s/MPa)'] == 32.76558].plot.line('ax', 'Jv (uL/s)', ax = ax2, c = 'orange')
     ax2.get_legend().remove()
     ax3 = dresults.plot.scatter('k (10-8 m/s/MPa)', 'Jv (uL/s)', c='black')
     dresults[dresults['ax'] == 1.0].plot.line('k (10-8 m/s/MPa)', 'Jv (uL/s)', ax = ax3, c = 'orange')
     ax3.get_legend().remove()
     ax3.set_ylim([0, 0.03])
-    ax3.set_title('supplemental figure 4-B')
+    ax3.set_title('supplemental figure 6-B')

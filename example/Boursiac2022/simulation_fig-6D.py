@@ -5,20 +5,17 @@
 #   single primary root with the same hydraulic characteristics
 ###############################################################################
 
-######
-# Imports
 
-# VERSION = 2
 
 import argparse
 import sys
+import pandas as pd
 
 from openalea.mtg.algo import axis
 
-from hydroroot.main import hydroroot_flow
+from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters
-
-from shared_functions import *
+from hydroroot.conductance import axial, radial
 
 results = {}
 
@@ -28,7 +25,6 @@ results = {}
 ###############################################
 
 parameter = Parameters()
-# parameter.read_file('../example/parameters.yml')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
@@ -69,7 +65,7 @@ if __name__ == '__main__':
         print('Simulation runs: ', nb_steps)
         print('#############################')
         print('figure 6-D')
-        print(outputfilename)
+        # print(outputfilename)
         j_relat = {}
         _columns = []
         _columns.append('ax')
@@ -155,5 +151,5 @@ if __name__ == '__main__':
             ax.set_xlabel('Distance to tip (m)')
             ax.set_ylabel('Normelized local flow (J)')
             ax.set_title('figure 6-D')
-        dj1.to_csv(outputfilename, index = False, header = False)
+        # dj1.to_csv(outputfilename, index = False, header = False) # save to file
         outputfilename = "fig-6D-cylindric.csv"

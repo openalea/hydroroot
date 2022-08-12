@@ -105,8 +105,7 @@ class Parameters():
         Read the input yaml file and perform some initialization
             see init_calculation
         :param filename: the input yaml file with the parameters
-        :return:
-        -  itself
+        :return: itself
         """
 
         # read the file as a dictionary
@@ -146,8 +145,7 @@ class Parameters():
         """
         Set self.archi['length_data'] by reading the two files self.archi['length_file']
         Set the seed to None if seed is not an integer nor a list of integer
-        :return:
-        -  itself
+        :return: itself
         """
 
         # set the data used to calculate the length laws
@@ -185,7 +183,6 @@ class Parameters():
             *   if it is a float or integer, then it is transform to a list of one single element
         :param parameter: the parameter to transform to a list
         :return:
-        -
         """
         if type(parameter) != list:
             if type(parameter) == str:

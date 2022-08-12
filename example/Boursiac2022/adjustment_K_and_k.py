@@ -1,28 +1,63 @@
-###############################################################################
-# Date: 2021-06-18
-# F. Bauget
-#   Use of HydroRoot to adjust axial conductance data and radial conductivity on
-#   cut and flow experiments
-###############################################################################
+"""
+Perform direct simulations or parameters adjustment to fit data of cut and flow experiment.
+Water transport only, electrical network analogy
 
-######
-# Imports
+Remark:
+    - Use input data see below
+    - Use mainy global variables
 
-# VERSION = 2
+Usage:
+    %run adjustment_K_and_k.py [-h] [-o OUTPUTFILE] [-op] inputfile
+        positional arguments:
+          inputfile             yaml input file
+        optional arguments:
+          -h, --help            show this help message and exit
+          -o OUTPUTFILE, --outputfile OUTPUTFILE
+                                output csv file
+          -op, --optimize       optimize K and k
+
+Inputs:
+    - yaml file given in command line argument
+    - data/arabido_data.csv: see beginning of the main part, csv file containing the cut and flow data with the following columns:
+            - arch: sample name that must be contained in the 'input_file' of the yaml file
+            - Jbase: flux of the full root
+            - J1, ..., Jn: columns containing the flux values of 1st cut, 2d cut, etc.
+            - lcut1, ...., lcutn: columns containing the maximum length to the base after each cut, 1st cut, 2d cut, etc.
+
+Remark: at this stage 2022-07-29, this script is used for arabidopsis and for experiment done at a constant working pressure
+        given in the yaml file, unlike adjustment_K_k_Js_Ps.py where the script has been used with CnF experiment where
+        pressure may change with cut steps
+
+Outputs:
+    - console:
+        - CnF: plant name, max length (m), k (10-8 m/s/MPa), total length (m), surface (m2), Jv (microL/s)
+    - matplotlib:
+        - 1 plot:
+            - Jv(l) cnf): Jv exp dot, Jv sim line
+    - outputfile (csv):
+        - column names: 'plant', 'cut length (m)', 'primary_length (m)', 'k (10-8 m/s/MPa)', '_length (m)',
+                        'surface (m2)', 'Jv (uL/s)', 'Jexp (uL/s)'
+        - if Flag_Optim add the following: 'x', 'K 1st', 'K optimized'
+                                            the initial and adjusted K(x)
+
+example:
+    - see notebook boursiac2022 Figure 2-B: '%run adjustment_K_and_k.py parameters_fig-2-B.yml -op'
+"""
 
 import numpy as np
 import glob
 import argparse
 import time
+import copy
+import pandas as pd
 
 from scipy import optimize
-import matplotlib.pyplot as plt
 
-from hydroroot import flux, conductance
-from hydroroot.main import hydroroot_flow
+from hydroroot import flux, conductance, radius
+from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters
+from hydroroot.read_file import read_archi_data
 
-from shared_functions import *
 
 results = {}
 g = None
@@ -59,8 +94,8 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     if axial_data is None: axial_data = parameter.hydro['axial_conductance_data']
     if k_radial is None: k_radial = parameter.hydro['k0']
     # compute axial & radial
-    Kexp_axial_data = axial(axial_data, axfold)
-    k_radial_data = radial(k_radial, axial_data, radfold)
+    Kexp_axial_data = conductance.axial(axial_data, axfold)
+    k_radial_data = conductance.radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
     g, Keq, Jv = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
@@ -252,9 +287,9 @@ if __name__ == '__main__':
                 flux.segments_at_length(g_cut['tot'], cut_length, dl = parameter.archi['segment_length'])
             g_cut[str(cut_length)] = \
                 flux.cut_and_set_conductance(g_cut['tot'], cut_length, parameter.archi['segment_length'])
-            g_cut[str(cut_length)], surface = radius.compute_surface(g_cut[str(cut_length)])
+            # g_cut[str(cut_length)], surface = radius.compute_surface(g_cut[str(cut_length)])
 
-        axial_data = list(axial(parameter.hydro['axial_conductance_data'], axfold))
+        axial_data = list(conductance.axial(parameter.hydro['axial_conductance_data'], axfold))
 
 
         ###############################################################################################
@@ -279,7 +314,7 @@ if __name__ == '__main__':
             print("*******************************************************************************")
         
         ## update the conductivities according to the first adjustment
-        axial_data = list(axial(parameter.hydro['axial_conductance_data'], axfold))
+        axial_data = list(conductance.axial(parameter.hydro['axial_conductance_data'], axfold))
         parameter.hydro['k0'] = parameter.hydro['k0'] *radfold
         
         ###############################################################################################
@@ -367,7 +402,7 @@ if __name__ == '__main__':
     results['Jv (uL/s)'].append(Jv)
     results['Jexp (uL/s)'].append(parameter.exp['Jv'])
     
-    print(primary_length, Jv)
+    print(index, primary_length, k0*0.1, _length, surface, Jv)
 
     ######################################
     ## Simulations with Kx and k adjusted
@@ -405,10 +440,9 @@ if __name__ == '__main__':
 
     dresults = pd.DataFrame(results, columns = columns)
 
-    fig, ax = plt.subplots()
     ax = dresults.plot.scatter('cut length (m)', 'Jexp (uL/s)', c = 'black')
     dresults.plot.line('cut length (m)', 'Jv (uL/s)', c = 'purple', ax = ax)
-    plt.show()
+    # plt.show()
 
     if Flag_Optim:
         optim_results  = {}

@@ -7,25 +7,19 @@
 #   If the argument outpufile is not None save the result to a csv file
 ###############################################################################
 
-######
-# Imports
-
-# VERSION = 2
-
-# F. Bauget 2021-12-14: removed unused import when migration to python 3 was done
-
+import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 import argparse
 import time
 
-from hydroroot.main import hydroroot_flow
+from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters
+from hydroroot.conductance import axial, radial
 
-from shared_functions import *
+
 
 results = {}
-Jv_global = 1.0
 
 start_time = time.time()
 
@@ -41,9 +35,11 @@ parameter = Parameters()
 parser = argparse.ArgumentParser()
 parser.add_argument("inputfile", help="yaml input file")
 parser.add_argument("-o", "--outputfile", help="output csv file")
+parser.add_argument("-n", "--nrecord", help="every nth record", default = 1, const = 1, nargs = '?', type = int)
 args = parser.parse_args()
 filename = args.inputfile
 output = args.outputfile
+nrecord = args.nrecord
 parameter.read_file(filename)
 
 def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial = None, cut_and_flow = False):
@@ -54,7 +50,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     k_radial_data = radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
-    g, Keq, Jv_global = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
+    g, Keq, Jv = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
                                        k0 = k_radial,
                                        Jv = parameter.exp['Jv'],
                                        psi_e = parameter.exp['psi_e'],
@@ -62,14 +58,14 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
                                        axial_conductivity_data = Kexp_axial_data,
                                        radial_conductivity_data = k_radial_data)
 
-    return g, Keq, Jv_global
+    return g, Keq, Jv
 
 if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
-    # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # Complete set
-    dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # 10 times shortest usefull for run time reduction
-
+    dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # Complete set
+    # dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # 10 times shortest usefull for run time reduction
+    dseeds = dseeds[dseeds.index % nrecord == 0] # Selects every nth raw starting from 0
 
     # if a seed is given in the parameters.yml file then restrict to this seed
     if parameter.archi['seed'][0] is not None:
@@ -164,7 +160,7 @@ if __name__ == '__main__':
         ax5[s] = fig[s].add_subplot(111, label = "1")
         dresults = pd.DataFrame(results[3], columns = columns)
         dresults.plot.scatter(s, 'Jv (uL/s)', ax = ax5[s], color = 'black')
-        ax5[s].set_title('supplemental figure 6-A')
+        ax5[s].set_title('supplemental figure 8')
         ax5[s].axis(xmin = 0.0, xmax = max(results[3][s])*1.1, ymin = 0.0, ymax = max(results[3]['Jv (uL/s)'])*1.1)
         xmax = ax5[s].get_xlim()[1] * 0.99
         xmin = ax5[s].get_xlim()[0] - 0.01 * ax5[s].get_xlim()[1]

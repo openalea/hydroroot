@@ -261,7 +261,7 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
     df_order = df[df.order == '1']  # array with 1st root
     length_base = df_order.index
     if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
-        PR_radius = df.iloc[-1].radius
+        PR_radius = df_order.iloc[-1].radius # F. Bauget 2022-06-28: error was df instead of df_order
         rnid.radius = PR_radius
 
     #    path = [1]
@@ -329,7 +329,8 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
             vid, lr, r = ramifs[path][0]
         else:
             vid, lr = ramifs[path][0]  # vid is the vertice index on the parent root from which the lateral of length lr starts
-        order = '-'.join(map(str, path))
+        # order = '-'.join(map(str, path))  # F. Bauget 2022-06-27
+        order = '-'.join(map(str, path[:2]))
         df_order = df[df.order == order]
         length_base = df_order.index
         code = order
@@ -372,10 +373,13 @@ def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
                 if len_lateral > 0.:
                     count += 1
                     if 'radius' in df_order: # F. Bauget 2020-11-02 : added the possibility to set real radii
-                        r = df_order.iloc[i].radius
+                        # r = df_order.iloc[i].radius  # F. Bauget 2022-06-27
+                        r_lrII = df_order.radius[i]  # F. Bauget 2022-06-27
                         p = tuple(['-'.join(map(str, path)), count, 0.])  # 1: PR, count: countieme RL
-                        ramifs.setdefault(p, []).append((vid, len_lateral, r))  # randomly added, to sort it sorted(ramifs)
+                        # ramifs.setdefault(p, []).append((vid, len_lateral, r))  # randomly added, to sort it sorted(ramifs)  # F. Bauget 2022-06-27
+                        new_ramifs.setdefault(p, []).append((vid, len_lateral, r_lrII))  # randomly added, to sort it sorted(ramifs)
                     else:
                         p = tuple(['-'.join(map(str, path)), count])
                         new_ramifs.setdefault(p, []).append((vid, len_lateral))
     return new_ramifs
+
