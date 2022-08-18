@@ -270,16 +270,21 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 
     nb_vertices = int(primary_length / segment_length)
 
-    length_max_secondary = length_data[0].LR_length_mm.max() * 1e-3  # in m
+    # F. Bauget 2022-08-12: added if-else to be able to use the function without length data, useful for usage demo
+    if length_data:
+        length_max_secondary = length_data[0].LR_length_mm.max() * 1e-3  # in m
 
-    law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
-    law_order2 = length_law(length_data[1], scale_x = length_max_secondary / 100., scale = segment_length)
+        law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
+        law_order2 = length_law(length_data[1], scale_x = length_max_secondary / 100., scale = segment_length)
+        _length_law = [law_order1, law_order2]
+    else:
+        _length_law = None
 
     g = markov_binary_tree(
         nb_vertices = nb_vertices,
         branching_variability = branching_variability,
         branching_delay = branching_delay,
-        length_law = [law_order1, law_order2],
+        length_law = _length_law,
         nude_tip_length = nb_nude_vertices,
         order_max = order_max,
         seed = seed)

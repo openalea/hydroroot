@@ -29,8 +29,7 @@ Documentation
 .. toctree::
     :maxdepth: 2
 
-    User Guide<user/index.rst>   
-    Reference Guide<user/autosum.rst>
+    User Guide<user/index.rst>
 
 - A `PDF <../latex/hydroroot.pdf>`_ version of |hydroroot| documentation is 
   available.

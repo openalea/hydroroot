@@ -1,6 +1,6 @@
 * Christophe Pradal
 * Yann Boursiac
-* Mikael Lucas
 * Fabrice Bauget
+* Mikael Lucas
 * Christophe Godin
 * Christophe Maurel

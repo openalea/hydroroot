@@ -51,8 +51,12 @@ def hydroroot_mtg(
     =======
 
     """
-    xl, yl = length_data
-    length_law = fit_law(xl, yl, scale=segment_length)
+    # F. Bauget 2022-08-12: added if-else to be able to use the function without length data, useful for usage demo
+    if length_data:
+        xl, yl = length_data
+        length_law = fit_law(xl, yl, scale=segment_length)
+    else:
+        length_law = None
 
     # compute the architecture
     nb_nude_vertices = int(nude_length / segment_length)

@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # 10 times shortest usefull for run time reduction
     dseeds = dseeds[dseeds.index % nrecord == 0] # Selects every nth raw starting from 0
 
-    # if a seed is given in the parameters.yml file then restrict to this seed
+    # if a seed is given in the parameters_palnt_01.yml file then restrict to this seed
     if parameter.archi['seed'][0] is not None:
         dseeds = dseeds[dseeds.seed == parameter.archi['seed']]
 

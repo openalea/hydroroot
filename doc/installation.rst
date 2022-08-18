@@ -2,7 +2,8 @@
 Installation
 ============
 
-Download sources and use setup::
+::
 
-    $ python setup.py install
+    conda create -n hydroroot3 -c conda-forge -c openalea3 openalea.hydroroot
+    conda activate hydroroot3
 

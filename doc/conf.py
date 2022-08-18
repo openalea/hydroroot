@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('../src'))
 # -- Project information -----------------------------------------------------
 
 project = 'HydroRoot'
-copyright = '2022, Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel'
-author = 'Christophe Pradal, Yann Boursiac, Mikael Lucas, Fabrice Bauget, Christophe Godin, Christophe Maurel'
+copyright = '2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel'
+author = 'Christophe Pradal, Yann Boursiac, Fabrice Bauget, Mikael Lucas, Christophe Godin, Christophe Maurel'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0.0'
