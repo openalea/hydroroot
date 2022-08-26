@@ -21,13 +21,13 @@ def compute_flux(g, n=300, psi_e=400000., psi_base=101325., Jv=1e-10, k0=0.3e-12
     g = radius.compute_length(g,length)
     g = radius.compute_relative_position(g)
     surf = radius.compute_surface(g)
-    print('surf',surf)
+    print 'surf',surf
     g = conductance.compute_k(g, k0)
     g = compute_conductance(g)
 
     k = g.property('k')
     K = g.property('K')
-    assert all(v>0 for v in list(K.values())),K
+    assert all(v>0 for v in K.values()),K
 
     g = flux(g, Jv, psi_e, psi_base)
 

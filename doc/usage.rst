@@ -118,6 +118,91 @@ Or the axial conductance
     print('sap flux (microL/s): ', jv)
     plot(g, prop_cmap='j')
 
+Importing architecture from RSML
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This is a small example to illustrate how to use the RSML format (http://rootsystemml.github.io/). The architecture is the
+arabidopsis-simple example http://rootsystemml.github.io/images/examples/arabidopsis-simple.rsml.
+
+.. code-block:: python
+
+    import rsml
+    from hydroroot import radius
+    from hydroroot.main import hydroroot_flow
+    from hydroroot.display import plot
+    from hydroroot.hydro_io import import_rsml_to_discrete_mtg, export_mtg_to_rsml
+
+We first read the RSML file and convert it into a *continuous* MTG. This is a MTG where each root (primary and lateral)
+is represented by one vertex. The geometry of each root is then stored in g_c.property(‘geometry’).
+
+.. code-block:: python
+
+    g_c = rsml.rsml2mtg('data/arabidopsis-simple.rsml')
+
+To be used in HydroRoot the MTG has to be converted to a *discrete* form of MTG, i.e. each vertex represent a representative
+elementary volume of a given length for example :math:`10^{-4}` m. In HydroRoot the lengths are in meter, therefore we
+must retrieve the resolution and unit of the RSML file,
+
+.. code-block:: python
+
+    resolution = g_c.graph_properties()['metadata']['resolution'] # pixel to unit
+    unit = g_c.graph_properties()['metadata']['unit']
+    print(unit)
+
+In this example, the resolution of the RSML file is 0.01 and the unit is cm. The length unit in HydroRoot is the meter.
+Therefore, to pass from pixels (the raw data in the RSML file) to the meter we must multiply *g_c.graph_properties()['metadata']['resolution']*
+by 0.01.
+
+.. code-block:: python
+
+    resolution = resolution * 0.01 # pixel to unit to m
+
+We build the discrete MTG.
+
+.. code-block:: python
+
+    g = import_rsml_to_discrete_mtg(g_c, segment_length = 1.0e-4, resolution = resolution)
+
+We calculate some properties needed to simulate a sap flux from the root.
+
+.. code-block:: python
+
+
+    g = radius.ordered_radius(g, 7.0e-5, 0.7) # root radii
+    g = radius.compute_relative_position(g) # Compute the position of each segment relative to the axis bearing it
+
+Some conductance data versus distance to tip
+
+.. code-block:: python
+
+    k_radial_data=([0, 0.2],[30.0,30.0])
+    K_axial_data=([0, 0.2],[3.0e-7,4.0e-4])
+
+Flux and equivalent conductance calculation, for a root in an external hydroponic medium at 0.4 MPa, its base at 0.1 MPa,
+and with the conductances set above.
+
+.. code-block:: python
+
+    g, keq, jv = hydroroot_flow(g, psi_e = 0.4, psi_base = 0.1, axial_conductivity_data = K_axial_data, radial_conductivity_data = k_radial_data)
+
+Display the local water uptake heatmap in 3D
+
+.. code-block:: python
+
+    %gui qt
+    plot(g, prop_cmap = 'j')
+
+We may also export the MTG to RSML
+
+.. code-block:: python
+
+    export_mtg_to_rsml(g, "test.rsml", segment_length = 1.0e-4)
+
+The resolution of the RSML data is 1.0e-4 and the unit is meter.
+At this stage (2022-08-22) only the root length and the branching
+position are used to simulate architecture in hydroponic solution. The
+exact position in 3D is not stored in the discrete MTG form and so not
+exported to RMSL.
+
 Run calculation on a generated architecture
 -------------------------------------------
 
@@ -125,21 +210,21 @@ The corresponding notebook is *example/example_generated_archi.ipynb*
 
 If the examples are run using the source, add the source directory to the system path
 
-.. code:: ipython3
+.. code-block:: python
 
     import sys;
     sys.path.extend(['../src'])
 
-.. code:: ipython3
+.. code-block:: python
 
     import pandas 
     from hydroroot.main import root_builder, hydroroot_flow
     from hydroroot.display import plot
 
-The Hydroroot generator of architecture is described in Boursiac et al. ([boursiac2022]_).
+The Hydroroot generator of architecture is described in Boursiac et al. [boursiac2022]_.
 It uses length distribution law for laterals, specific to a given species, to generate realistic architecture. Here we use the length laws determined for Col0 arabidopsis.
 
-.. code:: ipython3
+.. code-block:: python
 
     length_data = [] # length law used to generate arabidopsis realistic architecture
     for filename in ['data/length_LR_order1_160615.csv','data/length_LR_order2_160909.csv']:
@@ -156,7 +241,7 @@ We generate the MTG with some specific parameters:
 
 And return the primary root length, the total length and the surface.  Seed may be used as seed to generate the same architecture.
 
-.. code:: ipython3
+.. code-block:: python
 
     g, primary_length, total_length, surface, seed = root_builder(primary_length = 0.13, delta = 2.0e-3, nude_length = 2.0e-2, segment_length = 1.0e-4,
                                                       length_data = length_data, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
@@ -166,7 +251,7 @@ And return the primary root length, the total length and the surface.  Seed may 
 
 Some conductance data versus distance to tip
 
-.. code:: ipython3
+.. code-block:: python
 
     k_radial_data=([0, 0.2],[30.0,30.0])
     K_axial_data=([0, 0.2],[3.0e-7,4.0e-4])
@@ -175,11 +260,11 @@ Flux and equivalent conductance calculation, for a root in an external
 hydroponic medium at 0.4 MPa, its base at 0.1 MPa, and with the
 conductances set above.
 
-.. code:: ipython3
+.. code-block:: python
 
     g, keq, jv = hydroroot_flow(g, psi_e = 0.4, psi_base = 0.1, axial_conductivity_data = K_axial_data, radial_conductivity_data = k_radial_data)
 
-.. code:: ipython3
+.. code-block:: python
 
     print(keq,jv)
 
@@ -191,7 +276,7 @@ conductances set above.
 
 Display the local water uptake heatmap in 3D
 
-.. code:: ipython3
+.. code-block:: python
 
     %gui qt
     plot(g, prop_cmap='j') # j is the radial flux in ul/s
@@ -301,7 +386,7 @@ Run simple calculation using the Parameters class
 
 The corresponding notebook is *example/example_parameter_class.ipynb*
 
-.. code:: ipython3
+.. code-block:: python
 
     import sys; print('Python %s on %s' % (sys.version, sys.platform))
     sys.path.extend(['../src'])
@@ -313,7 +398,7 @@ The corresponding notebook is *example/example_parameter_class.ipynb*
     [GCC 9.4.0] on linux
 
 
-.. code:: ipython3
+.. code-block:: python
 
     import pandas as pd
     from hydroroot import radius
@@ -329,14 +414,14 @@ The corresponding notebook is *example/example_parameter_class.ipynb*
 Read the yaml file and set the Parameters variables, assuming that the
 code is run from the example folder
 
-.. code:: ipython3
+.. code-block:: python
 
     parameter = Parameters()
     parameter.read_file('parameters_palnt_01.yml')
 
 Read the architecture file and build the MTG
 
-.. code:: ipython3
+.. code-block:: python
 
     fname = parameter.archi['input_dir'] + parameter.archi['input_file'][0]
     df = read_archi_data(fname)
@@ -352,7 +437,7 @@ Read the architecture file and build the MTG
 
 Calculation of the equivalent conductance and the sap flux
 
-.. code:: ipython3
+.. code-block:: python
 
     g, Keq, Jv = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
                                 psi_e = parameter.exp['psi_e'],
@@ -360,7 +445,7 @@ Calculation of the equivalent conductance and the sap flux
                                 axial_conductivity_data = parameter.hydro['axial_conductance_data'],
                                 radial_conductivity_data = parameter.hydro['k0'])
 
-.. code:: ipython3
+.. code-block:: python
 
     result=f"""
     primary length (m): {primary_length}
@@ -380,15 +465,15 @@ Calculation of the equivalent conductance and the sap flux
     flux (microL/s): 0.0028789143185531108
     
 
-.. code:: ipython3
+.. code-block:: python
 
     plot(g, prop_cmap='j') # j is the radial flux in ul/s
 
 Example of solute and water transport simulation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Example
 
-.. code:: ipython3
+.. code-block:: python
 
     import sys; print('Python %s on %s' % (sys.version, sys.platform))
     sys.path.extend(['../src'])
@@ -400,7 +485,7 @@ Example
     [GCC 9.4.0] on linux
 
 
-.. code:: ipython3
+.. code-block:: python
 
     import math
     from hydroroot import flux
@@ -417,21 +502,21 @@ Example
 Read the yaml file and set the Parameters variables, assuming that the
 code is run from the example folder
 
-.. code:: ipython3
+.. code-block:: python
 
     parameter = Parameters()
     parameter.read_file('parameters_Ctr-3P2.yml')
 
 In the code the concentration are in :math:`mol.\mu L^{-1}`
 
-.. code:: ipython3
+.. code-block:: python
 
     Cse = parameter.solute['Cse'] * 1e-9 # mol/m3 -> mol/microL, external permeating solute concentration
     Ce = parameter.solute['Ce'] * 1e-9 # mol/m3 -> mol/microL, external non-permeating solute concentration
 
 Read the architecture file and build the MTG
 
-.. code:: ipython3
+.. code-block:: python
 
     fname = parameter.archi['input_dir'] + parameter.archi['input_file'][0]
     df = read_archi_data(fname)
@@ -450,7 +535,7 @@ hydroroot_flow), set some other properties in *init_some_MTG_properties*
 and perform some initialization. Note that here *parameter.hydro[‘k0’]*
 is a float.
 
-.. code:: ipython3
+.. code-block:: python
 
     g = set_conductances(g, axial_pr = parameter.hydro['axial_conductance_data'], k0_pr = parameter.hydro['k0']) 
     g = flux.flux(g, psi_e = parameter.exp['psi_e'], psi_base = parameter.exp['psi_base'])  # initialization
@@ -459,7 +544,7 @@ is a float.
 Perform the calculation, this a Newtown-Raphson loop on a matrix system,
 then there is a convergence loop.
 
-.. code:: ipython3
+.. code-block:: python
 
     eps = 1.0e-9 # global: stop criterion for the Newton-Raphson loop in Jv_P_calculation and Jv_cnf_calculation
     nb_v = g.nb_vertices()
@@ -478,7 +563,7 @@ then there is a convergence loop.
         Fdx_old = Fdx
     Jv = g.property('J_out')[1]
 
-.. code:: ipython3
+.. code-block:: python
 
     result=f"""
     primary length (m): {primary_length}
@@ -501,8 +586,6 @@ then there is a convergence loop.
 
 Display the concentration in the architecture
 
-.. code:: ipython3
+.. code-block:: python
 
     plot(g, prop_cmap='C') # C is the radial flux in mol/microL
-
-.. [boursiac2022] Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel, Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport, Plant Physiology, 2022;, kiac281, https://doi.org/10.1093/plphys/kiac281

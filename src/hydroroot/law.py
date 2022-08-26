@@ -16,24 +16,20 @@ from hydroroot import length
 
 
 def expovariate_law(data_xy, size=5e-2, scale_x=1e-2, scale_y=1e3, plot=False):
-    """
-    Fit a spline law from measured data by adding stochasticity.
-
+    """Fit a spline law from measured data by adding stochasticity.
+    
     To compute the law, data are first sampled using equal amplitude method. Then, a mean is computed on each sample.
     Then, an expovariate distribution is simulated from the mean of each sample.
     Finally a spline is interpolated based on the simulated data.
 
-    :parameters:
-        - data_xy: the data to fit
-        - size: the sample size, default 5 cm
-        - scale_x: a scaling factor on x array
-        - scale_y: a scaling factor on x array
-        - plot: True plot the law
+    :param data_xy: the data to fit
+    :param size: the sample size (Default value = 5e-2)
+    :param scale_x: a scaling factor on x array (Default value = 1e-2)
+    :param scale_y: a scaling factor on x array (Default value = 1e3)
+    :param plot: True plot the law (Default value = False)
+    :param Example: 
 
-    Example
-    =======
-
-        >>> filename = 'lr_length_law_data.csv'
+    >>> filename = 'lr_length_law_data.csv'
         >>> xy = readCSVFile(filename)
         >>> law = fit_law(data_xy=xy, size=5e-2)
     """
@@ -68,7 +64,13 @@ def expovariate_law(data_xy, size=5e-2, scale_x=1e-2, scale_y=1e3, plot=False):
 
 
 def discretize(x, y, size=5e-2):
-    """ Discretize by 5cm-intervals by using equal amplitudes method"""
+    """Discretize by 5cm-intervals by using equal amplitudes method
+
+    :param x: 
+    :param y: 
+    :param size:  (Default value = 5e-2)
+
+    """
 
     m, M = min(x), max(x)
 
@@ -99,6 +101,13 @@ def discretize(x, y, size=5e-2):
 def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):
     """
 
+    :param x: 
+    :param y: 
+    :param size:  (Default value = 5e-2)
+    :param scale_x:  (Default value = 0.16/100.)
+    :param scale_y:  (Default value = 1e-3)
+    :param plot:  (Default value = False)
+
     """
     x = np.array(x) * scale_x
     y = np.array(y) * scale_y
@@ -124,25 +133,24 @@ def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):
 
 
 def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, plot=False, uniform=False):
-    """ Return a length law from [0,1] to absolute length.
+    """
 
-    Algorithm:
-      - First, discretize the X values in different intervals of size `size`.
-      - Compute the histogram from the set of points include in each interval.
-      - Return a function that compute a value in a given histogram
+    :param x: list of float
+    :param y: list of float
+    :param size: float (Default value = 5e-2)
+    :param scale_x: float (Default value = 1.)
+    :param scale_y: float (Default value = 1e-3)
+    :param scale: float (Default value = 1e-4)
+    :param plot: unused (Default value = False)
+    :param uniform: string or boolean (Default value = False)
+    :param position: expo
+    :param min: and max
+    :param return: func
+    :param Algorithm: 
+    :param First: discretize the X values in different intervals of size
+    :param Compute: the histogram from the set of points include in each interval
+    :param Return: a function that compute a value in a given histogram
 
-    :parameters:
-        -x: (list of float) - abscissa
-        -y: (list of float) - values
-        -size: (float) - the size of the discretization
-        -scale_x: (float) - factor to x
-        -scale_y: (float) - factor to y
-        -scale: (float) - the vertices length to transform lengths to nb of vertices
-        -plot: unused
-        -uniform: (string or boolean) - determine the way the data will be explored to return a length associated to a
-                  position expo (expovariate), False (select randomly a value from data), anything else (random value between
-                  min and max)
-    :return:
     """
 
     x = np.array(x) * scale_x
@@ -155,6 +163,12 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
     means = [np.mean(ys) for ys in values]
 
     def return_law(position, scale=scale):
+        """
+
+        :param position: 
+        :param scale:  (Default value = scale)
+
+        """
         for i, x_min in enumerate(X):
             if position*scale <= x_min:
                 break
@@ -184,12 +198,20 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
     return return_law
 
 def reference_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3):
-    """ Return a length law from [0,1] to absolute length.
+    """
 
-    Algorithm:
+    :param x: 
+    :param y: 
+    :param size:  (Default value = 5e-2)
+    :param scale_x:  (Default value = 1.)
+    :param scale_y:  (Default value = 1e-3)
+    :returns:
+
+    :Algorithm:
       - First, discretize the X values in different intervals of size `size`.
       - Compute the histogram from the set of points include in each interval.
       - Return a function that compute a value in a given histogram
+
     """
 
     x = np.array(x) * scale_x
@@ -205,18 +227,16 @@ def reference_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3):
 
 
 def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'expo', size = 5):
-    """
-    Build the function giving the lateral length according to its position on the parent branch
+    """Build the function giving the lateral length according to its position on the parent branch
 
-    :Parameters:
-    	- pd: DataFrame - DataFrame with the laterals length law
-    	- scale_x: float (0.01) - x scale by default transform x in % to real value
-    	- scale_y: float (1.0) - any possible scale factor on y
-    	- scale: float (1e-4) - the segment length (m)
-    	- uniform: boolean or string (False) - if False use randomly an exact data point, True use a uniform distribution
-            between the minimum and the maximum of the data LR_length_mm, if 'expo', use an expovariate law
-    :Returns:
-        - a function giving the lateral length according to its position
+    :param pd: DataFrame
+    :param scale_x: float (Default value = 1 / 100.)
+    :param scale_y: float (Default value = 1.)
+    :param scale: float (Default value = 1e-4)
+    :param uniform: boolean or string (Default value = 'expo')
+    :param size:  (Default value = 5)
+    :returns: - a function giving the lateral length according to its position
+
     """
     x = pd.relative_distance_to_tip.tolist()
     y = pd.LR_length_mm.tolist()

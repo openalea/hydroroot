@@ -2,8 +2,8 @@
 
 """
 
-.. todo:: Compute the number of xylem pipes in each root segment
-and the radius of each xylem pipe.
+functions to compute the vertex radii in different way.
+functions to set the vertices length, to compute the total surface and volume of the MTG
 
 """
 from openalea.mtg import *
@@ -15,10 +15,14 @@ from math import pi
 
 
 def cont_radius(g, r_base, r_tip):
-    """ Compute the radius of each segment of a root system.
-
+    """Compute the radius of each segment of a root system.
     Set radius for elements of a mtg with an increase rate computed from
     given base and tip radius in a continuous way.
+
+    :param g: 
+    :param r_base: 
+    :param r_tip: 
+
     """
     r_base, r_tip = float(r_base), float(r_tip)
 
@@ -52,13 +56,18 @@ def cont_radius(g, r_base, r_tip):
     return g
 
 def discont_radius(g, r_base, r_tip):
-    """ Compute the radius of each segment of a root system.
-
+    """Compute the radius of each segment of a root system.
+    
     Set radius for elements of a mtg with an increase rate computed
     from the length of the longest axis and its base and tip radius.
-
+    
     Radius can be discontinuous e.g. for a young/small lateral on an old root,
     the young root radius is very small initially compared to the old one.
+
+    :param g: 
+    :param r_base: 
+    :param r_tip: 
+
     """
     r_base, r_tip = float(r_base), float(r_tip)
 
@@ -94,12 +103,16 @@ def discont_radius(g, r_base, r_tip):
     return g
 
 def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
-    """ Compute the radius of each segment of a root system.
-
+    """Compute the radius of each segment of a root system.
+    
     Set radius for elements of a mtg with fixed decrease between each order.
-
+    
     ref_radius: reference radius of the primary root (in m)
     order_decrease_factor: radius decrease factor applied when increasing order
+
+    :param g: 
+    :param ref_radius:  (Default value = 1e-4)
+    :param order_decrease_factor:  (Default value = 0.5)
 
     """
     #print 'entering MTG radius setting'
@@ -122,42 +135,12 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     #print 'exiting MTG radius setting'
     return g
 
-    """
-    max_scale = g.max_scale()
-    ref_r, d_factor = float(ref_radius), float(order_decrease_factor)
-
-    base = g.component_roots_iter(g.root).next()
-
-    base = g.node(base)
-    base.radius = ref_r
-
-    def has_successor(vid):
-        return any(v for v in g.children(vid) if g.edge_type(v) =='<')
-
-    orders = algo.orders(g,scale=max_scale)
-    _tips = dict((vid, orders[vid]) for vid in g.vertices_iter(scale=max_scale) if not has_successor(vid))
-
-    tips = {}
-    for tip,order in _tips.iteritems():
-        tips.setdefault(order, []).append(tip)
-
-    max_order = max(tips)
-
-    # radius are applied from tips to bases and scaled according to root order
-    for order in range(max_order+1):
-        rad = ref_r*(d_factor**order)
-        for tip in tips[order]:
-            node = g.node(tip)
-            node.radius = rad
-            while node and node.parent() and node.edge_type() != '+':
-                node.parent().radius = node.radius
-                node = node.parent()
-
-    return g
-    """
-
 def compute_length(g, length = 1.e-4):
-    """ Set the length of each vertex of the MTG
+    """Set the length of each vertex of the MTG
+
+    :param g: 
+    :param length:  (Default value = 1.e-4)
+
     """
     #print 'entering MTG length setting'
     length = float(length)
@@ -167,7 +150,10 @@ def compute_length(g, length = 1.e-4):
     return g
 
 def compute_surface(g):
-    """ Compute the total surface of the MTG (in square meters)
+    """Compute the total surface of the MTG (in square meters)
+
+    :param g: 
+
     """
     #print 'entering surface computation'
     surf = 0
@@ -182,11 +168,11 @@ def compute_surface(g):
     return g, surf
 
 def compute_volume(g):
-    """ Compute the total volume of the MTG (in cubic meters)
+    """Compute the total volume of the MTG (in cubic meters)
     If there is a varying volume the equation is rather:
-    .. math::
 
-        V = \frac{\pi h}{3}(R_1^2+R_2^2+R_1 R_2)
+    :param g: 
+
     """
     #print 'entering volume computation'
     volume = 0.
@@ -201,8 +187,13 @@ def compute_volume(g):
     return g, volume
 
 def compute_relative_position(g):
-    """ Compute the position of each segment relative to the axis bearing it.
+    """Compute the position of each segment relative to the axis bearing it.
     Add the properties "position" and "relative_position" to the MTG.
+    g.properties()['position'] is in meter the distance from the tip to the axis bearing it
+    g.properties()['relative_position'] is in relative distance from the tip to the axis bearing it (base is 1, tip is 0)
+
+    :param g: 
+
     """
     #print 'entering MTG node positionning computation'
     scale = g.max_scale()

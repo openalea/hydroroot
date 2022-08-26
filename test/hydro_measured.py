@@ -14,8 +14,7 @@ from openalea.mtg import algo
 
 import hydroroot
 from hydroroot.length import fit_law
-from hydroroot import radius, flux, conductance 
-from hydroroot.generator import markov, measured_root # 21-12-14: FB __init__.py in src not doing job
+from hydroroot import radius, markov, flux, conductance, measured_root
 
 
 
@@ -191,7 +190,7 @@ def my_flux(g,
     g = flux.flux(g, Jv, psi_e, psi_base, invert_model=True)
 
     Keqs = g.property('Keq')
-    v_base = next(g.component_roots_at_scale_iter(g.root, scale=1))
+    v_base = g.component_roots_at_scale_iter(g.root, scale=1).next()
 
     Keq = Keqs[v_base]
     Jv_global = Keq * (psi_e - psi_base)

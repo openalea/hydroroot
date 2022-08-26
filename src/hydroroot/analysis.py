@@ -9,18 +9,17 @@ from openalea.mtg.algo import orders
 
 
 def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
-    """Compute the number of segment intercepted at a given length.
+    """
+    Compute the number of segments intercepted at a given length from the base.
 
-    :parameters:
-        - g: MTG
-        - l: length
-        - root: the root vertex from which the tree traversal start
-        - dl: length of MTG segments (use for g.property('mylength') calculation
-        - max_order: maximum order of considering roots
-
-    Returns
-    =======
+    :param g: (MTG)
+    :param l: (length)
+    :param root: (int) - the root vertex from which the tree traversal start (Default value = 1)
+    :param dl: (float) - length of MTG segments (Default value = 1e-4)
+    :param max_order: (int) - maximum order of considering roots (Default value = None)
+    :returns:
         - number of segment
+
     """
     length = {}
 
@@ -52,29 +51,33 @@ def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
 
 
 def intercept(g, dists, dl=1e-4, max_order=None):
+    """
+    Compute intercepts (the number of segments intercepted) at given lengths from the base given as list of float
+
+    .. seealso:: :func:`nb_roots`
+
+    :param g: (MTG)
+    :param dists: (list of Float) list of distances
+    :param dl: (float) - length of MTG segments (Default value = 1e-4)
+    :param max_order: (int) - maximum order of considering roots (Default value = None)
+    :returns:
+        - intercepts: list of number of segments intercepted according to distances in dists
+    """
     # F. Bauget 2021-07-09 : added dl to arguments
-    """
-    Compute intercepts at given lengths from collet.
-
-    Parameters
-    ----------
-        - g: (MTG)
-        - dists: (list of Float) list distances from the collet
-        - dl: (float) length of MTG segments
-        - max_order: (int) maximum order of considering roots
-
-    Returns
-    -------
-        - intercepts: list of number of intercepts according to distances in dists
-    """
-
 
     intercepts = [nb_roots(g, x, dl = dl, max_order=max_order) for x in dists]
     return intercepts
 
 
 def read_data(data):
-    """Merge data and return a Dataframe."""
+    """
+    :Deprecated:
+
+    Merge data and return a Dataframe.
+
+    :param data: 
+
+    """
     names = ('relative_position', 'internode_length', 'LR_length', 'distance_to_tip')
 
     df = None

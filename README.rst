@@ -6,16 +6,11 @@ Software
 
 Authors
 -------
-  * Christophe Pradal
-  * Yann Boursiac
-  * Fabrice Bauget
-  * Mikael Lucas
-  * Christophe Godin
-  * Christophe Maurel
+.. include:: AUTHORS.txt
 
 Institutes
 ----------
-CIRAD / INRA / inria / CNRS
+CIRAD / INRAE / inria / CNRS
 
 Status
 ------
@@ -25,7 +20,9 @@ License
 -------
 CecILL-C
 
-**URL** : http://openalea.rtfd.io
+URL
+----
+https://github.com/openalea/hydroroot
 
 About
 ~~~~~~
@@ -33,14 +30,15 @@ About
 Description
 -----------
 
-OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root architecture system generator package.
-
+HydroRoot is a functional structural plant model dedicated to solute and water transport in roots.
 
 Content
 -------
 
-The OpenAlea.HydroRoot package contains a root architecture simulation model coupled with an hydraulic solver or
-a solute-water transportsolver.
+HydroRoot package contains:
+- a root architecture system generator
+- a water transport root architecture solver
+- a solute and water transport root architecture solver
 
 Example
 -------
@@ -59,20 +57,23 @@ Installation
 
 Requirements
 ------------
-  - numpy
-  - openalea.deploy
-  - openalea.mtg
-  - pandas >0.17
-  - path
-  - python >=3.6
-  - pyyaml
-  - rsml
-  - scipy
+    - openalea.deploy
+    - openalea.mtg
+    - openalea.plantgl
+    - python >=3.6
+    - matplotlib
+    - numpy
+    - pandas >0.17
+    - path
+    - yaml
+    - pyyaml
+    - rsml
+    - scipy
 
-Usage
------
+Quick start
+------------
 
-The following example builds a root and display it in the PlantGL viewer.
+Build a root and display it in the PlantGL viewer.
 
 .. code-block:: python
 
@@ -83,10 +84,11 @@ The following example builds a root and display it in the PlantGL viewer.
     plot(g)
 
 
-The following example builds a root, run the hydraulic solver and display the eat map representaion of the incoming
+Build a root, run the hydraulic solver and display the eat map representation of the incoming
 local radial flows on an arabidopsis root in the PlantGL viewer.
 
-K is the axial conductance in $10^{-9} m^4.s^{-1}.MPa^{-1}$, k is radial conductivity in $10^{-9} m.s^{-1}.MPa^{-1}$
+K (:math:`10^{-9}\ m^4.s^{-1}.MPa^{-1}`)  and k (:math:`10^{-9}\ m.s^{-1}.MPa^{-1}`) are the axial and radial conductances,
+versus distance to tip (m), respectively.
 
 .. code-block:: python
 
@@ -98,16 +100,18 @@ K is the axial conductance in $10^{-9} m^4.s^{-1}.MPa^{-1}$, k is radial conduct
     g, surface, volume, Keq, Jv_global = hydroroot(axial_conductivity_data = K, radial_conductivity_data=k, order_max = 1)
     plot(g, prop_cmap = 'j')
 
-See also the jupyter notebook boursiac2022.ipynb in example/Bourisac2022 for examples. This notebook is aimed to run different simulations to
-generate figures and tables of Bourisac et al. 2022 (see below), illustrating the HydroRoot capabilities.
+See also the jupyter notebook *boursiac2022.ipynb* in *example/Bourisac2022* for examples. This notebook is aimed to run different simulations to
+generate figures and tables of `Bourisac et al. 2022`__ , illustrating the some HydroRoot capabilities.
 
 Citation
 --------
-Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel,
-Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport,
-Plant Physiology, 2022;, kiac281, https://doi.org/10.1093/plphys/kiac281
+.. __:
+
+    Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel,
+    Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport, Plant Physiology,
+    2022;, kiac281, https://doi.org/10.1093/plphys/kiac281
 
 Documentation
 ~~~~~~~~~~~~~
-https://hydroroot.rtfd.io
+https://hydroroot.readthedocs.io/
 

@@ -22,7 +22,7 @@ def check_flux(g, Jv_global):
 
     # Jv_global is the sum of radial fluxes
     j = g.property('j')
-    delta = sum(j.values()) - Jv_global
+    delta = sum(j.itervalues()) - Jv_global
 
     closed(delta)
 
@@ -56,7 +56,7 @@ def check_radial_flow_conservation(g):
 
         delta = ji - ki*(psi_e-psi_i)
 
-        closed(delta, txt = "For vertex %d, radial flow is not propoerly calculated."%vid)
+        closed(delta, "For vertex %d, radial flow is not propoerly calculated."%vid)
 
 def check_vertex_flow_conservation(g):
     """j = ki *(psi_e -psi_in)
@@ -75,7 +75,7 @@ def check_vertex_flow_conservation(g):
         ji = j[vid]
         delta = J - (ji + J_c)
 
-        closed(delta, txt = "For vertex %d, Millmans law is not satisfied."%vid)
+        closed(delta, "For vertex %d, Millmans law is not satisfied."%vid)
 
 
 
@@ -87,26 +87,26 @@ def test_flux1():
                                                axial_conductivity_data=axial,
                                                radial_conductivity_data=radial,
                                                seed=2)
-    # F. Bauget 2022-04-11: the markov_binary_tree has been changed so the values were not correct anymore
-    assert len(g) == 9896
-    assert(4.1e-4 < surface < 4.2e-4)
-    assert(1.4e-8 < volume < 1.5e-8)
-    assert(0.1155 < Keq < 0.1156)
-    assert(0.034 < Jv_global < 0.035)
+
+    assert len(g) == 8584
+    assert(3.7e-4 < surface < 3.8e-4)
+    assert(1.3e-8 < volume < 1.4e-8)
+    assert(0.1029 < Keq < 0.103)
+    assert(0.03 < Jv_global < 0.031)
 
     check_flux(g, Jv_global)
 
     rid = 1
     lid = 899
-    assert(g.is_leaf(lid)) #no leaf
+    assert(g.is_leaf(lid))
     assert(g.parent(rid) is None)
     mid = 450
 
     psi_out = g.property('psi_out')
 
     closed(psi_out[rid]-0.1)
-    closed(psi_out[lid]-0.15120969955387603)
-    closed(psi_out[mid]-0.1357112706017493)
+    closed(psi_out[lid]-0.15145569239681866)
+    closed(psi_out[mid]-0.13587579341647765)
 
     # Test if Keq increase on the Trunk
     #check_Keq_monotony(g)
@@ -138,8 +138,7 @@ def test_cut_and_flow():
                                                radial_conductivity_data=radial,
                                                seed=2)
 
-    # g_cut = flux.cut(g, 0.04, threshold = 1e-4) #g_cut = flux.cut(g, 0.04)
-    g_cut = flux.cut_and_set_conductance(g, 0.04, threshold = 1e-4)
+    g_cut = flux.cut(g, 0.04, threshold = 1e-4) #g_cut = flux.cut(g, 0.04)
     check_length(g_cut, 0.04, segment_length=1e-4)
 
     g_cut = flux.flux(g_cut, cut_and_flow=True, invert_model=True)
@@ -149,7 +148,7 @@ def test_cut_and_flow():
     Keqs = g_cut.property('Keq')
     Jv_cut = Keqs[v_base] * (psi_e - psi_base)
 
-    print(Jv_cut)
+    print Jv_cut
     assert Jv_cut > Jv_global
 
 def check_length(g, length, segment_length):

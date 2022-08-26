@@ -6,33 +6,38 @@ from openalea.mtg import traversal
 
 def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0.0, Cse = 0.0, dP = None,
                          Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
-    """
-    the system of equation under matrix form is solved using a Newton-Raphson schemes so at each step a system A dx = b
-    is solved using:
-        solve = sparse.linalg.splu(A)
-        dx = solve.solve(b)
-    dx is the delta changes of the variables: pressure, permeating solutes concentration, and non-permeating solutes concentration
-    A = sparse.csc_matrix((data, (row, col)), shape = (3 * n, 3 * n))
+    """the system of equation under matrix form is solved using a Newton-Raphson schemes, at each step a system A dx = b
+    is solved by LU decomposition.
 
-    :Parameters:
-    	- g: (MTG)
-    	- Temp: (float) - temperature in Kelvin
-    	- sigma: (float) - the reflection coefficient
-    	- tau: (float) - the pumping rate in mol/s/m2 deprecated
-    	- Ce: (float) - the concentration of non-permeating solutes in mol/microL
-    	- Ps: (float) - the tissue permeability in m/s
-    	- Cse: (float) - concentration of permeating solutes in mol/microL
-    	- dP: (float) - the pressure difference between the xylem vessels and the external medium in MPa
-    	- Pe: (float) - the external pressure used if dP is None in MPa
-    	- Pbase: (float) - the pressure at the root base in MPa, typically the atmospheric pressure
-    	- data: (numpy array) - 1D the array with the non-zero elements of the matrix system
-    	- row: (numpy array) - 1D the array with the row indices of data
-    	- col: (numpy array) - 1D the array with the column indices of data
-    	- C_base: (float) - Boundary condition at the root base, if None use the Neumann boundary condition on
-    	the concentration dC=0, if not None use the Dirichlet boundary condition C = C_base
-    :Returns: 
-        - g, dx, data, row, col
+    :param g: MTG
+    :param Temp: float (Default value = 298)
+    :param sigma: float (Default value = 1.0)
+    :param tau: float (Default value = 0.0)
+    :param Ce: float (Default value = 0.0)
+    :param Ps: float (Default value = 0.0)
+    :param Cse: float (Default value = 0.0)
+    :param dP: float (Default value = None)
+    :param Pe: float (Default value = 0.4)
+    :param Pbase: float (Default value = 0.1)
+    :param data: numpy array (Default value = None)
+    :param row: numpy array (Default value = None)
+    :param col: numpy array (Default value = None)
+    :param C_base: float (Default value = None)
+    :returns: - g (MTG)
+        - dx (array)
+        - data (array)
+        - row (array)
+        - col (array)
+    
+    This function take into account the possibility to have non-permeating solute inside the root. This is, for instance,
+    the case when performing cut and flow experiment in a solution containing such solute. Indeed, the non-permeating solute
+    may enter the root at cut tips. It is referred to this non-permeating solute through Cpeg when C refers to the permeating solute
+    penetrating radially the root.
+    The presence of Cpeg may change the sap viscosity and has influence on the osmotic pressure see beginning of
+    the function inside the root.
+
     """
+
     p_out = g.property('psi_out')  # it is pressure not potential
     p_in = g.property('psi_in')  # it is pressure not potential
     J_out = g.property('J_out')
@@ -364,32 +369,28 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0, Ps = 0
 def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, tau = 0.0, Ce = 0.0,
                                                    Ps = 0.0, Cse = 0.0, dP = None,
                                                    Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
-    """
-    As pressure_calculation without non-permeating solutes
-    the system of equation under matrix form is solved using a Newton-Raphson schemes so at each step a system A dx = b
-    is solved using:
-        solve = sparse.linalg.splu(A)
-        dx = solve.solve(b)
-    dx is the delta changes of the variables: pressure, permeating solutes concentration
-    A = sparse.csc_matrix((data, (row, col)), shape = (2 * n, 2 * n)), one equation less than pressure_calculation
+    """As :func:`~water_solute_transport.py.pressure_calculation` without non-permeating solutes
 
-    :Parameters:
-    	- g: (MTG)
-    	- Temp: (float) - temperature in Kelvin
-    	- sigma: (float) - the reflection coefficient
-    	- tau: (float) - the pumping rate in mol/s/m2 deprecated
-    	- Ps: (float) - the tissue permeability in m/s
-    	- Cse: (float) - concentration of permeating solutes in mol/microL
-    	- dP: (float) - the pressure difference between the xylem vessels and the external medium in MPa
-    	- Pe: (float) - the external pressure used if dP is None in MPa
-    	- Pbase: (float) - the pressure at the root base in MPa, typically the atmospheric pressure
-    	- data: (numpy array) - 1D the array with the non-zero elements of the matrix system
-    	- row: (numpy array) - 1D the array with the row indices of data
-    	- col: (numpy array) - 1D the array with the column indices of data
-    	- C_base: (float) - Boundary condition at the root base, if None use the Neumann boundary condition on
-    	the concentration dC=0, if not None use the Dirichlet boundary condition C = C_base
-    :Returns:
-        - g, dx, data, row, col
+    :param g: MTG
+    :param Temp: float (Default value = 298)
+    :param sigma: float (Default value = 1.0)
+    :param tau: float (Default value = 0.0)
+    :param Ps: float (Default value = 0.0)
+    :param Cse: float (Default value = 0.0)
+    :param dP: float (Default value = None)
+    :param Pe: float (Default value = 0.4)
+    :param Pbase: float (Default value = 0.1)
+    :param data: numpy array (Default value = None)
+    :param row: numpy array (Default value = None)
+    :param col: numpy array (Default value = None)
+    :param C_base: float (Default value = None)
+    :param Ce:  (Default value = 0.0)
+    :returns: - g (MTG)
+        - dx (array)
+        - data (array)
+        - row (array)
+        - col (array)
+
     """
 
     p_out = g.property('psi_out')  # it is pressure not potential
@@ -421,7 +422,7 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
     nid = 0
     if data is None:
         # constant Matrix elements calculated only once, is data is None not a lot faster
-        # only usefull for calculation without Cpeg otherwise K changes
+        # only useful for calculation without Cpeg otherwise K changes
         m = 10 * n - 6  # -6 because of the coefficients outside the matrix at the boundaries
         data = np.empty(m)
         row = np.empty(m)
@@ -600,32 +601,30 @@ def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, t
 
 def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps = 0.0, Cse = 0.0, dP = None,
                               Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
-    """
-    As pressure_calculation with drag term in the solute transport equation
-    the system of equation under matrix form is solved using a Newton-Raphson schemes so at each step a system A dx = b
-    is solved using:
-        solve = sparse.linalg.splu(A)
-        dx = solve.solve(b)
-    dx is the delta changes of the variables: pressure, permeating solutes concentration
-    A = sparse.csc_matrix((data, (row, col)), shape = (2 * n, 2 * n))
+    """Deprecated (do not work with cut and flow)
+    As :func:`~water_solute_transport.py.pressure_calculation` without non-permeating solutes and with a drag term
+    in the solute transport equation.
 
-    :Parameters:
-    	- g: (MTG)
-    	- Temp: (float) - temperature in Kelvin
-    	- sigma: (float) - the reflection coefficient
-    	- tau: (float) - the pumping rate in mol/s/m2 deprecated
-    	- Ps: (float) - the tissue permeability in m/s
-    	- Cse: (float) - concentration of permeating solutes in mol/microL
-    	- dP: (float) - the pressure difference between the xylem vessels and the external medium in MPa
-    	- Pe: (float) - the external pressure used if dP is None in MPa
-    	- Pbase: (float) - the pressure at the root base in MPa, typically the atmospheric pressure
-    	- data: (numpy array) - 1D the array with the non-zero elements of the matrix system
-    	- row: (numpy array) - 1D the array with the row indices of data
-    	- col: (numpy array) - 1D the array with the column indices of data
-    	- C_base: (float) - Boundary condition at the root base, if None use the Neumann boundary condition on
-    	the concentration dC=0, if not None use the Dirichlet boundary condition C = C_base
-    :Returns: 
-        - g, dx, data, row, col
+    :param g: MTG
+    :param Temp: float (Default value = 298)
+    :param sigma: float (Default value = 1.0)
+    :param tau: float (Default value = 0.0)
+    :param Ps: float (Default value = 0.0)
+    :param Cse: float (Default value = 0.0)
+    :param dP: float (Default value = None)
+    :param Pe: float (Default value = 0.4)
+    :param Pbase: float (Default value = 0.1)
+    :param data: numpy array (Default value = None)
+    :param row: numpy array (Default value = None)
+    :param col: numpy array (Default value = None)
+    :param C_base: float (Default value = None)
+    :param Ce:  (Default value = 0.0)
+    :returns: - g (MTG)
+        - dx (array)
+        - data (array)
+        - row (array)
+        - col (array)
+
     """
     # F. Bauget 2021-03-12 : added drag term -(1-sigma) * 0.5 * (C+Cse) * j
     p_out = g.property('psi_out') # it is pressure not potential
@@ -820,21 +819,19 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, tau=0.0, Ce = 0.0, Ps 
     return g, dx, data, row, col
 
 def init_some_MTG_properties(g, tau = 0., Cini = 0., Cpeg_ini = 0., t = 1):
-    """
-    initialization of some g properties specific to solute transport: 
-        - 'C': the permeating solute concentration, 
-        - 'Cpeg': the non-permeating solute concentration, 
+    """initialization of some g properties specific to solute transport:
+        - 'C': the permeating solute concentration,
+        - 'Cpeg': the non-permeating solute concentration,
         - 'theta':  1 or 0 depending on the local flow direction in the xylem vessels 1 from tip to base, 0 the opposite
         - 'J_s': the pumping rate
-    
-    :Parameters:
-    	- g: (MTG)
-    	- tau: (float) - the pumping rate in mol/s/m2
-    	- Cini: (float) - the permeating solute concentration in mol/microL
-    	- Cpeg_ini:  (float) - the non-permeating solute concentration in mol/microL
-    	- t: (int) - 1 or 0 depending on the local flow direction in the xylem vessels 1 from tip to base, 0 the opposite
-    :Returns: 
-        - g
+
+    :param g: MTG
+    :param tau: float (Default value = 0.)
+    :param Cini: float (Default value = 0.)
+    :param Cpeg_ini: float (Default value = 0.)
+    :param t: int (Default value = 1)
+    :returns: - g
+
     """
     C = g.property('C')
     Cpeg = g.property('Cpeg')
@@ -852,21 +849,18 @@ def init_some_MTG_properties(g, tau = 0., Cini = 0., Cpeg_ini = 0., t = 1):
     return g
 
 def viscosity_peg(Cpeg = 0.0, unit_factor = 1.0):
-    """
-    Dynamic viscosity, mu, calculation in mPa.s according to the PEG-8000 concentration for a temperature T = 298 K
+    """Dynamic viscosity, mu, calculation in mPa.s according to the PEG-8000 concentration for a temperature T = 298 K
     Fit done on a point at Cpeg=0, mu = 1 mPa.s and the 2 fist data points (Cpeg=0.1 and 0.2) of
     table 2 from Gonzllez-Tello J. Chem. Eng. Data 1994,39, 611-614
-
+    
     mu = -17.4 + 18.4 exp(w/0.279)
     mu in mPa.s
     w in g/g water
 
-    parameters:
-    - Cpeg: Float (0), PEG concentration
-    - unit_factor: Float (1), factor used to pass the concentration in g/g water unit
+    :param Cpeg: Float (Default value = 0.0)
+    :param unit_factor: Float (Default value = 1.0)
+    :returns: - mu: Float, the dynamic viscosity in mPa.s
 
-    return:
-    - mu: Float, the dynamic viscosity in mPa.s
     """
 
     if Cpeg <= 1.0e-20: Cpeg = 0.0
@@ -878,20 +872,17 @@ def viscosity_peg(Cpeg = 0.0, unit_factor = 1.0):
     return mu
 
 def derivative_viscosity_peg(Cpeg = 0.0, unit_factor = 1.0):
-    """
-    Dynamic viscosity derivative according to concentration, dmu
+    """Dynamic viscosity derivative according to concentration, dmu
     see viscosity_peg
-
+    
     dmu/dw = 18.4 exp(w/0.279)/0.279
     dmu in mPa.s
     w in g/g water
 
-    parameters:
-    - Cpeg: Float (0), PEG concentration
-    - unit_factor: Float (1), factor used to pass the concentration in g/g water unit
+    :param Cpeg: Float (Default value = 0.0)
+    :param unit_factor: Float (Default value = 1.0)
+    :returns: - dmu: Float, the derivative
 
-    return:
-    - dmu: Float, the derivative
     """
 
     if Cpeg <= 1.0e-20: Cpeg = 0.0
@@ -903,22 +894,19 @@ def derivative_viscosity_peg(Cpeg = 0.0, unit_factor = 1.0):
     return dmu
 
 def osmotic_p_peg(Cpeg = 0.0, unit_factor = 1.0, T = 25.0):
-    """
-    osmotic pressure calculation of the PEG 8000
+    """osmotic pressure calculation of the PEG 8000
     equation 1 Michel, Plant Physiol. (1983) 72, 66-70
-
+    
     pi = (1.29*w^2*T - 140*w^2 - 4.0*w)
     pi: bar
     w: g/g
     T: Celcius
 
-    parameters:
-    - Cpeg: Float (0), PEG concentration
-    - unit_factor: Float (1), factor used to pass the concentration in g/g of water
-    - T: Float (20.0), temperature in Celcius
+    :param Cpeg: Float (Default value = 0.0)
+    :param unit_factor: Float (Default value = 1.0)
+    :param T: Float (Default value = 25.0)
+    :returns: - osmotic_p: Float, the osmotic pressure (MPa)
 
-    return:
-    - osmotic_p: Float, the osmotic pressure (MPa)
     """
     if Cpeg < 1.0e-20: Cpeg = 1.0e-20
     w = Cpeg * unit_factor
@@ -927,22 +915,19 @@ def osmotic_p_peg(Cpeg = 0.0, unit_factor = 1.0, T = 25.0):
     return osmotic_p
 
 def derivative_osmotic_p_peg(Cpeg = 0.0, unit_factor = 1.0, T = 25.0):
-    """
-    the 1st derivative according to X of the osmotic pressure calculation of the PEG 8000
+    """the 1st derivative according to X of the osmotic pressure calculation of the PEG 8000
     equation 1 Michel, Plant Physiol. (1983) 72, 66-70
-
+    
     dpi/dw = (2 * 1.29*w*T - 2*140*w - 4.0)
     pi: bar
     w: g/g
     T: Celcius
 
-    parameters:
-    - Cpeg: Float (0), PEG concentration
-    - unit_factor: Float (1), factor used to pass the concentration in g/g of water
-    - T: Float (20.0), temperature in Celcius
+    :param Cpeg: Float (Default value = 0.0)
+    :param unit_factor: Float (Default value = 1.0)
+    :param T: Float (Default value = 25.0)
+    :returns: - osmotic_p: Float, the osmotic pressure (MPa)
 
-    return:
-    - osmotic_p: Float, the osmotic pressure (MPa)
     """
     if Cpeg < 1.0e-20: Cpeg = 1.0e-20
     # dp/dCpeg = dw/dCpeg * dp/dw = unit_factor * dp/dw

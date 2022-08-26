@@ -24,31 +24,25 @@ def hydroroot_mtg(
     n=None,
     **kwds
 ):
-    """
-    Simulate and generate a root system.
-    
-    Parameters
-    ----------
-        - primary_length (Float) the primary root length
-        - delta (Float) the inter-branching length
-        - beta (Float) branching variability, random variability around delta (0.25 gives 25% of variability)
-        - order_max (int) root order maximum
-        - segment_length (Float) the MTG segment length
-        - nude_length (Float) distance to the tip without any laterals
-        - seed (int) the seed for the random generator
-        - ref_radius (Float) the primary root radius
-        - order_decrease_factor (Float) the radius decrease factor applied when increasing order
-        - length_data: (pandas dataframe) the length law 
-        - n: (int) maximum number of vertices
+    """Simulate and generate a root system.
 
-    Returns
-    -------
-        - g
+    :param primary_length: Float (Default value = 0.15)
+    :param delta: Float (Default value = 2.e-3)
+    :param beta: Float (Default value = 0.25)
+    :param order_max: int (Default value = 5)
+    :param segment_length: Float (Default value = 1e-4)
+    :param nude_length: Float (Default value = 0.02)
+    :param seed: int (Default value = 2)
+    :param ref_radius: Float (Default value = 1e-4)
+    :param order_decrease_factor: Float (Default value = 0.7)
+    :param length_data: pandas dataframe (Default value = None)
+    :param n: int (Default value = None)
+
+    :returns: - g
         - surface
         - volume
-
+    
     Example
-    =======
 
     """
     # F. Bauget 2022-08-12: added if-else to be able to use the function without length data, useful for usage demo
@@ -99,27 +93,21 @@ def hydroroot_flow(
     axial_conductivity_data=None,
     radial_conductivity_data=None,
 ):
-    """
-    Flux and equivalent conductance calculation
+    """Flux and equivalent conductance calculation
 
-    Parameters
-    ----------
-        - g (MTG)
-        - segment_length (Float) the MTG segment length
-        - k0 (Float) not used
-        - Jv (Float) flux in (microL/s)
-        - psi_e (Float) external hydrostatic potential (MPa)
-        - psi_base (Float) hydrostatic potential at the root base (MPa)
-        - axial_conductivity_data (list of Float) K vs distance to tip
-        - radial_conductivity_data (list of Float) k vs distance to tip
-
-    Returns
-    -------
-	- g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
-	            j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
-	            input and output of a MTG node
-	- Keq (float): the equivalent conductance of the whole root
-	- Jv_global (float): the outgoing flux at the root base
+    :param g: MTG
+    :param segment_length: Float (Default value = 1.e-4)
+    :param k0: Float (Default value = 300)
+    :param Jv: Float (Default value = 0.1)
+    :param psi_e: Float (Default value = 0.4)
+    :param psi_base: Float (Default value = 0.1)
+    :param axial_conductivity_data: list of Float (Default value = None)
+    :param radial_conductivity_data: list of Float (Default value = None)
+    :returns: - g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
+    	        j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
+    	        input and output of a MTG node
+    	- Keq (float): the equivalent conductance of the whole root
+    	- Jv_global (float): the outgoing flux at the root base
 
     """
     xa, ya = axial_conductivity_data
@@ -171,8 +159,25 @@ def hydroroot(
     n=None
 ):
     """Simulate a root system and compute global conductance and flux.
+    see :func:`~main.hydroroot_mtg` and  :func:`~main.hydroroot_flow`
 
-    see hydroroot_mtg and hydroroot_flow
+    :param primary_length:  (Default value = 0.15)
+    :param delta:  (Default value = 2.e-3)
+    :param beta:  (Default value = 0.25)
+    :param order_max:  (Default value = 5)
+    :param segment_length:  (Default value = 1e-4)
+    :param nude_length:  (Default value = 0.02)
+    :param seed:  (Default value = 2)
+    :param ref_radius:  (Default value = 1e-4)
+    :param order_decrease_factor:  (Default value = 0.7)
+    :param k0:  (Default value = 300)
+    :param Jv:  (Default value = 0.1)
+    :param psi_e:  (Default value = 0.4)
+    :param psi_base:  (Default value = 0.1)
+    :param length_data:  (Default value = None)
+    :param axial_conductivity_data:  (Default value = None)
+    :param radial_conductivity_data:  (Default value = None)
+    :param n:  (Default value = None)
 
     """
     g, surface, volume = hydroroot_mtg(primary_length=primary_length,
@@ -236,13 +241,33 @@ def hydroroot_from_data(
     primary_length_data=None,
     lateral_length_data=None,
     ):
-    """ Reconstruct a root system and compute global conductance and flux.
+    """Reconstruct a root system and compute global conductance and flux.
 
-    :parameters:
-    - primary_length_data (list Float) data with the lateral positions from the base
-    - lateral_length_data (list Float) data with the lateral lengths
-
-    see hydroroot_mtg and hydroroot_flow for the other parameters
+    :param primary_length_data: list Float (Default value = None)
+    :param lateral_length_data: list Float (Default value = None)
+    :param return: 
+    :param g: MTG
+    :param surface: float
+    :param volume: float
+    :param Keq: float
+    :param Jv_global: float
+    :param see: func
+    :param primary_length:  (Default value = 0.15)
+    :param delta:  (Default value = 2.e-3)
+    :param beta:  (Default value = 0.25)
+    :param order_max:  (Default value = 5)
+    :param segment_length:  (Default value = 1e-4)
+    :param nude_length:  (Default value = 0.02)
+    :param seed:  (Default value = 2)
+    :param ref_radius:  (Default value = 1e-4)
+    :param order_decrease_factor:  (Default value = 0.7)
+    :param k0:  (Default value = 300)
+    :param Jv:  (Default value = 0.1)
+    :param psi_e:  (Default value = 0.4)
+    :param psi_base:  (Default value = 0.1)
+    :param length_data:  (Default value = None)
+    :param axial_conductivity_data:  (Default value = None)
+    :param radial_conductivity_data:  (Default value = None)
 
     """
     xl, yl = length_data
@@ -307,35 +332,31 @@ def hydroroot_from_data(
 def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
                   ref_radius = 7.0e-5, Flag_radius = False):
-    """
-    wrapper function: build a MTG with properties like radius and vertex length set.
-
+    """wrapper function: build a MTG with properties like radius and vertex length set.
     The MTG is either generated or built from a data.
     The radius and vertex length properties are set.
-    The following properties are computed: length, position, mylength, surface, volume, total length,
-        primary root length, nb of intercepts
+    The following properties are computed: length, position, mylength, surface, volume, total length, primary root length, nb of intercepts
 
-    :Parameters:
-        primary_length: primary root length for generated mtg
-        seed:  seed for generated mtg, if None randomly generated
-        delta: branching delay  for generated mtg
-        nude_length: length from tip without lateral for generated mtg
-        df: pandas DataFrame with the architecture data to be reconstructed
-        segment_length: float (1.0e-4) - MTG segment length
-        length_data: string - length laws file names
-        branching_variability: float (0.25) - random variability of delta
-        order_max: float (4.0) - maximum lateral order
-        order_decrease_factor: float (0.7) - radius decrease factor between order
-        ref_radius: float (7.0e-5) - the primary root radius
-        intercepts: list (None) - list of distance from base
-        Flag_radius: boolean (False) - False: radius calculated in radius.ordered_radius; True: radius from the architecture file
-    :Returns:
-        g: MTG with the different properties set or computed (see comments above),
-        primary_length: primary root length (output for generated mtg)
-        total_length: total root length
-        surface: total root surface
-        intercepts: nb of intercepts at a given distance from base
-        _seed: the seed used in the generator
+    :param primary_length: primary root length for generated mtg (Default value = 0.13)
+    :param seed: seed for generated mtg (Default value = None)
+    :param delta: branching delay for generated mtg (Default value = 2.0e-3)
+    :param nude_length: length from tip without lateral for generated mtg (Default value = 2.0e-2)
+    :param df: pandas DataFrame with the architecture data to be reconstructed (Default value = None)
+    :param segment_length: float (Default value = 1.0e-4)
+    :param length_data: string (Default value = None)
+    :param branching_variability: float (Default value = 0.25)
+    :param order_max: float (Default value = 4.0)
+    :param order_decrease_factor: float (Default value = 0.7)
+    :param ref_radius: float (Default value = 7.0e-5)
+    :param intercepts: list
+    :param Flag_radius: boolean (Default value = False)
+    :returns: - g: MTG with the different properties set or computed (see comments above),
+        - primary_length: primary root length (output for generated mtg)
+        - total_length: total root length
+        - surface: total root surface
+        - intercepts: nb of intercepts at a given distance from base
+        - _seed: the seed used in the generator
+
     """
     if df is not None:
         g = measured_root.mtg_from_aqua_data(df, segment_length)

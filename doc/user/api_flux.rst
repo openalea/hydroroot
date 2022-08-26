@@ -4,6 +4,7 @@ flux
 ===============================================
 .. automodule:: hydroroot.flux
     :members:
+    :exclude-members: RadialShuntFlux
     :undoc-members:
     :inherited-members:
     :show-inheritance:

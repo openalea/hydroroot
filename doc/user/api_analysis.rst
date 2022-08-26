@@ -4,6 +4,7 @@ analysis API
 ===============================================
 .. automodule:: hydroroot.analysis
     :members:
+    :exclude-members: read_data
     :undoc-members:
     :inherited-members:
     :show-inheritance:

@@ -94,7 +94,7 @@ non-permeating solute and the osmotic water potential difference due to the perm
 :math:`P_e` and :math:`P` are the hydrostatic pressure of the bathing solution and within the xylem vessels, respectively.
 :math:`\pi_{np}^{ext}` and :math:`\pi_{np}` are the np contribution to the osmotic pressure of the bathing solution and
 inside the xylem vessels, respectively. Note, :math:`\pi_{np}` is most of the time equal to 0 because these molecules can
-not penetrate the root tissues. However, in the particular case of a cut and flow experiment [Boursiac2022]_, they can enter
+not penetrate the root tissues. However, in the particular case of a cut and flow experiment [boursiac2022]_, they can enter
 the xylem vessels through the cut tips of the root.
 :math:`C_e` and :math:`C` are the permeating solute concentration in the bathing solution and in the xylem vessels,
 respectively. σ is the effective reflection coefficient, :math: `R` the gas constant, :math:`T` the temperature (set to 298°K here). 
@@ -144,6 +144,18 @@ where :math:`C_{np}` is the np concentration in the xylem vessels.
 Notes on the numerical resolution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+**Boundary conditions:**
+
+At the base, we consider a Dirichlet boundary condition for the pressure
+and Neumann boundary condition for the concentration:
+
+.. math:: P_{1} = P_{atm}
+
+.. math:: \frac{\partial C}{\partial x} = 0
+
+in other words, root base is at atmospheric pressure and solute and np
+concentrations at the outlet are the same as in the first node.
+
 **Discretization of the transport equations:**
 
 The root system architecture (RSA) is represented by a Multiscale Tree
@@ -154,9 +166,13 @@ numbered from root base to tip.
 In each REV, mass conservation is independently applied for water,
 permeating solutes and non-permeating solutes. that gives for a REV numbered i:
 
-.. math:: J_{i} & = \sum_{j}^{}J_{j} + k_{i}\left\lbrack P_{e} - P_{i} - \pi_{np}^{ext} + {\pi_{np}^{}}_{i}- \sigma RT\left( C_{e} - C_{i} \right) \right\rbrack S_{i} \\
-     J_{i}Χ_{i} & = \sum_{j}^{}{J_{j}Χ_{j}} + \left\lbrack J_{s}^{*} - P_{s}\left( C_{i} - C_{e} \right) \right\rbrack S_{i} \\
-     J_{i}{Χ_{np}}_{i} &= \sum_{j}^{}{J_{j}{Χ_{np}}_{j}}
+.. math:: \left\{
+    \begin{array}{l}
+		J_{i} & = \sum_{j}^{}J_{j} + k_{i}\left\lbrack P_{e} - P_{i} - \pi_{np}^{ext} + {\pi_{np}^{}}_{i}- \sigma RT\left( C_{e} - C_{i} \right) \right\rbrack S_{i} \\
+		J_{i}Χ_{i} & = \sum_{j}^{}{J_{j}Χ_{j}} + \left\lbrack J_{s}^{*} - P_{s}\left( C_{i} - C_{e} \right) \right\rbrack S_{i} \\
+		J_{i}{Χ_{np}}_{i} &= \sum_{j}^{}{J_{j}{Χ_{np}}_{j}}
+    \end{array}
+	\right.
 
 where :math:`P_e, \pi_{np}^{ext} \text{and}\ C_e` are the hydrostatic
 pressure, the osmotic pressure due to the np and the solute
@@ -174,7 +190,7 @@ effective reflection coefficient, :math:`R` the gas constant, and :math:`T` the
 temperature. :math:`J_s^*` is the solute active uptake rate and :math:`P_s` is
 the radial permeability of the root peripheral tissues. :math:`J_i\ \text{and}\ J_j` are proportional to the local pressure gradient as follows:
 
-.. math:: J_{i} = K_{i}\frac{\left( P_{i} - P_{i - 1} \right)}{l_{i}}
+.. math:: J_{i} = K_{i}\frac{\left( P_{i + 1} - P_{i} \right)}{l_{i}}
 
 .. math:: J_{j} = K_{j}\frac{\left( P_{j} - P_{i} \right)}{l_{j}}
 
@@ -183,7 +199,7 @@ the subscript.
 
 :math:`Χ_i` is the solute concentration according to the sap flow direction,
 with
-:math:`Χ_{i} = \theta_{i}C_{i} + \left( 1 - \theta_{i} \right)C_{i - 1}`,
+:math:`Χ_{i} = \theta_{i}C_{i} + \left( 1 - \theta_{i} \right)C_{i + 1}`,
 :math:`\theta_i` being a factor that depends on flow direction:
 :math:`\theta_{i} = 1` if :math:`P_{i} > P_{i - 1}` and
 :math:`\theta_{i} = 0` if :math:`P_{i} < P_{i - 1}`. Χ\ :sub:`j` is the
@@ -195,22 +211,13 @@ variable for the np concentration.
 
 The system can be transformed as follows:
 
-.. math:: G_{w_{i}} = J_{i} - \sum_{j}^{}J_{j} - k_{i}\left\lbrack P_{e} - P_{i} - \pi_{np}^{ext} + {\pi_{np}^{}}_{i} - \sigma RT\left( C_{e} - C_{i} \right) \right\rbrack S_{i} = 0 \\
-     G_{s_{i}} = J_{i}Χ_{i} - \sum_{j}^{}{J_{j}Χ_{j}} - \left\lbrack J_{s}^{*} - P_{s}\left( C_{i} - C_{e} \right) \right\rbrack S_{i} = 0 \\
-     {G_{np}}_{i} = J_{i}{Χ_{np}}_{i} - \sum_{j}^{}{J_{j}{Χ_{np}}_{j}} = 0
-
-
-**Boundary conditions:**
-
-At the base, we consider a Dirichlet boundary condition for the pressure
-and Neumann boundary condition for the concentration:
-
-.. math:: P_{1} = P_{atm}
-
-.. math:: \frac{\partial C}{\partial x} = 0
-
-in other words, root base is at atmospheric pressure and solute and np
-concentrations at the outlet are the same as in the first node.
+.. math:: \left\{
+    \begin{array}{l}
+		G_{w_{i}} = J_{i} - \sum_{j}^{}J_{j} - k_{i}\left\lbrack P_{e} - P_{i} - \pi_{np}^{ext} + {\pi_{np}^{}}_{i} - \sigma RT\left( C_{e} - C_{i} \right) \right\rbrack S_{i} = 0 \\
+		G_{s_{i}} = J_{i}Χ_{i} - \sum_{j}^{}{J_{j}Χ_{j}} - \left\lbrack J_{s}^{*} - P_{s}\left( C_{i} - C_{e} \right) \right\rbrack S_{i} = 0 \\
+		{G_{np}}_{i} = J_{i}{Χ_{np}}_{i} - \sum_{j}^{}{J_{j}{Χ_{np}}_{j}} = 0
+    \end{array}
+	\right.
 
 The purpose is to solve the mass balance equation for the three components water 
 (w), permeating solutes (s) and non-permeating solute (np) i.e. to solve on each 
@@ -243,63 +250,29 @@ Now to solve the system a Newton-Raphson is used leading to:
 
 .. math:: J\ dY = - G
 
-J is the Jacobian of G according to the three unknowns, dY is the 3N vector
-containing alternatively dP, dC\ :sub:`s` and dC\ :sub:`np`.
+dY is a 3N vector containing alternatively dP, dC\ :sub:`s` and dC\ :sub:`np`:
+
+.. math::
+	dY = (\cdots, dP_{i-1}, d{C_s}_{i-1}, d{C_{np}}_{i-1}, dP_{i}, d{C_s}_{i}, d{C_{np}}_{i}, dP_{i+1}, d{C_s}_{i+1}, d{C_{np}}_{i+1}, \cdots)
+
+J is the Jacobian of G according to the three unknowns:
 
 .. math::
 
-   \begin{matrix}
-   \frac{dG_{w_i}}{dP_{i - 1}} & \frac{dG_{w_i}}{dC_{s_{i - 1}}} & \frac{dG_{w_i}}{dC_{np__{i - 1}}} &
-   \frac{dG_{w_i}}{dP_{i}} & \frac{dG_{w_i}}{dC_{s_{i}}} & \frac{dG_{w_i}}{dC_{np__{i}}} &
-   \frac{dG_{w_i}}{dP_{i + 1}} & \frac{dG_{w_i}}{dC_{s_{i + 1}}} & \frac{dG_{w_i}}{dC_{np__{i + 1}}}\\
-   \frac{dG_{s_i}}{dP_{i - 1}} & \frac{dG_{s_i}}{dC_{s_{i - 1}}} & \frac{dG_{s_i}}{dC_{np__{i - 1}}} &
-   \frac{dG_{s_i}}{dP_{i}} & \frac{dG_{s_i}}{dC_{s_{i}}} & \frac{dG_{s_i}}{dC_{np__{i}}} &
-   \frac{dG_{s_i}}{dP_{i + 1}} & \frac{dG_{s_i}}{dC_{s_{i + 1}}} & \frac{dG_{s_i}}{dC_{np__{i + 1}}}\\
-   \frac{dG_{np_i}}{dP_{i - 1}} & \frac{dG_{np_i}}{dC_{s_{i - 1}}} & \frac{dG_{np_i}}{dC_{np__{i - 1}}} &
-   \frac{dG_{np_i}}{dP_{i}} & \frac{dG_{np_i}}{dC_{s_{i}}} & \frac{dG_{np_i}}{dC_{np__{i}}} &
-   \frac{dG_{np_i}}{dP_{i + 1}} & \frac{dG_{np_i}}{dC_{s_{i + 1}}} & \frac{dG_{np_i}}{dC_{np__{i + 1}}}
-   \end{matrix}
-   \begin{pmatrix}
-   \begin{matrix}
-   \binom{dS_{i - 1}}{dP_{i - 1}} \\
-   \binom{dS_{i}}{dP_{i}} \\
-   \end{matrix} \\
-   \binom{dS_{i + 1}}{dP_{i + 1}} \\
-   \end{pmatrix} = - \begin{pmatrix}
-   G_{{nr}_{i}} \\
-   G_{r_{i}} \\
+	J = \begin{pmatrix}
+		 & \vdots & \vdots & \vdots & & \vdots & \vdots & \vdots & & \vdots & \vdots & \vdots & \\
+		\cdots  & \frac{\partial G_{w_i}}{\partial P_{i - 1}} & \frac{\partial G_{w_i}}{{\partial C_s}_{i - 1}} & \frac{\partial G_{w_i}}{{\partial C_{np}}_{i - 1}} & &
+		\frac{\partial G_{w_i}}{\partial P_{i}} & \frac{\partial G_{w_i}}{{\partial C_s}_{i}} & \frac{\partial G_{w_i}}{{\partial C_{np}}_{i}} &  &
+		\frac{\partial G_{w_i}}{\partial P_{i + 1}} & \frac{\partial G_{w_i}}{{\partial C_s}_{i + 1}} & \frac{\partial G_{w_i}}{{\partial C_{np}}_{i + 1}} & \cdots  \\
+		\cdots  & \frac{\partial G_{s_i}}{\partial P_{i - 1}} & \frac{\partial G_{s_i}}{{\partial C_s}_{i - 1}} & \frac{\partial G_{s_i}}{{\partial C_{np}}_{i - 1}} & &
+		\frac{\partial G_{s_i}}{\partial P_{i}} & \frac{\partial G_{s_i}}{{\partial C_s}_{i}} & \frac{\partial G_{s_i}}{{\partial C_{np}}_{i}} & &
+		\frac{\partial G_{s_i}}{\partial P_{i + 1}} & \frac{\partial G_{s_i}}{{\partial C_s}_{i + 1}} & \frac{\partial G_{s_i}}{{\partial C_{np}}_{i + 1}} & \cdots  \\
+		\cdots  & \frac{\partial G_{np_i}}{\partial P_{i - 1}} & \frac{\partial G_{np_i}}{{\partial C_s}_{i - 1}} & \frac{\partial G_{np_i}}{{\partial C_{np}}_{i - 1}} & &
+		\frac{\partial G_{np_i}}{\partial P_{i}} & \frac{\partial G_{np_i}}{{\partial C_s}_{i}} & \frac{\partial G_{np_i}}{{\partial C_{np}}_{i}} & &
+		\frac{\partial G_{np_i}}{\partial P_{i + 1}} & \frac{\partial G_{np_i}}{{\partial C_s}_{i + 1}} & \frac{\partial G_{np_i}}{{\partial C_{np}}_{i + 1}} & \cdots  \\
+		 & \vdots & \vdots & \vdots & & \vdots & \vdots & \vdots & & \vdots & \vdots & \vdots &
    \end{pmatrix}
+   
+Most of the non diagonal terms of J are zero.
 
-The diagonal is formed by :math:`\frac{d{G_{nr}}_{i}}{dS_{i}}` and
-:math:`\frac{d{G_{r}}_{i}}{dP_{i}}` so the maximum number of non-zero
-element from the diagonal is 3, 3 on the left in the first line, 3 on
-the right in the 2\ :sup:`nd` line. Therefore the system is 7 band
-diagonal.
-
-All other elements are strictly zero, so to avoid stocking null element
-and performing loop over them J is stock in a compact way. Only the
-seven elements of the diagonal are stocked giving an array of 2N lines
-and 7 columns. This gives for the grid block i:
-
-.. math::
-
-   \begin{pmatrix}
-   0 & \frac{d{G_{nr}}_{i}}{dS_{i - 1}} & \frac{d{G_{nr}}_{i}}{dP_{i - 1}} & \frac{d{G_{nr}}_{i}}{dS_{i}} & \frac{d{G_{nr}}_{i}}{dP_{i}} & \frac{d{G_{nr}}_{i}}{dS_{i + 1}} & \frac{d{G_{nr}}_{i}}{dP_{i + 1}} \\
-   \frac{d{G_{r}}_{i}}{dS_{i - 1}} & \frac{d{G_{r}}_{i}}{dP_{i - 1}} & \frac{d{G_{r}}_{i}}{dS_{i}} & \frac{d{G_{r}}_{i}}{dP_{i}} & \frac{d{G_{r}}_{i}}{dS_{i + 1}} & \frac{d{G_{r}}_{i}}{dP_{i + 1}} & 0 \\
-   \end{pmatrix}
-
-**Remark (09/19/2012)**: For the two first lines, the two first element
-of each do not need to be calculated because they are outside the
-system, ditto for the two last lines and their two last elements. These
-elements are actually calculated in the routines
-“FullyImplicit_Calcul_DP_DS” and “FullyImplicit_Compr_Calcul_DP_DS”,
-which is useless and so not efficient but harmless. To be corrected.
-
-Now to solve the linear system JdX=-G, an LU decomposition is used see §
-“LU decomposition J=LU” and § “Solving the system
-:math:`\underline{\underline{A}}.\ \underline{x} = \underline{b}`\ ” in
-Appendices.
-
-
-.. [boursiac2022] Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel, Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport, Plant Physiology, 2022;, kiac281, https://doi.org/10.1093/plphys/kiac281.
-.. [bauget2022] Fabrice Bauget, Virginia Protto, Christophe Pradal, Yann Boursiac, Christophe Maurel, A functional-structural model for assessing water and solute transport parameters of roots under water deficit, Journal of Experimental Botany, submitted, 2022.
+Finally, the linear system :math:`J\ dY = - G` is solved by a direct LU decomposition. This is not the most efficient in term of run time but this is the most robust.

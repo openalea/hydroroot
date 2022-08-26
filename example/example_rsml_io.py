@@ -49,8 +49,7 @@ def set_mtg_properties(g):
 
     g = radius.ordered_radius(g, parameter.archi['ref_radius'], parameter.archi['order_decrease_factor'])
 
-    # compute length property and parametrisation
-    g = radius.compute_length(g, parameter.archi['segment_length'])
+    # Compute the position of each segment relative to the axis bearing it.
     g = radius.compute_relative_position(g)
 
     # Calculation of the distance from base of each vertex, used for cut and flow
