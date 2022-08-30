@@ -16,6 +16,7 @@ from rsml import continuous, io
 from hydroroot import display
 
 
+
 def export_mtg_to_aqua_file(g, filename = "out.csv"):
     """
     Export a MTG architecture in a csv file into format used by aquaporin team
@@ -115,7 +116,7 @@ def export_mtg_to_rsml(g_discrete, filename = None, segment_length = 1.0e-4):
 
     # Compute 3D polylines: new property 'position3d'
     visitor = display.get_root_visitor_with_point(factor = factor)
-    scene = display.plot(g, visitor = visitor)
+    scene = display.mtg_scene(g, visitor = visitor)  # improved display.plot and changed its name because it was not a plot but a scene
 
     # Scale insertion: axes
     def quotient_axis(v):

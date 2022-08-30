@@ -19,7 +19,7 @@ archi:
 
     #File name:
     #may be a list of names, eg. [file1, file2, file3] wildcar may be used
-    input_file: [plant-1.txt]
+    input_file: [plant-01.txt]
 
     seed:
 

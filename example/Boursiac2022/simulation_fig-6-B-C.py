@@ -7,25 +7,19 @@
 #   The factor axfold on axial data and radfold on radial k given in the parameter yaml file are used
 ###############################################################################
 
-######
-# Imports
 
-# VERSION = 2
 
 import sys
 import argparse
 import time
+import pandas as pd
 
-from hydroroot.main import hydroroot_flow
+from hydroroot.main import hydroroot_flow, root_builder
 from hydroroot.init_parameter import Parameters
-
-from shared_functions import *
+from hydroroot.conductance import axial, radial
 
 results = {}
-Jv_global = 1.0
 
-ONE_LAW = False
-EXPOVARIATE = True
 
 start_time = time.time()
 
@@ -55,7 +49,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     k_radial_data = radial(k_radial, axial_data, radfold)
 
     # compute local jv and psi, global Jv, Keq
-    g, Keq, Jv_global = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
+    g, Keq, Jv = hydroroot_flow(g, segment_length = parameter.archi['segment_length'],
                                        k0 = k_radial,
                                        Jv = parameter.exp['Jv'],
                                        psi_e = parameter.exp['psi_e'],
@@ -63,14 +57,13 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
                                        axial_conductivity_data = Kexp_axial_data,
                                        radial_conductivity_data = k_radial_data)
 
-    return g, Keq, Jv_global
+    return g, Keq, Jv
 
 if __name__ == '__main__':
 
     k0 = parameter.hydro['k0']
     # dseeds = pd.read_csv('data/generated-roots-20-10-07.csv') # full set
-    dseeds = pd.read_csv('data/short-generated-roots-20-10-07.csv') # short subset
-    # dseeds = pd.read_csv('data/test.csv')
+    dseeds = pd.read_csv('data/subset_generated-roots-20-10-07_delta-2-10-3.csv') # short subset
 
     # predict the number of simulation run
     nb_steps = len(dseeds) * len(parameter.output['radfold']) * len(parameter.output['axfold'])
@@ -91,12 +84,12 @@ if __name__ == '__main__':
         delta = dseeds.delta[id]
         nude_length = dseeds.nude_length[id]
 
-        g, primary_length, _length, surface, _seed = root_creation(primary_length = primary_length, seed = seed,
+        g, primary_length, _length, surface, _seed = root_builder(primary_length = primary_length, seed = seed,
             delta = delta, nude_length = nude_length, df = None, segment_length = parameter.archi['segment_length'],
             length_data = parameter.archi['length_data'],  branching_variability = parameter.archi['branching_variability'],
             order_max = parameter.archi['order_max'], order_decrease_factor = parameter.archi['order_decrease_factor'],
             ref_radius = parameter.archi['ref_radius'])
-            
+
 
         for axfold in parameter.output['axfold']:
             g, Keq, Jv = hydro_calculation(g, axfold = axfold, k_radial = k0)
@@ -110,7 +103,7 @@ if __name__ == '__main__':
             results['internode (m)'].append(dseeds.delta[id])
             results['nude length (m)'].append(dseeds.nude_length[id])
 
-            
+
             count += 1
             progress = float(count) / nb_steps
             # print progress*100, ' %'
@@ -136,7 +129,7 @@ if __name__ == '__main__':
             delta = dseeds.delta[id]
             nude_length = dseeds.nude_length[id]
 
-            g, primary_length, _length, surface, _seed = root_creation(primary_length = primary_length, seed = seed,
+            g, primary_length, _length, surface, _seed = root_builder(primary_length = primary_length, seed = seed,
                 delta = delta, nude_length = nude_length, df = None, segment_length = parameter.archi['segment_length'],
                 length_data = parameter.archi['length_data'],  branching_variability = parameter.archi['branching_variability'],
                 order_max = parameter.archi['order_max'], order_decrease_factor = parameter.archi['order_decrease_factor'],

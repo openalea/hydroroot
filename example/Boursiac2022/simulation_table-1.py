@@ -1,23 +1,22 @@
 ###############################################################################
 # Date: 2021-06-18
 # F. Bauget
-#   Use of HydroRoot to determinate the radial conductivity k on the set of
-#   architecture given in the yaml file
+#   Use of HydroRoot to determinate the radial conductivity k for a set of
+#   architecture given in the yaml file and according to the flux measurements
+#   given in the csv file 'data/arabido_data.csv'
 ###############################################################################
 
-######
-# Imports
-
-# VERSION = 2
 
 import glob
 import argparse
 import sys
 
-from hydroroot.main import hydroroot_flow
-from hydroroot.init_parameter import Parameters
+import pandas as pd
 
-from shared_functions import *
+from hydroroot.main import hydroroot_flow, root_builder
+from hydroroot.init_parameter import Parameters
+from hydroroot.conductance import radial, axial
+from hydroroot.read_file import read_archi_data
 
 ################################################
 # get the model parameters, the length laws are
@@ -97,7 +96,7 @@ if __name__ == '__main__':
             break
         parameter.exp['Jv'] = j
 
-        g, primary_length, _length, surface, seed = root_creation(df = df, segment_length = parameter.archi['segment_length'],
+        g, primary_length, _length, surface, seed = root_builder(df = df, segment_length = parameter.archi['segment_length'],
             order_decrease_factor = parameter.archi['order_decrease_factor'], ref_radius = parameter.archi['ref_radius'])
 
         axial_data = parameter.hydro['axial_conductance_data']

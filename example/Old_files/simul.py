@@ -1,3 +1,5 @@
+# F. Bauget 2022-07-26: deprecated
+
 from openalea.deploy.shared_data import shared_data
 import pandas
 import pylab

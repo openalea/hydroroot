@@ -1,7 +1,10 @@
 
 
 from warnings import warn
-import numpy as np
+# import numpy as np
+
+from openalea.mtg import traversal
+
 from hydroroot.length import fit_law
 from hydroroot import radius, flux, conductance 
 from hydroroot.generator import markov, measured_root # 21-12-14: FB __init__.py in src not doing job
@@ -278,3 +281,78 @@ def hydroroot_from_data(
     Jv_global = Keq * (psi_e - psi_base)
 
     return g, surface, volume, Keq, Jv_global
+
+def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
+                  length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
+                  ref_radius = 7.0e-5, Flag_radius = False):
+    """
+    wrapper function: build a MTG with properties like radius and vertex length set.
+
+    The MTG is either generated or built from a data.
+    The radius and vertex length properties are set.
+    The following properties are computed: length, position, mylength, surface, volume, total length,
+        primary root length, nb of intercepts
+
+    :Parameters:
+        primary_length: primary root length for generated mtg
+        seed:  seed for generated mtg, if None randomly generated
+        delta: branching delay  for generated mtg
+        nude_length: length from tip without lateral for generated mtg
+        df: pandas DataFrame with the architecture data to be reconstructed
+        segment_length: float (1.0e-4) - MTG segment length
+        length_data: string - length laws file names
+        branching_variability: float (0.25) - random variability of delta
+        order_max: float (4.0) - maximum lateral order
+        order_decrease_factor: float (0.7) - radius decrease factor between order
+        ref_radius: float (7.0e-5) - the primary root radius
+        intercepts: list (None) - list of distance from base
+        Flag_radius: boolean (False) - False: radius calculated in radius.ordered_radius; True: radius from the architecture file
+    :Returns:
+        g: MTG with the different properties set or computed (see comments above),
+        primary_length: primary root length (output for generated mtg)
+        total_length: total root length
+        surface: total root surface
+        intercepts: nb of intercepts at a given distance from base
+        _seed: the seed used in the generator
+    """
+    if df is not None:
+        g = measured_root.mtg_from_aqua_data(df, segment_length)
+        _seed = None
+    else:
+        # if no seed just create one
+        if seed is None:
+            _seed = markov.my_seed()
+        else:
+            _seed = seed
+
+        g = markov.generate_g(_seed, length_data,
+                       branching_variability, delta,
+                       nude_length, primary_length, segment_length,
+                       order_max)
+
+    # compute radius property on MTG
+    # F. Bauget 2022-05-17 : added if
+    if (not Flag_radius) or ('radius' not in g.property_names()):
+        g = radius.ordered_radius(g, ref_radius, order_decrease_factor)
+
+    # compute length property and parametrisation
+    g = radius.compute_length(g, segment_length)
+    g = radius.compute_relative_position(g)
+
+    # Calculation of the distance from base of each vertex, used for cut and flow
+    _mylength = {}
+    for v in traversal.pre_order2(g, 1):
+        pid = g.parent(v)
+        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
+    g.properties()['mylength'] = _mylength
+
+    # total_length is the total length of the RSA (sum of the length of all the segments)
+    total_length = g.nb_vertices(scale = 1) * segment_length
+    g, surface = radius.compute_surface(g)
+    g, volume = radius.compute_volume(g)
+
+    if df is not None:
+        v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
+        primary_length = g.property('position')[v_base]
+
+    return g, primary_length, total_length, surface, _seed

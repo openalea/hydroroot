@@ -5,6 +5,7 @@ from openalea.mtg import MTG, traversal
 from hydroroot.hydro_io import export_mtg_to_rsml, import_rsml_to_discrete_mtg
 from hydroroot import radius
 from hydroroot.init_parameter import Parameters
+from hydroroot.main import root_builder
 
 def closed(delta, eps=1e-14, txt=''):
     if not txt:
@@ -82,15 +83,15 @@ def test_rsml():
     g = import_rsml_to_discrete_mtg(g_c, segment_length = segment_length, resolution = resolution)
     
     # calculation of g properties: radius, mylength, etc.
-    g, primary_length, _length, surface = root_creation(g, segment_length, ref_radius, order_decrease_factor)
+    g, primary_length, _length, surface = set_mtg_properties(g, segment_length, ref_radius, order_decrease_factor)
 
-    export_mtg_to_rsml(g, "test_rsml_io.rsml", segment_length = segment_length)
-    g_c = rsml.rsml2mtg("test_rsml_io.rsml")
+    export_mtg_to_rsml(g, "data/test_rsml_io.rsml", segment_length = segment_length)
+    g_c = rsml.rsml2mtg("data/test_rsml_io.rsml")
     resolution = g_c.graph_properties()['metadata']['resolution']
     unit = g_c.graph_properties()['metadata']['unit']
     resolution *= rsml_units_to_metre[unit] # rsml file unit to meter
     g2 = import_rsml_to_discrete_mtg(g_c, segment_length = segment_length, resolution = resolution)
-    g2, primary_length2, _length2, surface2 = root_creation(g2, segment_length, ref_radius, order_decrease_factor)
+    g2, primary_length2, _length2, surface2 = set_mtg_properties(g2, segment_length, ref_radius, order_decrease_factor)
 
     diff = abs(_length2 - _length + surface - surface2 + primary_length - primary_length2)
 
@@ -100,7 +101,7 @@ def test_yaml():
     # F. Bauget 2021-06-11: test yaml file reading
 
     parameter = Parameters()
-    parameter.read_file('parameters_test_yaml.yml')
+    parameter.read_file('data/parameters_test_yaml.yml')
 
     boolflag = (parameter.archi['branching_delay'] == [0.001])
     boolflag = (parameter.archi['branching_variability'] == 0.25)
@@ -127,3 +128,48 @@ def test_yaml():
     boolflag = (parameter.output['radfold'] == [0.5, 1.0, 1.5, 2.0])
     
     closed(abs(1.0 - float(boolflag)), txt = 'Error during yaml file reading.')
+
+def set_mtg_properties(g, segment_length, ref_radius, order_decrease_factor):
+    # F. Bauget 2022-07-28: changed function name because set_mtg_properties in english does not work
+    """
+    Set MTG properties and perform some gemetrical calculation
+
+    The vertex radius properties is set.
+    The following properties are computed: length, position, mylength, surface, volume, total length,
+        primary root length
+
+    :param:
+        - `g` (MTG)
+
+    :return:
+        `g`: MTG with the different properties set or computed (see comments above),
+        `primary_length`: primary root length (m)
+        `_length`: total root length (m)
+        `surface`: total root surface (m^2)
+    """
+
+    g = radius.ordered_radius(g, ref_radius, order_decrease_factor)
+
+    # compute length property and parametrisation
+    g = radius.compute_length(g, segment_length)
+    g = radius.compute_relative_position(g)
+
+    # Calculation of the distance from base of each vertex, used for cut and flow
+    # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
+    # parameter dl which should be equal to vertex length but which is not pass
+    _mylength = {}
+    for v in traversal.pre_order2(g, 1):
+        pid = g.parent(v)
+        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
+    g.properties()['mylength'] = _mylength
+
+    # _length is the total length of the RSA (sum of the length of all the segments)
+    _length = g.nb_vertices(scale = 1) * segment_length
+    g, surface = radius.compute_surface(g)
+    g, volume = radius.compute_volume(g)
+
+
+    v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
+    primary_length = g.property('position')[v_base]
+
+    return g, primary_length, _length, surface

@@ -7,8 +7,69 @@ from openalea.mtg import *
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 import pylab
+from hydroroot.length import fit_law
 
+def setting_k0_according_to_order(g, k0_pr, k0_lr):
+    """
+    set uniform radial conductivity to roots according to their order, to the primary root if oreder == 0,
+    to the laterals otherwise
+    :Parameters:
+    	- g: (MTG) - the root architecture
+    	- k0_pr: (float, microL/(s.MPa.m2)) - uniform radial conductivity of the primary root
+    	- k0_lr: (float, microL/(s.MPa.m2)) - uniform radial conductivity of the laterals root
 
+    :Returns:
+        - g: (MTG) - the root architecture with k0_pr and k0_lr set
+    """
+    d = {k: k0_pr if g.property('order')[k] == 0 else k0_lr for k, v in list(g.property('order').items())}
+    g.properties()['k0'] = d
+    return g
+
+def set_conductances(g, axial_pr, k0_pr, axial_lr = None, k0_lr = None):
+    """
+    Set the properties 'K_exp', 'K' and 'k', the axial conductance in [L^4 P^(-1) T^(-1)], the axial conductance in
+    [L^3 P^(-1) T^(-1)] K_exp/segment_length and the radial conductivity
+    if axial_lr is None, set 'K_exp' and 'K' whatever the roots order, otherwise set differently the root of order==1
+    idem for the radial conductivity if k0_lr is not None
+
+    :Parameters:
+    	- g: (MTG)
+    	- axial_pr: (list) - the axial conductance, list of 2 lists of floats
+    	- k0_pr: (float) - the radial conductivity
+    	- axial_lr:  (list) - if not None the axial conductance of the laterals, list of 2 lists of floats
+    	- k0_lr: (float) - if not None the radial conductivity  of the laterals
+    :Returns:
+        - g (MTG)
+    """
+    xa, ya = axial_pr
+    axial_conductivity_law = fit_law(xa, ya)
+
+    # Compute K using axial conductance data
+    if axial_lr is None:
+        g = fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
+    else:
+        K = {}
+        xa, ya = axial_lr
+        axial_conductivity_lr_law = fit_law(xa, ya)
+
+        for v, k in list(g.property('order').items()):
+            x = g.property('position')[v]
+            if k == 0:
+                K[v] = axial_conductivity_law(x)
+            else:
+                K[v] = axial_conductivity_lr_law(x)
+
+        g.properties()['K_exp'] = K
+
+    g = compute_K(g)  # Fabrice 2020-01-17: calculation of K in dimension [L^3 P^(-1) T^(-1)]
+
+    if k0_lr is None: k0_lr = k0_pr
+
+    g = setting_k0_according_to_order(g, k0_pr, k0_lr)
+
+    g = compute_k(g, k0 = 'k0')
+
+    return g
 
 def compute_K_from_laws(g):
     K={}
@@ -241,3 +302,71 @@ def fit_K(g, s=0.):   # DEPRECATED
 
 
     return g
+
+
+# Below these function does not do very complicated things but are used in most of the scripts
+
+def radial(v = 92, acol = [], scale = 1):
+    """
+    create a list of uniform value v*scale of the same length than acol given in arguments
+    the purpose is to return  x-y data in a form of two lists
+    called radial because used to get x-y data with uniform y (radial conductivity) values
+
+    :Parameters:
+    	- v: (float)
+    	- acol: (float list)
+    	- scale: (float) -
+    :Returns:
+        - xr, yr (list)
+    """
+    xr = acol[0]  # at this stage kr constant so the same x than Ka
+    yr = [v * scale] * len(xr)
+
+    return xr, yr
+
+
+def radial_step(kmin = 92, factor = 1.0, x_step = None, x_base = 1., dx = 1.0e-4, scale = 1.0):
+    """
+    Radial k as a step function.
+    Maximum value from the tip x=0 to the x_step, then minimum value from x_step + dx to x_base.
+    The maximum value = kmin * factor
+
+    :Parameters:
+        - kmin: (Float), the minimum value in microL/(s.MPa.m**2)
+        - factor: (Float), see above
+        - x_step: (Float), the distance from tip where the step is in meter
+        - x_base: (Float), the maximum distance from tip in meter
+        - dx: (Float), elementary distance in m
+        - scale: (Float), a scale facteur
+
+    :Returns:
+        - xr: (list), list of distance from the tip
+        - xr: (list), list of radial k values
+    """
+
+    xr = [0.0]
+    yr = [kmin * factor * scale]
+    if x_step is not None:
+        xr.append(x_step)
+        yr.append(kmin * factor * scale)
+        xr.append(x_step + dx)
+        yr.append(kmin * scale)
+    xr.append(x_base)
+    yr.append(kmin * scale)
+
+    return xr, yr
+
+
+def axial(acol = [], scale = 1):
+    """
+    the purpose is to give in arguments a set of 2 lists representing a x-y data and to return it with y*scale
+
+    :Parameters:
+    	- acol: (list) - list of two float list of the same length
+    	- scale: (float) - the number that multiply the 2d list
+    :Returns:
+        - x, y (list) - 2 lists
+    """
+    x, y = acol
+    y = [a * scale for a in y]
+    return x, y
