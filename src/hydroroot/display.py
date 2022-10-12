@@ -142,7 +142,7 @@ def plot(g = None, min=None, max=None, name=None, cmap = 'jet', **kwds):
 
 def mtg_scene(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
          visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
-         min = None, max = None, prune=None, factor = None):
+         min = None, max = None, prune=None, factor = 1.0e4):
     """
     Build scene of a MTG to be displayed in 3D plantgl viewer (https://github.com/openalea/plantgl)
 
@@ -162,12 +162,9 @@ def mtg_scene(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
 
     """
     # hydroroot.display.plot modified to use my_colormap where min-max can be imposed
-    # F. Bauget 2022-08-26: added factor as argument it is not fundamental here because usually the purpose is only to display
+
     if visitor is None:
-        if factor is None:
-            visitor = get_root_visitor(prune=prune)
-        else:
-            visitor = get_root_visitor(prune=prune, factor = factor)
+        visitor = get_root_visitor(prune=prune, factor = factor)
 
     r_base, r_tip = float(r_base), float(r_tip)
 

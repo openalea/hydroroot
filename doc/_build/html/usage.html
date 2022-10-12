@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Modeling principles" href="modeling_principles.html" />
+    <link rel="prev" title="Quick start" href="quick-start.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run-calculation-on-a-given-architecture">Run calculation on a given architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-text-format-architecture-file">The text format architecture file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-calculation">Running the calculation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#importing-architecture-from-rsml">Importing architecture from RSML</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#run-calculation-on-a-generated-architecture">Run calculation on a generated architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-parameters">Model parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-simple-calculation-using-the-parameters-class">Run simple calculation using the Parameters class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-of-solute-and-water-transport-simulation">Example of solute and water transport simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">HydroRoot’s API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h1>
+<p>Many examples are given in the notebook <em>exampleboursiac2022.ipynb</em> that reproduces most of the figures and tables of Boursiac et al. <a class="reference internal" href="references.html#boursiac2022" id="id1"><span>[boursiac2022]</span></a>.</p>
+<section id="run-calculation-on-a-given-architecture">
+<h2>Run calculation on a given architecture<a class="headerlink" href="#run-calculation-on-a-given-architecture" title="Permalink to this heading"></a></h2>
+<p>The following example shows how to run a simulation to calculate the out going sap flux and the equivalent conductance of a given architecture. Hydroroot is able to read two file format for architecture: RSML (<a class="reference external" href="http://rootsystemml.github.io/">http://rootsystemml.github.io/</a>) and a simple tabulated text file that only details root lengths and branching positions. The later format is enough to describe root in hydroponic condition.</p>
+<section id="the-text-format-architecture-file">
+<h3>The text format architecture file<a class="headerlink" href="#the-text-format-architecture-file" title="Permalink to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 44%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>distance_from_base_(mm)</p></th>
+<th class="head"><p>lateral_root_length_(mm)</p></th>
+<th class="head"><p>order</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0.89</p></td>
+<td><p>90.81</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3.02</p></td>
+<td><p>63.98</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>102.94</p></td>
+<td><p>0.0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.14</p></td>
+<td><p>23.72</p></td>
+<td><p>1-1</p></td>
+</tr>
+<tr class="row-even"><td><p>90.81</p></td>
+<td><p>0.0</p></td>
+<td><p>1-1</p></td>
+</tr>
+<tr class="row-odd"><td><p>2.48</p></td>
+<td><p>5.15</p></td>
+<td><p>1-2</p></td>
+</tr>
+<tr class="row-even"><td><p>63.98</p></td>
+<td><p>0.0</p></td>
+<td><p>1-2</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is a tab separated text file with 3 columns:</p>
+<ol class="arabic simple">
+<li><p>the distance from base of the branching laterals in mm</p></li>
+<li><p>the lateral root length in mm</p></li>
+<li><p>a string of one or more number indicating the parent root</p></li>
+</ol>
+<p>In the example above, the root has two lateral of 1st order and on each of them one lateral of 2d order. The order of 1 indicates that the laterals are on the primary root. The last line with order 1 with 0.0 in the second column indicates the primary root tip.
+The line with order 1-1 indicates that this a second order lateral on the first lateral positioned at 2.14 mm from the branching on the primary root. And so on.</p>
+<p>A 4th column with the averaged diameter of the root may be given, that may be used to build the MTG representing the architecture.</p>
+</section>
+<section id="running-the-calculation">
+<h3>Running the calculation<a class="headerlink" href="#running-the-calculation" title="Permalink to this heading"></a></h3>
+<p>The corresponding notebook is <em>example/example_archi_from_file.ipynb</em></p>
+<p>If the package HydroRoot is not installed, the following examples can be run by cloning the sources from git and then sourcing the src directory in Ipython console for instance like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;../src&#39;</span><span class="p">])</span> <span class="c1"># if run from the example folder for instance</span>
+</pre></div>
+</div>
+<p>assuming the dependencies installed.</p>
+<p>The following lines present a small example of calculation of the sap flux from an Arabidopsis de-topped root plunged in a hydroponic solution at a hydrostatic pressure of 0.4 Mpa when its  base is at the atmospheric pressure.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydroroot.display</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">from</span> <span class="nn">hydroroot.read_file</span> <span class="kn">import</span> <span class="n">read_archi_data</span>
+<span class="kn">from</span> <span class="nn">hydroroot.main</span> <span class="kn">import</span> <span class="n">hydroroot_flow</span><span class="p">,</span> <span class="n">root_builder</span>
+</pre></div>
+</div>
+<p>Reading the file architecture as a DataFrame</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">read_archi_data</span><span class="p">(</span><span class="s1">&#39;data/plant-01.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Building the MTG from the file, and  return the primary root length, the total length and the surface. The seed refer to the seed of the root generator when the MTG is not built from a file but is generated.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="p">,</span> <span class="n">primary_length</span><span class="p">,</span> <span class="n">total_length</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">root_builder</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">segment_length</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some conductance data versus distance to tip</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">k_radial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">30.0</span><span class="p">,</span><span class="mf">30.0</span><span class="p">])</span>
+<span class="n">K_axial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">3.0e-7</span><span class="p">,</span><span class="mf">4.0e-4</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Flux and equivalent conductance calculation, for a root in an external hydroponic medium at 0.4 MPa, its base at 0.1 MPa,
+and with the conductances set above.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="p">,</span> <span class="n">keq</span><span class="p">,</span> <span class="n">jv</span> <span class="o">=</span> <span class="n">hydroroot_flow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">psi_e</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">psi_base</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">axial_conductivity_data</span> <span class="o">=</span> <span class="n">K_axial_data</span><span class="p">,</span> <span class="n">radial_conductivity_data</span> <span class="o">=</span> <span class="n">k_radial_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;equivalent root conductance (microL/s/MPa): &#39;</span><span class="p">,</span><span class="n">keq</span><span class="p">,</span> <span class="s1">&#39;sap flux (microL/s): &#39;</span><span class="p">,</span> <span class="n">jv</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Displaying the water uptake along the architecture using the Plantgl viewer (<a class="reference external" href="https://github.com/openalea/plantgl">https://github.com/openalea/plantgl</a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">gui</span> <span class="n">qt</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;j&#39;</span><span class="p">)</span> <span class="c1"># j is the radial influx in ul/s</span>
+</pre></div>
+</div>
+<p>You may change the property to display the hydrostatic pressure inside the xylem vessels for instance</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;psi_in&#39;</span><span class="p">)</span> <span class="c1"># P in MPa</span>
+</pre></div>
+</div>
+<p>You may change the radial conductivity and see the impact on the water uptake</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">k_radial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">300.0</span><span class="p">,</span><span class="mf">300.0</span><span class="p">])</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">keq</span><span class="p">,</span> <span class="n">jv</span> <span class="o">=</span> <span class="n">hydroroot_flow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">psi_e</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">psi_base</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">axial_conductivity_data</span> <span class="o">=</span> <span class="n">K_axial_data</span><span class="p">,</span> <span class="n">radial_conductivity_data</span> <span class="o">=</span> <span class="n">k_radial_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sap flux (microL/s): &#39;</span><span class="p">,</span> <span class="n">jv</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;j&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or the axial conductance</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">k_radial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">30.0</span><span class="p">,</span><span class="mf">30.0</span><span class="p">])</span>
+<span class="n">K_axial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">3.0e-7</span><span class="p">,</span><span class="mf">1.0e-4</span><span class="p">])</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">keq</span><span class="p">,</span> <span class="n">jv</span> <span class="o">=</span> <span class="n">hydroroot_flow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">psi_e</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">psi_base</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">axial_conductivity_data</span> <span class="o">=</span> <span class="n">K_axial_data</span><span class="p">,</span> <span class="n">radial_conductivity_data</span> <span class="o">=</span> <span class="n">k_radial_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sap flux (microL/s): &#39;</span><span class="p">,</span> <span class="n">jv</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;j&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="importing-architecture-from-rsml">
+<h3>Importing architecture from RSML<a class="headerlink" href="#importing-architecture-from-rsml" title="Permalink to this heading"></a></h3>
+<p>This is a small example to illustrate how to use the RSML format (<a class="reference external" href="http://rootsystemml.github.io/">http://rootsystemml.github.io/</a>). The architecture is the
+arabidopsis-simple example <a class="reference external" href="http://rootsystemml.github.io/images/examples/arabidopsis-simple.rsml">http://rootsystemml.github.io/images/examples/arabidopsis-simple.rsml</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rsml</span>
+<span class="kn">from</span> <span class="nn">hydroroot</span> <span class="kn">import</span> <span class="n">radius</span>
+<span class="kn">from</span> <span class="nn">hydroroot.main</span> <span class="kn">import</span> <span class="n">hydroroot_flow</span>
+<span class="kn">from</span> <span class="nn">hydroroot.display</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">from</span> <span class="nn">hydroroot.hydro_io</span> <span class="kn">import</span> <span class="n">import_rsml_to_discrete_mtg</span><span class="p">,</span> <span class="n">export_mtg_to_rsml</span>
+</pre></div>
+</div>
+<p>We first read the RSML file and convert it into a <em>continuous</em> MTG. This is a MTG where each root (primary and lateral)
+is represented by one vertex. The geometry of each root is then stored in g_c.property(‘geometry’).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g_c</span> <span class="o">=</span> <span class="n">rsml</span><span class="o">.</span><span class="n">rsml2mtg</span><span class="p">(</span><span class="s1">&#39;data/arabidopsis-simple.rsml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To be used in HydroRoot the MTG has to be converted to a <em>discrete</em> form of MTG, i.e. each vertex represent a representative
+elementary volume of a given length for example <span class="math notranslate nohighlight">\(10^{-4}\)</span> m. In HydroRoot the lengths are in meter, therefore we
+must retrieve the resolution and unit of the RSML file,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">resolution</span> <span class="o">=</span> <span class="n">g_c</span><span class="o">.</span><span class="n">graph_properties</span><span class="p">()[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;resolution&#39;</span><span class="p">]</span> <span class="c1"># pixel to unit</span>
+<span class="n">unit</span> <span class="o">=</span> <span class="n">g_c</span><span class="o">.</span><span class="n">graph_properties</span><span class="p">()[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example, the resolution of the RSML file is 0.01 and the unit is cm. The length unit in HydroRoot is the meter.
+Therefore, to pass from pixels (the raw data in the RSML file) to the meter we must multiply <em>g_c.graph_properties()[‘metadata’][‘resolution’]</em>
+by 0.01.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span> <span class="o">*</span> <span class="mf">0.01</span> <span class="c1"># pixel to unit to m</span>
+</pre></div>
+</div>
+<p>We build the discrete MTG.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">import_rsml_to_discrete_mtg</span><span class="p">(</span><span class="n">g_c</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="mf">1.0e-4</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We calculate some properties needed to simulate a sap flux from the root.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">radius</span><span class="o">.</span><span class="n">ordered_radius</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mf">7.0e-5</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">)</span> <span class="c1"># root radii</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">radius</span><span class="o">.</span><span class="n">compute_relative_position</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="c1"># Compute the position of each segment relative to the axis bearing it</span>
+</pre></div>
+</div>
+<p>Some conductance data versus distance to tip</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">k_radial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">30.0</span><span class="p">,</span><span class="mf">30.0</span><span class="p">])</span>
+<span class="n">K_axial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">3.0e-7</span><span class="p">,</span><span class="mf">4.0e-4</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Flux and equivalent conductance calculation, for a root in an external hydroponic medium at 0.4 MPa, its base at 0.1 MPa,
+and with the conductances set above.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="p">,</span> <span class="n">keq</span><span class="p">,</span> <span class="n">jv</span> <span class="o">=</span> <span class="n">hydroroot_flow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">psi_e</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">psi_base</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">axial_conductivity_data</span> <span class="o">=</span> <span class="n">K_axial_data</span><span class="p">,</span> <span class="n">radial_conductivity_data</span> <span class="o">=</span> <span class="n">k_radial_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Display the local water uptake heatmap in 3D</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">gui</span> <span class="n">qt</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span> <span class="o">=</span> <span class="s1">&#39;j&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We may also export the MTG to RSML</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">export_mtg_to_rsml</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s2">&quot;test.rsml&quot;</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="mf">1.0e-4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resolution of the RSML data is 1.0e-4 and the unit is meter.
+At this stage (2022-08-22) only the root length and the branching
+position are used to simulate architecture in hydroponic solution. The
+exact position in 3D is not stored in the discrete MTG form and so not
+exported to RMSL.</p>
+</section>
+</section>
+<section id="run-calculation-on-a-generated-architecture">
+<h2>Run calculation on a generated architecture<a class="headerlink" href="#run-calculation-on-a-generated-architecture" title="Permalink to this heading"></a></h2>
+<p>The corresponding notebook is <em>example/example_generated_archi.ipynb</em></p>
+<p>If the examples are run using the source, add the source directory to the system path</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="p">;</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;../src&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">from</span> <span class="nn">hydroroot.main</span> <span class="kn">import</span> <span class="n">root_builder</span><span class="p">,</span> <span class="n">hydroroot_flow</span>
+<span class="kn">from</span> <span class="nn">hydroroot.display</span> <span class="kn">import</span> <span class="n">plot</span>
+</pre></div>
+</div>
+<p>The Hydroroot generator of architecture is described in Boursiac et al. <a class="reference internal" href="references.html#boursiac2022" id="id2"><span>[boursiac2022]</span></a>.
+It uses length distribution law for laterals, specific to a given species, to generate realistic architecture. Here we use the length laws determined for Col0 arabidopsis.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">length_data</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># length law used to generate arabidopsis realistic architecture</span>
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;data/length_LR_order1_160615.csv&#39;</span><span class="p">,</span><span class="s1">&#39;data/length_LR_order2_160909.csv&#39;</span><span class="p">]:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;LR_length_mm&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_distance_to_tip&#39;</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span> <span class="o">=</span> <span class="s1">&#39;relative_distance_to_tip&#39;</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">length_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>We generate the MTG with some specific parameters:</dt><dd><ul class="simple">
+<li><p>primary_length:length of the primary root</p></li>
+<li><p>delta: the average distance between lateral branching</p></li>
+<li><p>branching_variability: the variability of the branching distance around delta</p></li>
+<li><p>nude_length: distance from the tip without any laterals</p></li>
+<li><p>order_max: the maximum order of laterals</p></li>
+</ul>
+</dd>
+</dl>
+<p>And return the primary root length, the total length and the surface.  Seed may be used as seed to generate the same architecture.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="p">,</span> <span class="n">primary_length</span><span class="p">,</span> <span class="n">total_length</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">root_builder</span><span class="p">(</span><span class="n">primary_length</span> <span class="o">=</span> <span class="mf">0.13</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="mf">2.0e-3</span><span class="p">,</span> <span class="n">nude_length</span> <span class="o">=</span> <span class="mf">2.0e-2</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="mf">1.0e-4</span><span class="p">,</span>
+                                                  <span class="n">length_data</span> <span class="o">=</span> <span class="n">length_data</span><span class="p">,</span> <span class="n">branching_variability</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">order_max</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span> <span class="n">order_decrease_factor</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+                                                  <span class="n">ref_radius</span> <span class="o">=</span> <span class="mf">7.0e-5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some conductance data versus distance to tip</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">k_radial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">30.0</span><span class="p">,</span><span class="mf">30.0</span><span class="p">])</span>
+<span class="n">K_axial_data</span><span class="o">=</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],[</span><span class="mf">3.0e-7</span><span class="p">,</span><span class="mf">4.0e-4</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Flux and equivalent conductance calculation, for a root in an external
+hydroponic medium at 0.4 MPa, its base at 0.1 MPa, and with the
+conductances set above.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="p">,</span> <span class="n">keq</span><span class="p">,</span> <span class="n">jv</span> <span class="o">=</span> <span class="n">hydroroot_flow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">psi_e</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">psi_base</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">axial_conductivity_data</span> <span class="o">=</span> <span class="n">K_axial_data</span><span class="p">,</span> <span class="n">radial_conductivity_data</span> <span class="o">=</span> <span class="n">k_radial_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">keq</span><span class="p">,</span><span class="n">jv</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.007146429180199128</span> <span class="mf">0.002143928754059739</span>
+</pre></div>
+</div>
+<p>Display the local water uptake heatmap in 3D</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">gui</span> <span class="n">qt</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;j&#39;</span><span class="p">)</span> <span class="c1"># j is the radial flux in ul/s</span>
+</pre></div>
+</div>
+</section>
+<section id="model-parameters">
+<h2>Model parameters<a class="headerlink" href="#model-parameters" title="Permalink to this heading"></a></h2>
+<p>The main model parameters are grouped in the python class parameters, see <a class="reference internal" href="user/api_init_parameter.html#hydroroot.init_parameter.Parameters" title="hydroroot.init_parameter.Parameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">hydroroot.init_parameter.Parameters</span></code></a>.
+The parameters may be passed to the class by reading a yaml file, see <a class="reference internal" href="user/api_init_parameter.html#hydroroot.init_parameter.Parameters.read_file" title="hydroroot.init_parameter.Parameters.read_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">hydroroot.init_parameter.Parameters.read_file()</span></code></a>.</p>
+<p>There are two solvers in HydroRoot project. The first, used for the paper Boursiac et al. 2022 <a class="reference internal" href="references.html#boursiac2022" id="id3"><span>[boursiac2022]</span></a>, is a purely water transport model. The second is a solute and water transport model. Therefore, the <em>solute</em> category in the yaml file has meaning only for the second solver.</p>
+<p>The structure of the yaml file is the following (see examples at <a class="reference external" href="https://github.com/openalea/hydroroot">https://github.com/openalea/hydroroot</a>)</p>
+<div class="line-block">
+<div class="line"><strong>archi</strong></div>
+<div class="line-block">
+<div class="line"><strong>read_architecture:</strong> Boulean</div>
+<div class="line-block">
+<div class="line">True read an architecture file, False generate an architecture</div>
+</div>
+<div class="line"><strong>input_dir</strong>: String</div>
+<div class="line-block">
+<div class="line">the folder with the architecture file, relative path to the script</div>
+</div>
+<div class="line"><strong>input_file</strong>: list of string</div>
+<div class="line-block">
+<div class="line">list of architecture file names, eg. [file1.txt] or [file1.txt, file2.txt, file3.txt] wildcar may be used</div>
+</div>
+<div class="line"><strong>seed</strong>: int or list of int</div>
+<div class="line-block">
+<div class="line">the seed used to generate architecture</div>
+</div>
+<div class="line"><strong>length_file</strong>: list of string</div>
+<div class="line-block">
+<div class="line">name of the files containing the length law, relative path</div>
+<div class="line">file format: “LR_length_mm” ; “relative_distance_to_tip”</div>
+<div class="line">laws used to generate lateral roots of the 1st order (1_order_law), and lateral roots of order above 1 (2_order_law)</div>
+</div>
+<div class="line"><strong>primary_length</strong>: float or list of float</div>
+<div class="line-block">
+<div class="line">primary root length in m used when generating architecture</div>
+<div class="line">unit: m</div>
+</div>
+<div class="line"><strong>branching_delay</strong>: float or list of float</div>
+<div class="line-block">
+<div class="line">distance between branching</div>
+<div class="line">unit: m</div>
+</div>
+<div class="line"><strong>branching_variability</strong>: float</div>
+<div class="line-block">
+<div class="line">maximum random variation around the branching_delay value</div>
+<div class="line">between [0 ; 1]</div>
+</div>
+<div class="line"><strong>order_max</strong>: int</div>
+<div class="line-block">
+<div class="line">maximum order of laterals possible</div>
+</div>
+<div class="line"><strong>segment_length</strong>: float</div>
+<div class="line-block">
+<div class="line">MTG vertices length</div>
+<div class="line">unit: m</div>
+</div>
+<div class="line"><strong>nude_length</strong>: float or list of float</div>
+<div class="line-block">
+<div class="line">part of roots without any lateral root, distance from tip</div>
+<div class="line">unit: m</div>
+</div>
+<div class="line"><strong>ref_radius</strong>: float</div>
+<div class="line-block">
+<div class="line">reference radius of the primary root</div>
+<div class="line">unit: m</div>
+</div>
+<div class="line"><strong>order_decrease_factor</strong>: float</div>
+<div class="line-block">
+<div class="line">radius decrease factor applied when increasing order</div>
+<div class="line">radius of lateral of order n: <span class="math notranslate nohighlight">\(r = \beta^n R_{ref}\)</span></div>
+<div class="line">with <span class="math notranslate nohighlight">\(r = \beta\)</span> order_decrease_factor and <span class="math notranslate nohighlight">\(R_{ref}\)</span> ref_radius</div>
+</div>
+</div>
+<div class="line"><strong>hydro</strong></div>
+<div class="line-block">
+<div class="line"><strong>k0</strong>: float</div>
+<div class="line-block">
+<div class="line">radial conductivity</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(\mu L.s^{-1}.MPa^{-1}.m^{-2}\)</span></div>
+</div>
+<div class="line"><strong>axial_conductance_data</strong>: 2 list of float</div>
+<div class="line-block">
+<div class="line">axial conductance versus distance to tip, K(x)</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(\mu L.m.s^{-1}.MPa^{-1}\)</span></div>
+</div>
+</div>
+<div class="line"><strong>solute</strong></div>
+<div class="line-block">
+<div class="line"><strong>J_s</strong>: float</div>
+<div class="line-block">
+<div class="line">active pumping rate</div>
+<div class="line">unit: mol/(m2.s)</div>
+</div>
+<div class="line"><strong>P_s</strong>: float</div>
+<div class="line-block">
+<div class="line">permeability coefficient</div>
+<div class="line">unit: m/s</div>
+</div>
+<div class="line"><strong>Cse</strong>: float</div>
+<div class="line-block">
+<div class="line">concentration of permeating solutes</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(mol.m^{-3} \text{or}\ mM\)</span></div>
+</div>
+<div class="line"><strong>Ce</strong>: float</div>
+<div class="line-block">
+<div class="line">concentration of non-permeating solutes</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(mol.m^{-3} \text{or}\ mM\)</span></div>
+</div>
+<div class="line"><strong>sigma</strong>: float</div>
+<div class="line-block">
+<div class="line">reflection coefficient</div>
+<div class="line">dimensionless</div>
+</div>
+</div>
+<div class="line"><strong>experimental</strong></div>
+<div class="line-block">
+<div class="line"><strong>Jv</strong>:  float</div>
+<div class="line-block">
+<div class="line">flux at the root base</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(\mu L.s^{-1}\)</span></div>
+</div>
+<div class="line"><strong>psi_e</strong>:  float</div>
+<div class="line-block">
+<div class="line">hydrostatic pressure outside the root (pressure chamber)</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(MPa\)</span></div>
+</div>
+<div class="line"><strong>psi_base</strong>:  float</div>
+<div class="line-block">
+<div class="line">hydrostatic pressure at the root base (e.g. atmospheric pressure for decapitated plant)</div>
+<div class="line">unit: <span class="math notranslate nohighlight">\(MPa\)</span></div>
+</div>
+</div>
+<div class="line"><strong>output</strong>:</div>
+<div class="line-block">
+<div class="line"><strong>intercepts</strong>: float or list of float</div>
+<div class="line-block">
+<div class="line">distance from the base at which the number of intercepts are calculated</div>
+<div class="line">unit: m</div>
+</div>
+<div class="line"><strong>radfold</strong>: float or list of float</div>
+<div class="line-block">
+<div class="line">factor to explore a k0 range</div>
+</div>
+<div class="line"><strong>axfold</strong>: float or list of float</div>
+<div class="line-block">
+<div class="line">factor to explore a axial conductance range</div>
+</div>
+<div class="line"><strong>run_nb</strong>: int</div>
+<div class="line-block">
+<div class="line">number of run with the same set of parameters</div>
+</div>
+</div>
+</div>
+<p>Few parameters may be set to lists allowing to run successive simulations.
+For list of number there are two syntax: [x1, …, xn] or range(start, end, step).
+For example, range(0.02, 0.09, 0.02) or [0.02, 0.04, 0.06, 0.08] will give the same results.
+The parameter will take successively the values 0.02, 0.04, 0.06 and 0.08.
+The parameter <em>run_nb</em>  would be useful with read_architecture = False and no given seed to generate different architectures.</p>
+<p><strong>Note:</strong> Parameter is just a python class. It can not be used directly with Hydroroot functions, intermediary script should be used.
+We will give you some examples using scripts that be found at <a class="reference external" href="https://github.com/openalea/hydroroot">https://github.com/openalea/hydroroot</a> in example.</p>
+<section id="run-simple-calculation-using-the-parameters-class">
+<h3>Run simple calculation using the Parameters class<a class="headerlink" href="#run-simple-calculation-using-the-parameters-class" title="Permalink to this heading"></a></h3>
+<p>The corresponding notebook is <em>example/example_parameter_class.ipynb</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Python </span><span class="si">%s</span><span class="s1"> on </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;../src&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Python</span> <span class="mf">3.8.12</span> <span class="o">|</span> <span class="n">packaged</span> <span class="n">by</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">|</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Jan</span> <span class="mi">30</span> <span class="mi">2022</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">07</span><span class="p">)</span>
+<span class="p">[</span><span class="n">GCC</span> <span class="mf">9.4.0</span><span class="p">]</span> <span class="n">on</span> <span class="n">linux</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">hydroroot</span> <span class="kn">import</span> <span class="n">radius</span>
+<span class="kn">from</span> <span class="nn">hydroroot.main</span> <span class="kn">import</span> <span class="n">hydroroot_flow</span><span class="p">,</span> <span class="n">root_builder</span>
+<span class="kn">from</span> <span class="nn">hydroroot.init_parameter</span> <span class="kn">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span> <span class="nn">hydroroot.generator.measured_root</span> <span class="kn">import</span> <span class="n">mtg_from_aqua_data</span>
+<span class="kn">from</span> <span class="nn">hydroroot.display</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">from</span> <span class="nn">hydroroot.read_file</span> <span class="kn">import</span> <span class="n">read_archi_data</span>
+
+<span class="c1"># for the PlantGL viewer used in hydroroot.display.plot</span>
+<span class="o">%</span><span class="n">gui</span> <span class="n">qt</span>
+</pre></div>
+</div>
+<p>Read the yaml file and set the Parameters variables, assuming that the
+code is run from the example folder</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parameter</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">()</span>
+<span class="n">parameter</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;parameters_palnt_01.yml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Read the architecture file and build the MTG</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;input_dir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;input_file&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">read_archi_data</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">primary_length</span><span class="p">,</span> <span class="n">total_length</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">root_builder</span><span class="p">(</span> <span class="n">primary_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;primary_length&#39;</span><span class="p">],</span>
+                                                                <span class="n">delta</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;branching_delay&#39;</span><span class="p">],</span>
+                                                                <span class="n">nude_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;nude_length&#39;</span><span class="p">],</span>
+                                                                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">,</span>
+                                                                <span class="n">segment_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;segment_length&#39;</span><span class="p">],</span>
+                                                                <span class="n">length_data</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;length_data&#39;</span><span class="p">],</span>
+                                                                <span class="n">order_max</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;order_max&#39;</span><span class="p">],</span>
+                                                                <span class="n">order_decrease_factor</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;order_decrease_factor&#39;</span><span class="p">],</span>
+                                                                <span class="n">ref_radius</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;ref_radius&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Calculation of the equivalent conductance and the sap flux</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span><span class="p">,</span> <span class="n">Keq</span><span class="p">,</span> <span class="n">Jv</span> <span class="o">=</span> <span class="n">hydroroot_flow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">segment_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;segment_length&#39;</span><span class="p">],</span>
+                            <span class="n">psi_e</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;psi_e&#39;</span><span class="p">],</span>
+                            <span class="n">psi_base</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;psi_base&#39;</span><span class="p">],</span>
+                            <span class="n">axial_conductivity_data</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">hydro</span><span class="p">[</span><span class="s1">&#39;axial_conductance_data&#39;</span><span class="p">],</span>
+                            <span class="n">radial_conductivity_data</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">hydro</span><span class="p">[</span><span class="s1">&#39;k0&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">primary length (m): </span><span class="si">{</span><span class="n">primary_length</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">surface (m2): </span><span class="si">{</span><span class="n">surface</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">total length (m): </span><span class="si">{</span><span class="n">total_length</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">flux (microL/s): </span><span class="si">{</span><span class="n">Jv</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">primary</span> <span class="n">length</span> <span class="p">(</span><span class="n">m</span><span class="p">):</span> <span class="mf">0.10300000000000001</span>
+<span class="n">surface</span> <span class="p">(</span><span class="n">m2</span><span class="p">):</span> <span class="mf">0.0004625701757655344</span>
+<span class="n">total</span> <span class="n">length</span> <span class="p">(</span><span class="n">m</span><span class="p">):</span> <span class="mf">1.6260000000000001</span>
+<span class="n">flux</span> <span class="p">(</span><span class="n">microL</span><span class="o">/</span><span class="n">s</span><span class="p">):</span> <span class="mf">0.0028789143185531108</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;j&#39;</span><span class="p">)</span> <span class="c1"># j is the radial flux in ul/s</span>
+</pre></div>
+</div>
+</section>
+<section id="example-of-solute-and-water-transport-simulation">
+<h3>Example of solute and water transport simulation<a class="headerlink" href="#example-of-solute-and-water-transport-simulation" title="Permalink to this heading"></a></h3>
+<p>Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Python </span><span class="si">%s</span><span class="s1"> on </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;../src&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Python</span> <span class="mf">3.8.12</span> <span class="o">|</span> <span class="n">packaged</span> <span class="n">by</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">|</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Jan</span> <span class="mi">30</span> <span class="mi">2022</span><span class="p">,</span> <span class="mi">23</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">07</span><span class="p">)</span>
+<span class="p">[</span><span class="n">GCC</span> <span class="mf">9.4.0</span><span class="p">]</span> <span class="n">on</span> <span class="n">linux</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">hydroroot</span> <span class="kn">import</span> <span class="n">flux</span>
+<span class="kn">from</span> <span class="nn">hydroroot.main</span> <span class="kn">import</span> <span class="n">root_builder</span>
+<span class="kn">from</span> <span class="nn">hydroroot.init_parameter</span> <span class="kn">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span> <span class="nn">hydroroot.display</span> <span class="kn">import</span> <span class="n">plot</span>
+<span class="kn">from</span> <span class="nn">hydroroot.read_file</span> <span class="kn">import</span> <span class="n">read_archi_data</span>
+<span class="kn">from</span> <span class="nn">hydroroot.conductance</span> <span class="kn">import</span> <span class="n">set_conductances</span>
+<span class="kn">from</span> <span class="nn">hydroroot.water_solute_transport</span> <span class="kn">import</span> <span class="n">pressure_calculation_no_non_permeating_solutes</span><span class="p">,</span> <span class="n">init_some_MTG_properties</span>
+
+<span class="c1"># for the PlantGL viewer used in hydroroot.display.plot</span>
+<span class="o">%</span><span class="n">gui</span> <span class="n">qt</span>
+</pre></div>
+</div>
+<p>Read the yaml file and set the Parameters variables, assuming that the
+code is run from the example folder</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parameter</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">()</span>
+<span class="n">parameter</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;parameters_Ctr-3P2.yml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the code the concentration are in <span class="math notranslate nohighlight">\(mol.\mu L^{-1}\)</span></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Cse</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;Cse&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-9</span> <span class="c1"># mol/m3 -&gt; mol/microL, external permeating solute concentration</span>
+<span class="n">Ce</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;Ce&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e-9</span> <span class="c1"># mol/m3 -&gt; mol/microL, external non-permeating solute concentration</span>
+</pre></div>
+</div>
+<p>Read the architecture file and build the MTG</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;input_dir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;input_file&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">read_archi_data</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">primary_length</span><span class="p">,</span> <span class="n">total_length</span><span class="p">,</span> <span class="n">surface</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">root_builder</span><span class="p">(</span> <span class="n">primary_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;primary_length&#39;</span><span class="p">],</span>
+                                                                <span class="n">delta</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;branching_delay&#39;</span><span class="p">],</span>
+                                                                <span class="n">nude_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;nude_length&#39;</span><span class="p">],</span>
+                                                                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">,</span>
+                                                                <span class="n">segment_length</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;segment_length&#39;</span><span class="p">],</span>
+                                                                <span class="n">length_data</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;length_data&#39;</span><span class="p">],</span>
+                                                                <span class="n">order_max</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;order_max&#39;</span><span class="p">],</span>
+                                                                <span class="n">order_decrease_factor</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;order_decrease_factor&#39;</span><span class="p">],</span>
+                                                                <span class="n">ref_radius</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">archi</span><span class="p">[</span><span class="s1">&#39;ref_radius&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Set the conductance in the MTG (in previous examples that was done in
+hydroroot_flow), set some other properties in <em>init_some_MTG_properties</em>
+and perform some initialization. Note that here <em>parameter.hydro[‘k0’]</em>
+is a float.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">set_conductances</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">axial_pr</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">hydro</span><span class="p">[</span><span class="s1">&#39;axial_conductance_data&#39;</span><span class="p">],</span> <span class="n">k0_pr</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">hydro</span><span class="p">[</span><span class="s1">&#39;k0&#39;</span><span class="p">])</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">flux</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">psi_e</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;psi_e&#39;</span><span class="p">],</span> <span class="n">psi_base</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;psi_base&#39;</span><span class="p">])</span>  <span class="c1"># initialization</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">init_some_MTG_properties</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;J_s&#39;</span><span class="p">],</span> <span class="n">Cini</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;Cse&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Perform the calculation, this a Newtown-Raphson loop on a matrix system,
+then there is a convergence loop.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">eps</span> <span class="o">=</span> <span class="mf">1.0e-9</span> <span class="c1"># global: stop criterion for the Newton-Raphson loop in Jv_P_calculation and Jv_cnf_calculation</span>
+<span class="n">nb_v</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">nb_vertices</span><span class="p">()</span>
+<span class="n">Fdx</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">Fdx_old</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="k">while</span> <span class="n">Fdx</span> <span class="o">&gt;</span> <span class="n">eps</span><span class="p">:</span>
+    <span class="n">g</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">pressure_calculation_no_non_permeating_solutes</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;Sigma&#39;</span><span class="p">],</span>
+                                                                           <span class="n">tau</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;J_s&#39;</span><span class="p">],</span>
+                                                                           <span class="n">Ce</span> <span class="o">=</span> <span class="n">Ce</span><span class="p">,</span>
+                                                                           <span class="n">Ps</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">solute</span><span class="p">[</span><span class="s1">&#39;P_s&#39;</span><span class="p">],</span>
+                                                                           <span class="n">Cse</span> <span class="o">=</span> <span class="n">Cse</span><span class="p">,</span>
+                                                                           <span class="n">Pe</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;psi_e&#39;</span><span class="p">],</span>
+                                                                           <span class="n">Pbase</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;psi_base&#39;</span><span class="p">])</span>
+    <span class="n">Fdx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">dx</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">))</span> <span class="o">/</span> <span class="n">nb_v</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Fdx</span> <span class="o">-</span> <span class="n">Fdx_old</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span> <span class="k">break</span>
+    <span class="n">Fdx_old</span> <span class="o">=</span> <span class="n">Fdx</span>
+<span class="n">Jv</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s1">&#39;J_out&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">primary length (m): </span><span class="si">{</span><span class="n">primary_length</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">surface (m2): </span><span class="si">{</span><span class="n">surface</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">total length (m): </span><span class="si">{</span><span class="n">total_length</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">flux (microL/s): </span><span class="si">{</span><span class="n">Jv</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">primary</span> <span class="n">length</span> <span class="p">(</span><span class="n">m</span><span class="p">):</span> <span class="mf">0.434</span>
+<span class="n">surface</span> <span class="p">(</span><span class="n">m2</span><span class="p">):</span> <span class="mf">0.005643500494241343</span>
+<span class="n">total</span> <span class="n">length</span> <span class="p">(</span><span class="n">m</span><span class="p">):</span> <span class="mf">3.979</span>
+<span class="n">flux</span> <span class="p">(</span><span class="n">microL</span><span class="o">/</span><span class="n">s</span><span class="p">):</span> <span class="mf">0.025700314390202567</span>
+</pre></div>
+</div>
+<p>Display the concentration in the architecture</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">prop_cmap</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span> <span class="c1"># C is the radial flux in mol/microL</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quick-start.html" class="btn btn-neutral float-left" title="Quick start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modeling_principles.html" class="btn btn-neutral float-right" title="Modeling principles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

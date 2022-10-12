@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>display &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="flux" href="api_flux.html" />
+    <link rel="prev" title="conductance" href="api_conductance.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">HydroRoot’s API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api_analysis.html">analysis API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_conductance.html">conductance</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_flux.html">flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_init_parameter.html">init_parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_law.html">law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_length.html">length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_main.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_radius.html">radius</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_read_file.html">read_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_water_solute_transport.html">water and solute transport API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">HydroRoot’s API</a> &raquo;</li>
+      <li>display</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_display.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hydroroot.display">
+<span id="display"></span><h1>display<a class="headerlink" href="#module-hydroroot.display" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.display.get_root_visitor">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.display.</span></span><span class="sig-name descname"><span class="pre">get_root_visitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prune</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/display.html#get_root_visitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.display.get_root_visitor" title="Permalink to this definition"></a></dt>
+<dd><p>Turtle going through the architecture
+used in <a class="reference internal" href="#hydroroot.display.plot" title="hydroroot.display.plot"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot()</span></code></a> and <a class="reference internal" href="#hydroroot.display.get_root_visitor_with_point" title="hydroroot.display.get_root_visitor_with_point"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_root_visitor_with_point()</span></code></a>
+Root angles are dummy values to get better display in 3D</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prune</strong> – (float) - distance from base after witch the MTG is no longer read (Default value = None)</p></li>
+<li><p><strong>factor</strong> – (float) - a factor apply to length and radius properties (Default value = 1.0e4)</p></li>
+</ul>
+</dd>
+<dt class="field-even">For example</dt>
+<dd class="field-even"><p>if the MTG vertices length is 0.1 mm (1.0e-4 m), then if we want to set each vertex
+as a dot (let say a pixel) we have to multiply length by 1/1e-4 is useful for plot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.display.get_root_visitor_with_point">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.display.</span></span><span class="sig-name descname"><span class="pre">get_root_visitor_with_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prune</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/display.html#get_root_visitor_with_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.display.get_root_visitor_with_point" title="Permalink to this definition"></a></dt>
+<dd><p>Get 3D position of root segment by using turtle in <a class="reference internal" href="#hydroroot.display.get_root_visitor" title="hydroroot.display.get_root_visitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_root_visitor()</span></code></a>
+Create a new property position3d = [x,y,z] coordinate needed for example to export MTG in RSML format see
+<a class="reference internal" href="api_hydro_io.html#hydroroot.hydro_io.export_mtg_to_rsml" title="hydroroot.hydro_io.export_mtg_to_rsml"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.hydro_io.export_mtg_to_rsml()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prune</strong> – (float)  - distance from base after witch the MTG is no longer read (Default value = None)</p></li>
+<li><p><strong>factor</strong> – (float) a factor apply to property length (Default value = 1.0e4)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>the 3D coordinate are calculated from a virtual 3D representation with imaginary angles. Therefore, the resulting
+3D coordinate are dummy values.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.display.mtg_scene">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.display.</span></span><span class="sig-name descname"><span class="pre">mtg_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_tip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visitor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'radius'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/display.html#mtg_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.display.mtg_scene" title="Permalink to this definition"></a></dt>
+<dd><p>Build scene of a MTG to be displayed in 3D plantgl viewer (<a class="reference external" href="https://github.com/openalea/plantgl">https://github.com/openalea/plantgl</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG)</p></li>
+<li><p><strong>has_radius</strong> – (boolean) - if True use the ‘radius’ property otherwise compute the radius (<a class="reference internal" href="api_radius.html#hydroroot.radius.discont_radius" title="hydroroot.radius.discont_radius"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.radius.discont_radius()</span></code></a>) (Default value = False)</p></li>
+<li><p><strong>r_base</strong> – (float) - radius (m) at the base to use if the radius property is computed (Default value = 1.e-4)</p></li>
+<li><p><strong>r_tip</strong> – (float) - radius (m) at the tip to use if the radius property is computed (Default value = 5e-5)</p></li>
+<li><p><strong>visitor</strong> – Turtle going through the architecture see <a class="reference internal" href="#hydroroot.display.get_root_visitor" title="hydroroot.display.get_root_visitor"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_root_visitor()</span></code></a> (Default value = None)</p></li>
+<li><p><strong>prop_cmap</strong> – (string) property used for the color map (Default value = ‘radius’)</p></li>
+<li><p><strong>cmap</strong> – matplotlib color map (Default value = ‘jet’)</p></li>
+<li><p><strong>lognorm</strong> – (boolean) - if None no normalization, if False linear normalization, if True log normalization (Default value = False)</p></li>
+<li><p><strong>min</strong> – (float) - if not None, the minimum used for the colormap normalization (Default value = None)</p></li>
+<li><p><strong>max</strong> – (float) - if not None, the maximum used for the colormap normalization (Default value = None)</p></li>
+<li><p><strong>prune</strong> – (float) - distance from base after witch the MTG is no longer read (Default value = None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a plantgl Scene</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.display.my_colormap">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.display.</span></span><span class="sig-name descname"><span class="pre">my_colormap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/display.html#my_colormap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.display.my_colormap" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the property `color` based on a given property and a colormap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG)</p></li>
+<li><p><strong>property_name</strong> – (string) - the property to display with  the heatmap</p></li>
+<li><p><strong>cmap</strong> – (string) - the color map name (<a class="reference external" href="https://matplotlib.org/stable/tutorials/colors/colormaps.html">https://matplotlib.org/stable/tutorials/colors/colormaps.html</a>) (Default value = ‘jet’)</p></li>
+<li><p><strong>lognorm</strong> – if True Normalize to the 0-1 range on a log scale, if False on a linear scale (Default value = False)</p></li>
+<li><p><strong>min</strong> – (float) - if not None, the minimum used for normalization (Default value = None)</p></li>
+<li><p><strong>max</strong> – (float) - if not None, the maximum used for normalization (Default value = None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG) with the property ‘color’ set</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is the function openalea.mtg.plantframe.color.colormap modified to add the possibility to fix the min-max
+for normalization and so the possibility to compare two MTG with different min-max but the same colormap</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.display.plot">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.display.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/display.html#plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.display.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Display the MTG g in 3D see <a class="reference internal" href="#hydroroot.display.mtg_scene" title="hydroroot.display.mtg_scene"><code class="xref py py-func docutils literal notranslate"><span class="pre">mtg_scene()</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG) - the mtg to plot (Default value = None)</p></li>
+<li><p><strong>min</strong> – (float) - the minimum used for normalization (Default value = None)</p></li>
+<li><p><strong>max</strong> – (float) - the maximum used for normalization (Default value = None)</p></li>
+<li><p><strong>name</strong> – (string) - if not None save the plot to name (Default value = None)</p></li>
+<li><p><strong>cmap</strong> – (string) - the color map name (<a class="reference external" href="https://matplotlib.org/stable/tutorials/colors/colormaps.html">https://matplotlib.org/stable/tutorials/colors/colormaps.html</a>) (Default value = ‘jet’)</p></li>
+<li><p><strong>kwds</strong> – see <a class="reference internal" href="#hydroroot.display.mtg_scene" title="hydroroot.display.mtg_scene"><code class="xref py py-func docutils literal notranslate"><span class="pre">mtg_scene()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.display.property_scale_bar">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.display.</span></span><span class="sig-name descname"><span class="pre">property_scale_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">property_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/display.html#property_scale_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.display.property_scale_bar" title="Permalink to this definition"></a></dt>
+<dd><p>display a color scale bar based on the property_name values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG)</p></li>
+<li><p><strong>property_name</strong> – (string) - the property name</p></li>
+<li><p><strong>cmap</strong> – (string) - the color map name (Default value = ‘jet’)</p></li>
+<li><p><strong>lognorm</strong> – (boolean) - if True Normalize to the 0-1 range on a log scale (Default value = False)</p></li>
+<li><p><strong>min</strong> – (float) - if not None the scale minimum (Default value = None)</p></li>
+<li><p><strong>max</strong> – (float) - if not None the scale maximum (Default value = None)</p></li>
+<li><p><strong>format</strong> – (string) - format for tick labes, e.i. ‘%.2f’ (Default value = None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/916ddae08b1ecd8f6e9d4a4e4ac34761/display.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/display.py</span></code></a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_conductance.html" class="btn btn-neutral float-left" title="conductance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_flux.html" class="btn btn-neutral float-right" title="flux" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

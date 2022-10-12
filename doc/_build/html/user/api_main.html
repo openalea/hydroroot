@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>main &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="radius" href="api_radius.html" />
+    <link rel="prev" title="length" href="api_length.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">HydroRoot’s API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api_analysis.html">analysis API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_conductance.html">conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_display.html">display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_flux.html">flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_init_parameter.html">init_parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_law.html">law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_length.html">length</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_radius.html">radius</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_read_file.html">read_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_water_solute_transport.html">water and solute transport API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">HydroRoot’s API</a> &raquo;</li>
+      <li>main</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hydroroot.main">
+<span id="main"></span><h1>main<a class="headerlink" href="#module-hydroroot.main" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.main.hydroroot">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.main.</span></span><span class="sig-name descname"><span class="pre">hydroroot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">primary_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nude_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_decrease_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axial_conductivity_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_conductivity_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/main.html#hydroroot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.main.hydroroot" title="Permalink to this definition"></a></dt>
+<dd><p>Simulate a root system and compute global conductance and flux.
+see <code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot_mtg()</span></code> and  <code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot_flow()</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>primary_length</strong> – (Default value = 0.15)</p></li>
+<li><p><strong>delta</strong> – (Default value = 2.e-3)</p></li>
+<li><p><strong>beta</strong> – (Default value = 0.25)</p></li>
+<li><p><strong>order_max</strong> – (Default value = 5)</p></li>
+<li><p><strong>segment_length</strong> – (Default value = 1e-4)</p></li>
+<li><p><strong>nude_length</strong> – (Default value = 0.02)</p></li>
+<li><p><strong>seed</strong> – (Default value = 2)</p></li>
+<li><p><strong>ref_radius</strong> – (Default value = 1e-4)</p></li>
+<li><p><strong>order_decrease_factor</strong> – (Default value = 0.7)</p></li>
+<li><p><strong>k0</strong> – (Default value = 300)</p></li>
+<li><p><strong>Jv</strong> – (Default value = 0.1)</p></li>
+<li><p><strong>psi_e</strong> – (Default value = 0.4)</p></li>
+<li><p><strong>psi_base</strong> – (Default value = 0.1)</p></li>
+<li><p><strong>length_data</strong> – (Default value = None)</p></li>
+<li><p><strong>axial_conductivity_data</strong> – (Default value = None)</p></li>
+<li><p><strong>radial_conductivity_data</strong> – (Default value = None)</p></li>
+<li><p><strong>n</strong> – (Default value = None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.main.hydroroot_flow">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.main.</span></span><span class="sig-name descname"><span class="pre">hydroroot_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axial_conductivity_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_conductivity_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/main.html#hydroroot_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.main.hydroroot_flow" title="Permalink to this definition"></a></dt>
+<dd><p>Flux and equivalent conductance calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>segment_length</strong> – Float (Default value = 1.e-4)</p></li>
+<li><p><strong>k0</strong> – Float (Default value = 300)</p></li>
+<li><p><strong>Jv</strong> – Float (Default value = 0.1)</p></li>
+<li><p><strong>psi_e</strong> – Float (Default value = 0.4)</p></li>
+<li><p><strong>psi_base</strong> – Float (Default value = 0.1)</p></li>
+<li><p><strong>axial_conductivity_data</strong> – list of Float (Default value = None)</p></li>
+<li><p><strong>radial_conductivity_data</strong> – list of Float (Default value = None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><dl class="simple">
+<dt>g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),</dt><dd><p>j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
+input and output of a MTG node</p>
+</dd>
+</dl>
+</li>
+<li><p>Keq (float): the equivalent conductance of the whole root</p></li>
+<li><p>Jv_global (float): the outgoing flux at the root base</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.main.hydroroot_from_data">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.main.</span></span><span class="sig-name descname"><span class="pre">hydroroot_from_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">primary_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nude_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_decrease_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Jv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axial_conductivity_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_conductivity_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lateral_length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/main.html#hydroroot_from_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.main.hydroroot_from_data" title="Permalink to this definition"></a></dt>
+<dd><p>Reconstruct a root system and compute global conductance and flux.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>primary_length_data</strong> – list Float (Default value = None)</p></li>
+<li><p><strong>lateral_length_data</strong> – list Float (Default value = None)</p></li>
+<li><p><strong>return</strong> – </p></li>
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>surface</strong> – float</p></li>
+<li><p><strong>volume</strong> – float</p></li>
+<li><p><strong>Keq</strong> – float</p></li>
+<li><p><strong>Jv_global</strong> – float</p></li>
+<li><p><strong>see</strong> – func</p></li>
+<li><p><strong>primary_length</strong> – (Default value = 0.15)</p></li>
+<li><p><strong>delta</strong> – (Default value = 2.e-3)</p></li>
+<li><p><strong>beta</strong> – (Default value = 0.25)</p></li>
+<li><p><strong>order_max</strong> – (Default value = 5)</p></li>
+<li><p><strong>segment_length</strong> – (Default value = 1e-4)</p></li>
+<li><p><strong>nude_length</strong> – (Default value = 0.02)</p></li>
+<li><p><strong>seed</strong> – (Default value = 2)</p></li>
+<li><p><strong>ref_radius</strong> – (Default value = 1e-4)</p></li>
+<li><p><strong>order_decrease_factor</strong> – (Default value = 0.7)</p></li>
+<li><p><strong>k0</strong> – (Default value = 300)</p></li>
+<li><p><strong>Jv</strong> – (Default value = 0.1)</p></li>
+<li><p><strong>psi_e</strong> – (Default value = 0.4)</p></li>
+<li><p><strong>psi_base</strong> – (Default value = 0.1)</p></li>
+<li><p><strong>length_data</strong> – (Default value = None)</p></li>
+<li><p><strong>axial_conductivity_data</strong> – (Default value = None)</p></li>
+<li><p><strong>radial_conductivity_data</strong> – (Default value = None)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.main.hydroroot_mtg">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.main.</span></span><span class="sig-name descname"><span class="pre">hydroroot_mtg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">primary_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nude_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_decrease_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/main.html#hydroroot_mtg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.main.hydroroot_mtg" title="Permalink to this definition"></a></dt>
+<dd><p>Simulate and generate a root system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>primary_length</strong> – Float (Default value = 0.15)</p></li>
+<li><p><strong>delta</strong> – Float (Default value = 2.e-3)</p></li>
+<li><p><strong>beta</strong> – Float (Default value = 0.25)</p></li>
+<li><p><strong>order_max</strong> – int (Default value = 5)</p></li>
+<li><p><strong>segment_length</strong> – Float (Default value = 1e-4)</p></li>
+<li><p><strong>nude_length</strong> – Float (Default value = 0.02)</p></li>
+<li><p><strong>seed</strong> – int (Default value = 2)</p></li>
+<li><p><strong>ref_radius</strong> – Float (Default value = 1e-4)</p></li>
+<li><p><strong>order_decrease_factor</strong> – Float (Default value = 0.7)</p></li>
+<li><p><strong>length_data</strong> – pandas dataframe (Default value = None)</p></li>
+<li><p><strong>n</strong> – int (Default value = None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g</p></li>
+<li><p>surface</p></li>
+<li><p>volume</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>Example</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.main.root_builder">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.main.</span></span><span class="sig-name descname"><span class="pre">root_builder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">primary_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.13</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nude_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branching_variability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_decrease_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Flag_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/main.html#root_builder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.main.root_builder" title="Permalink to this definition"></a></dt>
+<dd><p>wrapper function: build a MTG with properties like radius and vertex length set.
+The MTG is either generated or built from a data.
+The radius and vertex length properties are set.
+The following properties are computed: length, position, mylength, surface, volume, total length, primary root length, nb of intercepts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>primary_length</strong> – primary root length for generated mtg (Default value = 0.13)</p></li>
+<li><p><strong>seed</strong> – seed for generated mtg (Default value = None)</p></li>
+<li><p><strong>delta</strong> – branching delay for generated mtg (Default value = 2.0e-3)</p></li>
+<li><p><strong>nude_length</strong> – length from tip without lateral for generated mtg (Default value = 2.0e-2)</p></li>
+<li><p><strong>df</strong> – pandas DataFrame with the architecture data to be reconstructed (Default value = None)</p></li>
+<li><p><strong>segment_length</strong> – float (Default value = 1.0e-4)</p></li>
+<li><p><strong>length_data</strong> – string (Default value = None)</p></li>
+<li><p><strong>branching_variability</strong> – float (Default value = 0.25)</p></li>
+<li><p><strong>order_max</strong> – float (Default value = 4.0)</p></li>
+<li><p><strong>order_decrease_factor</strong> – float (Default value = 0.7)</p></li>
+<li><p><strong>ref_radius</strong> – float (Default value = 7.0e-5)</p></li>
+<li><p><strong>intercepts</strong> – list</p></li>
+<li><p><strong>Flag_radius</strong> – boolean (Default value = False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g: MTG with the different properties set or computed (see comments above),</p></li>
+<li><p>primary_length: primary root length (output for generated mtg)</p></li>
+<li><p>total_length: total root length</p></li>
+<li><p>surface: total root surface</p></li>
+<li><p>intercepts: nb of intercepts at a given distance from base</p></li>
+<li><p>_seed: the seed used in the generator</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/0b8b790e70980eb897374016386e7988/main.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/main.py</span></code></a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_length.html" class="btn btn-neutral float-left" title="length" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_radius.html" class="btn btn-neutral float-right" title="radius" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

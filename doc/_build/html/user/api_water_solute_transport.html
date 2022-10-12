@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>water and solute transport API &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="References" href="../references.html" />
+    <link rel="prev" title="read_file" href="api_read_file.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">HydroRoot’s API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api_analysis.html">analysis API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_conductance.html">conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_display.html">display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_flux.html">flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_init_parameter.html">init_parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_law.html">law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_length.html">length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_main.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_radius.html">radius</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_read_file.html">read_file</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">water and solute transport API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">HydroRoot’s API</a> &raquo;</li>
+      <li>water and solute transport API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_water_solute_transport.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hydroroot.water_solute_transport">
+<span id="water-and-solute-transport-api"></span><h1>water and solute transport API<a class="headerlink" href="#module-hydroroot.water_solute_transport" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.derivative_osmotic_p_peg">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">derivative_osmotic_p_peg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cpeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#derivative_osmotic_p_peg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.derivative_osmotic_p_peg" title="Permalink to this definition"></a></dt>
+<dd><p>the 1st derivative according to X of the osmotic pressure calculation of the PEG 8000
+equation 1 Michel, Plant Physiol. (1983) 72, 66-70</p>
+<p>dpi/dw = (2 * 1.29*w*T - 2*140*w - 4.0)
+pi: bar
+w: g/g
+T: Celcius</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Cpeg</strong> – Float (Default value = 0.0)</p></li>
+<li><p><strong>unit_factor</strong> – Float (Default value = 1.0)</p></li>
+<li><p><strong>T</strong> – Float (Default value = 25.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>osmotic_p: Float, the osmotic pressure (MPa)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.derivative_viscosity_peg">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">derivative_viscosity_peg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cpeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#derivative_viscosity_peg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.derivative_viscosity_peg" title="Permalink to this definition"></a></dt>
+<dd><p>Dynamic viscosity derivative according to concentration, dmu
+see viscosity_peg</p>
+<p>dmu/dw = 18.4 exp(w/0.279)/0.279
+dmu in mPa.s
+w in g/g water</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Cpeg</strong> – Float (Default value = 0.0)</p></li>
+<li><p><strong>unit_factor</strong> – Float (Default value = 1.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>dmu: Float, the derivative</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.init_some_MTG_properties">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">init_some_MTG_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cini</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cpeg_ini</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#init_some_MTG_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.init_some_MTG_properties" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>initialization of some g properties specific to solute transport:</dt><dd><ul class="simple">
+<li><p>‘C’: the permeating solute concentration,</p></li>
+<li><p>‘Cpeg’: the non-permeating solute concentration,</p></li>
+<li><p>‘theta’:  1 or 0 depending on the local flow direction in the xylem vessels 1 from tip to base, 0 the opposite</p></li>
+<li><p>‘J_s’: the pumping rate</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>tau</strong> – float (Default value = 0.)</p></li>
+<li><p><strong>Cini</strong> – float (Default value = 0.)</p></li>
+<li><p><strong>Cpeg_ini</strong> – float (Default value = 0.)</p></li>
+<li><p><strong>t</strong> – int (Default value = 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.osmotic_p_peg">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">osmotic_p_peg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cpeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#osmotic_p_peg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.osmotic_p_peg" title="Permalink to this definition"></a></dt>
+<dd><p>osmotic pressure calculation of the PEG 8000
+equation 1 Michel, Plant Physiol. (1983) 72, 66-70</p>
+<p>pi = (1.29*w^2*T - 140*w^2 - 4.0*w)
+pi: bar
+w: g/g
+T: Celcius</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Cpeg</strong> – Float (Default value = 0.0)</p></li>
+<li><p><strong>unit_factor</strong> – Float (Default value = 1.0)</p></li>
+<li><p><strong>T</strong> – Float (Default value = 25.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>osmotic_p: Float, the osmotic pressure (MPa)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.pressure_calculation">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">pressure_calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">298</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pbase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#pressure_calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.pressure_calculation" title="Permalink to this definition"></a></dt>
+<dd><p>the system of equation under matrix form is solved using a Newton-Raphson schemes, at each step a system A dx = b
+is solved by LU decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>Temp</strong> – float (Default value = 298)</p></li>
+<li><p><strong>sigma</strong> – float (Default value = 1.0)</p></li>
+<li><p><strong>tau</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Ce</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Ps</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Cse</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>dP</strong> – float (Default value = None)</p></li>
+<li><p><strong>Pe</strong> – float (Default value = 0.4)</p></li>
+<li><p><strong>Pbase</strong> – float (Default value = 0.1)</p></li>
+<li><p><strong>data</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>row</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>col</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>C_base</strong> – float (Default value = None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG)</p></li>
+<li><p>dx (array)</p></li>
+<li><p>data (array)</p></li>
+<li><p>row (array)</p></li>
+<li><p>col (array)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>This function take into account the possibility to have non-permeating solute inside the root. This is, for instance,
+the case when performing cut and flow experiment in a solution containing such solute. Indeed, the non-permeating solute
+may enter the root at cut tips. It is referred to this non-permeating solute through Cpeg when C refers to the permeating solute
+penetrating radially the root.
+The presence of Cpeg may change the sap viscosity and has influence on the osmotic pressure see beginning of
+the function inside the root.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.pressure_calculation_drag">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">pressure_calculation_drag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">298</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pbase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#pressure_calculation_drag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.pressure_calculation_drag" title="Permalink to this definition"></a></dt>
+<dd><p>Deprecated (do not work with cut and flow)
+As <code class="xref py py-func docutils literal notranslate"><span class="pre">pressure_calculation()</span></code> without non-permeating solutes and with a drag term
+in the solute transport equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>Temp</strong> – float (Default value = 298)</p></li>
+<li><p><strong>sigma</strong> – float (Default value = 1.0)</p></li>
+<li><p><strong>tau</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Ps</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Cse</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>dP</strong> – float (Default value = None)</p></li>
+<li><p><strong>Pe</strong> – float (Default value = 0.4)</p></li>
+<li><p><strong>Pbase</strong> – float (Default value = 0.1)</p></li>
+<li><p><strong>data</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>row</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>col</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>C_base</strong> – float (Default value = None)</p></li>
+<li><p><strong>Ce</strong> – (Default value = 0.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG)</p></li>
+<li><p>dx (array)</p></li>
+<li><p>data (array)</p></li>
+<li><p>row (array)</p></li>
+<li><p>col (array)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.pressure_calculation_no_non_permeating_solutes">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">pressure_calculation_no_non_permeating_solutes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">298</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pbase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#pressure_calculation_no_non_permeating_solutes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.pressure_calculation_no_non_permeating_solutes" title="Permalink to this definition"></a></dt>
+<dd><p>As <code class="xref py py-func docutils literal notranslate"><span class="pre">pressure_calculation()</span></code> without non-permeating solutes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>Temp</strong> – float (Default value = 298)</p></li>
+<li><p><strong>sigma</strong> – float (Default value = 1.0)</p></li>
+<li><p><strong>tau</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Ps</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>Cse</strong> – float (Default value = 0.0)</p></li>
+<li><p><strong>dP</strong> – float (Default value = None)</p></li>
+<li><p><strong>Pe</strong> – float (Default value = 0.4)</p></li>
+<li><p><strong>Pbase</strong> – float (Default value = 0.1)</p></li>
+<li><p><strong>data</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>row</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>col</strong> – numpy array (Default value = None)</p></li>
+<li><p><strong>C_base</strong> – float (Default value = None)</p></li>
+<li><p><strong>Ce</strong> – (Default value = 0.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG)</p></li>
+<li><p>dx (array)</p></li>
+<li><p>data (array)</p></li>
+<li><p>row (array)</p></li>
+<li><p>col (array)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.water_solute_transport.viscosity_peg">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.water_solute_transport.</span></span><span class="sig-name descname"><span class="pre">viscosity_peg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Cpeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/water_solute_transport.html#viscosity_peg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.water_solute_transport.viscosity_peg" title="Permalink to this definition"></a></dt>
+<dd><p>Dynamic viscosity, mu, calculation in mPa.s according to the PEG-8000 concentration for a temperature T = 298 K
+Fit done on a point at Cpeg=0, mu = 1 mPa.s and the 2 fist data points (Cpeg=0.1 and 0.2) of
+table 2 from Gonzllez-Tello J. Chem. Eng. Data 1994,39, 611-614</p>
+<p>mu = -17.4 + 18.4 exp(w/0.279)
+mu in mPa.s
+w in g/g water</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Cpeg</strong> – Float (Default value = 0.0)</p></li>
+<li><p><strong>unit_factor</strong> – Float (Default value = 1.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>mu: Float, the dynamic viscosity in mPa.s</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/12f188c1c951ca7a3e11de6197bb1c60/water_solute_transport.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/water_solute_transport.py</span></code></a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_read_file.html" class="btn btn-neutral float-left" title="read_file" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

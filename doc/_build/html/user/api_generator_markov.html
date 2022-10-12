@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>generator markov &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="generator_measured_root" href="api_generator_measured_root.html" />
+    <link rel="prev" title="flux" href="api_flux.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">HydroRoot’s API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api_analysis.html">analysis API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_conductance.html">conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_display.html">display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_flux.html">flux</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">generator markov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_init_parameter.html">init_parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_law.html">law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_length.html">length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_main.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_radius.html">radius</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_read_file.html">read_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_water_solute_transport.html">water and solute transport API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">HydroRoot’s API</a> &raquo;</li>
+      <li>generator markov</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_generator_markov.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hydroroot.generator.markov">
+<span id="generator-markov"></span><h1>generator markov<a class="headerlink" href="#module-hydroroot.generator.markov" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.generator.markov.generate_g">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.generator.markov.</span></span><span class="sig-name descname"><span class="pre">generate_g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branching_variability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nude_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.13</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/generator/markov.html#generate_g"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.generator.markov.generate_g" title="Permalink to this definition"></a></dt>
+<dd><p>generate a MTG according to the input parameters using length_data (mendatory) for the branching</p>
+<p>Preprocessing variables before calling <a class="reference internal" href="#hydroroot.generator.markov.markov_binary_tree" title="hydroroot.generator.markov.markov_binary_tree"><code class="xref py py-func docutils literal notranslate"><span class="pre">markov_binary_tree()</span></code></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>nb_vertices: primary root length in vertex number</p></li>
+<li><p>branching_delay: distance between branching in vertex number</p></li>
+<li><p>nb_nude_vertices: distance from tip without branching in vertex number</p></li>
+<li><p>length_law: the function giving the lateral length according to its position on the parent branch</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> – (int) - the seed for the random generator in the markof chain (Default value = None)</p></li>
+<li><p><strong>length_data</strong> – (Dataframe) - pandas dataframe columns names ‘LR_length_mm’ and ‘relative_distance_to_tip’ sorted by ‘relative_distance_to_tip’ (Default value = None)</p></li>
+<li><p><strong>branching_variability</strong> – (float) - variability on branching_delay and lateral lengths, <span class="math notranslate nohighlight">\(\in [0, 1]\)</span> (Default value = 0.25)</p></li>
+<li><p><strong>delta</strong> – (float) - reference distance (m) between successive branching axis (Default value = 2e-3)</p></li>
+<li><p><strong>nude_length</strong> – (float) - length (m) at root tip with no ramification (Default value = 2e-3)</p></li>
+<li><p><strong>primary_length</strong> – (float) - primary root length (m) (Default value = 0.13)</p></li>
+<li><p><strong>segment_length</strong> – (float) - length of the vertices (m) (Default value = 1e-4)</p></li>
+<li><p><strong>order_max</strong> – (int) - maximum lateral roots order (Default value = 4)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g: MTG with the following properties set: edge_type, label, position</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="api_law.html#hydroroot.law.length_law" title="hydroroot.law.length_law"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.law.length_law()</span></code></a>, <a class="reference internal" href="api_law.html#hydroroot.law.histo_relative_law" title="hydroroot.law.histo_relative_law"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.law.histo_relative_law()</span></code></a>, <a class="reference internal" href="api_main.html#hydroroot.main.root_builder" title="hydroroot.main.root_builder"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.main.root_builder()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.generator.markov.linear">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.generator.markov.</span></span><span class="sig-name descname"><span class="pre">linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/generator/markov.html#linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.generator.markov.linear" title="Permalink to this definition"></a></dt>
+<dd><p>Create a MTG with just one linear axis without properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> – (int) - number of vertices (Default value = 5)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>g (MTG)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.generator.markov.markov_binary_tree">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.generator.markov.</span></span><span class="sig-name descname"><span class="pre">markov_binary_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branching_variability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branching_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_law</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nude_tip_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">censure_variability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/generator/markov.html#markov_binary_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.generator.markov.markov_binary_tree" title="Permalink to this definition"></a></dt>
+<dd><p>Build a tree by modeling the stochastic process of lateral root branching by a first-order Markov chain on growing root axes.
+The building process is constrained by the arguments, see parameter descriptions.</p>
+<p>if <cite>g</cite> <code class="code docutils literal notranslate"><span class="pre">not</span> <span class="pre">None</span></code> then add the new tree to <cite>g</cite> at the vertex <cite>vid</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG) (Default value = None)</p></li>
+<li><p><strong>vid</strong> – (int) - the vertex id to which the new tree is added if not zero (Default value = 0)</p></li>
+<li><p><strong>nb_vertices</strong> – (int) - the number of vertices in the main axis (Default value = 1500)</p></li>
+<li><p><strong>branching_variability</strong> – (float) - variability on branching_delay and lateral lengths, <span class="math notranslate nohighlight">\(\in [0, 1]\)</span> (Default value = 0.1)</p></li>
+<li><p><strong>branching_delay</strong> – (float) - number of vertex between branching (Default value = 20)</p></li>
+<li><p><strong>length_law</strong> – function giving a length according to the branching position (Default value = None)</p></li>
+<li><p><strong>nude_tip_length</strong> – (float) - distance from tip without branching in vertices number (Default value = 200)</p></li>
+<li><p><strong>order_max</strong> – (int) - maximum root order (Default value = 5)</p></li>
+<li><p><strong>seed</strong> – (int) - a seed for the random generators (Default value = None)</p></li>
+<li><p><strong>censure_variability</strong> – (boolean) - deprecated because constrained by length_law- if True avoids to get a lateral longer than its parent (Default value = False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="api_law.html#hydroroot.law.length_law" title="hydroroot.law.length_law"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.law.length_law()</span></code></a>, <a class="reference internal" href="api_law.html#hydroroot.law.histo_relative_law" title="hydroroot.law.histo_relative_law"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.law.histo_relative_law()</span></code></a>, <a class="reference internal" href="api_main.html#hydroroot.main.hydroroot_mtg" title="hydroroot.main.hydroroot_mtg"><code class="xref py py-func docutils literal notranslate"><span class="pre">hydroroot.main.hydroroot_mtg()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.generator.markov.my_seed">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.generator.markov.</span></span><span class="sig-name descname"><span class="pre">my_seed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/generator/markov.html#my_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.generator.markov.my_seed" title="Permalink to this definition"></a></dt>
+<dd><p>generate my own seed function to capture the seed value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.generator.markov.shuffle_axis">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.generator.markov.</span></span><span class="sig-name descname"><span class="pre">shuffle_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/generator/markov.html#shuffle_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.generator.markov.shuffle_axis" title="Permalink to this definition"></a></dt>
+<dd><p>For each subtree of a MTG, change its root node to another node of the same axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (Default value = None)</p></li>
+<li><p><strong>shuffle</strong> – (Default value = False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/cc980263bb253d0caac065dde0baf9f2/markov.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/generator/markov.py</span></code></a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_flux.html" class="btn btn-neutral float-left" title="flux" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_generator_measured_root.html" class="btn btn-neutral float-right" title="generator_measured_root" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

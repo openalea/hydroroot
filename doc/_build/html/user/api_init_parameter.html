@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>init_parameter &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="law" href="api_law.html" />
+    <link rel="prev" title="hydro_io" href="api_hydro_io.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">HydroRoot’s API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api_analysis.html">analysis API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_conductance.html">conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_display.html">display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_flux.html">flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">init_parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_law.html">law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_length.html">length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_main.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_radius.html">radius</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_read_file.html">read_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_water_solute_transport.html">water and solute transport API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">HydroRoot’s API</a> &raquo;</li>
+      <li>init_parameter</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_init_parameter.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hydroroot.init_parameter">
+<span id="init-parameter"></span><h1>init_parameter<a class="headerlink" href="#module-hydroroot.init_parameter" title="Permalink to this heading"></a></h1>
+<p>Created on Tue Dec  3 10:45:01 2019</p>
+<p>&#64;author: F. Bauget</p>
+<dl class="simple">
+<dt>Parameters class:</dt><dd><dl class="field-list simple">
+<dt class="field-odd">init</dt>
+<dd class="field-odd"><p>set the default values</p>
+</dd>
+<dt class="field-even">Methods</dt>
+<dd class="field-even"><ul class="simple">
+<li><p>read_file: read the Yaml configuration file containing the model parameters into a Class.</p></li>
+<li><p>init_calculation: perform some initialization</p></li>
+<li><p>parameters_to_list: convert some parameters to list if they are not</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="hydroroot.init_parameter.Parameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hydroroot.init_parameter.</span></span><span class="sig-name descname"><span class="pre">Parameters</span></span><a class="reference internal" href="../_modules/hydroroot/init_parameter.html#Parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.init_parameter.Parameters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Init Parameters class. Set setting default values and structure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archi</strong> – all inputs related to the architecture generation or reconstruction</p></li>
+<li><p><strong>read_architecture</strong> – Bool</p></li>
+<li><p><strong>input_dir</strong> – string</p></li>
+<li><p><strong>input_file</strong> – list of string</p></li>
+<li><p><strong>seed</strong> – integer or list of integer</p></li>
+<li><p><strong>length_file</strong> – list of strings</p></li>
+<li><p><strong>length_data</strong> – float data containing in the files above</p></li>
+<li><p><strong>primary_length</strong> – float or list of float</p></li>
+<li><p><strong>branching_delay</strong> – float or list of float</p></li>
+<li><p><strong>branching_variability</strong> – float</p></li>
+<li><p><strong>order_max</strong> – integer</p></li>
+<li><p><strong>segment_length</strong> – float</p></li>
+<li><p><strong>nude_length</strong> – float or list of float</p></li>
+<li><p><strong>ref_radius</strong> – float</p></li>
+<li><p><strong>order_decrease_factor</strong> – float</p></li>
+<li><p><strong>hydro</strong> – inputs related to the hydrodynamics</p></li>
+<li><p><strong>k0</strong> – float</p></li>
+<li><p><strong>axial_conductance_data</strong> – list of 2 list of float</p></li>
+<li><p><strong>solute</strong> – inputs related to solutes transport eather permating or not</p></li>
+<li><p><strong>J_s</strong> – float</p></li>
+<li><p><strong>P_s</strong> – float</p></li>
+<li><p><strong>Cse</strong> – float</p></li>
+<li><p><strong>Ce</strong> – float</p></li>
+<li><p><strong>sigma</strong> – float</p></li>
+<li><p><strong>exp</strong> – inputs related to the experimental conditions and measurements</p></li>
+<li><p><strong>jv</strong> – float</p></li>
+<li><p><strong>psi_e</strong> – float</p></li>
+<li><p><strong>psi_base</strong> – float</p></li>
+<li><p><strong>output</strong> – inputs related to the simulations and its output</p></li>
+<li><p><strong>radfold</strong> – float or list of float</p></li>
+<li><p><strong>axfold</strong> – float or list of float</p></li>
+<li><p><strong>intercepts</strong> – list of float</p></li>
+<li><p><strong>run_nb</strong> – int</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="hydroroot.init_parameter.Parameters.init_calculation">
+<span class="sig-name descname"><span class="pre">init_calculation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/init_parameter.html#Parameters.init_calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.init_parameter.Parameters.init_calculation" title="Permalink to this definition"></a></dt>
+<dd><p>Set self.archi[‘length_data’] by reading the two files self.archi[‘length_file’]
+Set the seed to None if seed is not an integer nor a list of integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>itself</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hydroroot.init_parameter.Parameters.parameters_to_list">
+<span class="sig-name descname"><span class="pre">parameters_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/init_parameter.html#Parameters.parameters_to_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.init_parameter.Parameters.parameters_to_list" title="Permalink to this definition"></a></dt>
+<dd><p>transform parameter to a list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameter</strong> – the parameter to transform to a list</p></li>
+<li><p><strong>return</strong> – </p></li>
+<li><p><strong>parameter</strong> – list</p></li>
+<li><p><strong>In</strong> – the yaml file it is possible to use the following syntaxe</p></li>
+<li><p><strong>this</strong> – syntax and the corresponding list is calculated</p></li>
+<li><p><strong>to</strong> – a list of one single element</p></li>
+<li><p><strong>For</strong> – example</p></li>
+<li><p><strong>range</strong> – </p></li>
+<li><p><strong>0</strong> – 02 is converted to</p></li>
+<li><p><strong>see</strong> – func</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hydroroot.init_parameter.Parameters.read_file">
+<span class="sig-name descname"><span class="pre">read_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/init_parameter.html#Parameters.read_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.init_parameter.Parameters.read_file" title="Permalink to this definition"></a></dt>
+<dd><p>Read the input yaml file, set the class variables and perform some initialization
+see <code class="xref py py-func docutils literal notranslate"><span class="pre">init_calculation()</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – string (Default value = None)</p></li>
+<li><p><strong>return</strong> – itself</p></li>
+<li><p><strong>Some</strong> – instance variables are converted to list if not they are not list in the yaml file</p></li>
+<li><p><strong>branching_delay</strong> – nude_length</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/fe0e73e6158dca72b8a230b2a345d175/init_parameter.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/init_parameter.py</span></code></a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_hydro_io.html" class="btn btn-neutral float-left" title="hydro_io" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_law.html" class="btn btn-neutral float-right" title="law" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

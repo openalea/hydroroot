@@ -81,12 +81,12 @@ Water transport
 The axial flow is unchanged, but a term due to osmotic potential difference is added to the 
 radial water flow rate, that can be modeled as follows:
 
-.. math:: j = k\left( \Delta\Psi_{H} + \Delta\Psi_{np} + \Delta\Psi_{S} \right)S
+.. math:: j = k\left( \Delta\Psi_{H} + \Delta\Psi_{np} + \sigma \Delta\Psi_{S} \right)S
 
 where :math:`j` is the local radial water flow rate, :math:`k` the radial hydraulic conductivity.
 :math:`\Delta\Psi_{H}`, :math:`\Delta\Psi_{np}` and :math:`\Delta\Psi_{S}` are the hydrostatic water
 potential difference between the bathing solution and the xylem sap, the osmotic water potential difference due to the 
-non-permeating solute and the osmotic water potential difference due to the permeating solutes, respectively. :math:`S`
+non-permeating solute and the osmotic water potential difference due to the permeating solutes, respectively. σ is the effective reflection coefficient. :math:`S`
 (:math:`S = \pi\ d\ l`) is the external surface area of the REV. Expressing the water potentials, we obtain:
 
 .. math:: j = k\left( P_{e} - P - \pi_{np}^{ext} + \pi_{np} - \sigma RT\left( C_{e} - C \right) \right)S
@@ -94,10 +94,10 @@ non-permeating solute and the osmotic water potential difference due to the perm
 :math:`P_e` and :math:`P` are the hydrostatic pressure of the bathing solution and within the xylem vessels, respectively.
 :math:`\pi_{np}^{ext}` and :math:`\pi_{np}` are the np contribution to the osmotic pressure of the bathing solution and
 inside the xylem vessels, respectively. Note, :math:`\pi_{np}` is most of the time equal to 0 because these molecules can
-not penetrate the root tissues. However, in the particular case of a cut and flow experiment [boursiac2022]_, they can enter
+not penetrate the root tissues. However, in the particular case of a cut and flow experiment [boursiac2022], they can enter
 the xylem vessels through the cut tips of the root.
 :math:`C_e` and :math:`C` are the permeating solute concentration in the bathing solution and in the xylem vessels,
-respectively. σ is the effective reflection coefficient, :math: `R` the gas constant, :math:`T` the temperature (set to 298°K here). 
+respectively. :math:`R` is the gas constant, :math:`T` the temperature (set to 298°K here). 
 
 The axial sap flow rate was modeled with a Hagen-Poiseuille’s law type:
 

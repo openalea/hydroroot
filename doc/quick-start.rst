@@ -1,6 +1,14 @@
 ===============
 Quick start
 ===============
+If the package HydroRoot is not installed, the following examples can be run by cloning the sources from git and then sourcing the src directory in Ipython console for instance like this:
+
+.. code-block:: python
+
+    import sys
+    sys.path.extend(['../src']) # if run from the example folder for instance
+
+assuming the dependencies installed.
 
 Build a root and display it in the PlantGL viewer.
 
@@ -23,7 +31,6 @@ versus distance to tip (m), respectively.
 
     from hydroroot.main import hydroroot
     from hydroroot.display import plot
-    %gui qt
     K = ([0,0.2],[0.0,1.0e-2])
     k = ([0.0,0.2],[300.0,300.0])
     g, surface, volume, Keq, Jv_global = hydroroot(axial_conductivity_data = K, radial_conductivity_data=k, order_max = 1)

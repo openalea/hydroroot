@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>conductance &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="display" href="api_display.html" />
+    <link rel="prev" title="analysis API" href="api_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modeling_principles.html">Modeling principles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">HydroRoot’s API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="api_analysis.html">analysis API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_display.html">display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_flux.html">flux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_markov.html">generator markov</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_generator_measured_root.html">generator_measured_root</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_hydro_io.html">hydro_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_init_parameter.html">init_parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_law.html">law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_length.html">length</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_main.html">main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_radius.html">radius</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_read_file.html">read_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_water_solute_transport.html">water and solute transport API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../api.html">HydroRoot’s API</a> &raquo;</li>
+      <li>conductance</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/api_conductance.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hydroroot.conductance">
+<span id="conductance"></span><h1>conductance<a class="headerlink" href="#module-hydroroot.conductance" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.axial">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">axial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">acol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#axial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.axial" title="Permalink to this definition"></a></dt>
+<dd><p>the purpose is to give in arguments a set of 2 lists representing a x-y data and to return it with y*scale</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>acol</strong> – list (Default value = [])</p></li>
+<li><p><strong>scale</strong> – float (Default value = 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>x, y (list) - 2 lists</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.compute_K">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">compute_K</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#compute_K"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.compute_K" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the conductance in dimension <span class="math notranslate nohighlight">\([L^3 P^{-1} T^{-1}]\)</span> from the ‘experimental’ one which is
+in <span class="math notranslate nohighlight">\([L^4 P^{-1} T^{-1}]\)</span></p>
+<p>In each vertex compute <span class="math notranslate nohighlight">\(K = K_{exp} \frac{\text{scale_factor}}{\text{vertex_length}}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG) - the root architecture</p></li>
+<li><p><strong>scale_factor</strong> – (float) - a factor used for sensitivity analysis (Default value = 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG) - with the property K set</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.compute_k">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">compute_k</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#compute_k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.compute_k" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the radial conductance k (<span class="math notranslate nohighlight">\(m.s^{-1}.MPa^{-1}\)</span>) of each vertex of the MTG.</p>
+<div class="math notranslate nohighlight">
+\[k = 2 \pi r l k0\]</div>
+<p>with l and r the segment length and radius of the vertex</p>
+<ul class="simple">
+<li><p>if k0 == “k0”: calculation using k0 values from g.property(‘k0’) on each vertex</p></li>
+<li><p>if k0 is a float: use this value in the calculation</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG)</p></li>
+<li><p><strong>k0</strong> – (float or string) - “k0” or the radial conductivity in <span class="math notranslate nohighlight">\(m.s^{-1}.MPa^{-1}\)</span> (Default value = 300.)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.fit_property_from_spline">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">fit_property_from_spline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#fit_property_from_spline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.fit_property_from_spline" title="Permalink to this definition"></a></dt>
+<dd><p>compute a property from another one using a spline transformation.</p>
+<p>Retrieve the values from the prop_in of the MTG.
+And evaluate the <em>spline</em> according to <em>prop_in</em> to compute the property <em>prop_out</em></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – MTG</p></li>
+<li><p><strong>spline</strong> – (class scipy)</p></li>
+<li><p><strong>prop_in</strong> – (string)</p></li>
+<li><p><strong>prop_out</strong> – (string)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example</dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<p>Typically, we have, as input, the axial conductance versus distance to tip K(x) given as a list of 2 lists
+of few number of floats. Then we have to calculate on each vertex the axial conductance according to it.
+To do that, we first fit with a spline K(x) and then use the present function to use the spline to compute
+K according to the position of the vertex.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.poiseuille">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">poiseuille</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viscosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#poiseuille"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.poiseuille" title="Permalink to this definition"></a></dt>
+<dd><p>Compute a conductance of a cylindrical element based on its radius and length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> – (float)</p></li>
+<li><p><strong>length</strong> – (float)</p></li>
+<li><p><strong>viscosity</strong> – (float) (Default value = 1e-3)</p></li>
+</ul>
+</dd>
+</dl>
+<p>The Poiseuille formula is, for a cylinder <span class="math notranslate nohighlight">\(K = {\pi r^4} / {8 \mu l}\)</span></p>
+<p>with <span class="math notranslate nohighlight">\(r\)</span> the radius of a pipe, <span class="math notranslate nohighlight">\(\mu\)</span> the viscosity of the liquid, <span class="math notranslate nohighlight">\(l\)</span> the length of the pipe.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.radial">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">radial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">92</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#radial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.radial" title="Permalink to this definition"></a></dt>
+<dd><p>create a list of uniform value v*scale of the same length than acol
+the purpose is to return  x-y data in a form of two lists</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – (float) (Default value = 92)</p></li>
+<li><p><strong>acol</strong> – (list) 2 lists of floats (Default value = [])</p></li>
+<li><p><strong>scale</strong> – (float) (Default value = 1)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>xr, yr (list)</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Example</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<p>in HydroRoot the conductivity and the conductance are properties versus distance to tip. Then if in the
+yaml file with parameters we give a float for k0, we must transform it to a list of 2 lists of float as the axial
+conductance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.radial_step">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">radial_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">92</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#radial_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.radial_step" title="Permalink to this definition"></a></dt>
+<dd><p>Radial conductivity k as a step function.</p>
+<p>k is set to its maximum value (kmin * factor) from the tip (x=0) to x_step, and its minimum value kmin from x_step + dx to x_base.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kmin</strong> – Float (Default value = 92)</p></li>
+<li><p><strong>factor</strong> – Float (Default value = 1.0)</p></li>
+<li><p><strong>x_step</strong> – Float (Default value = None)</p></li>
+<li><p><strong>x_base</strong> – Float (Default value = 1.)</p></li>
+<li><p><strong>dx</strong> – Float (Default value = 1.0e-4)</p></li>
+<li><p><strong>scale</strong> – Float (Default value = 1.0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>xr: (list), list of distance from the tip</p></li>
+<li><p>yr: (list), list of radial k values</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.set_conductances">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">set_conductances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axial_pr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0_pr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axial_lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0_lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#set_conductances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.set_conductances" title="Permalink to this definition"></a></dt>
+<dd><p>Set the MTG properties ‘K_exp’, ‘K’ and ‘k’:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>K_exp: the model input axial conductance in <span class="math notranslate nohighlight">\([L^4.P^{-1}.T^{-1}]\)</span></p></li>
+<li><p>K: the effective axial conductance of each vertex <span class="math notranslate nohighlight">\(K=K_{exp}/l\ [L^3.P^{-1}.T^{-1}]\)</span></p></li>
+<li><p>k: the radial conductance <span class="math notranslate nohighlight">\(k=2 \pi r l k_0 \ [L^3.P^{-1}.T^{-1}]\)</span></p></li>
+</ul>
+</div></blockquote>
+<p>with r and l the radius and the length of the vertex respectively.</p>
+<p>if axial_lr is None, set ‘K_exp’ and ‘K’ according to axial_pr whatever the roots order, otherwise set
+the roots of order == 0 according to axial_pr and others according to axial_lr. idem for the radial conductivity if
+k0_lr is not None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG)</p></li>
+<li><p><strong>axial_pr</strong> – (list) - axial conductance (<span class="math notranslate nohighlight">\(10^{-9}\ m^4.MPa^{-1}.s^{-1}\)</span>) vs distance to tip, 2 lists of float</p></li>
+<li><p><strong>k0_pr</strong> – (float) - radial donductivity (<span class="math notranslate nohighlight">\(10^{-9}\ m.MPa^{-1}.s^{-1}\)</span>)</p></li>
+<li><p><strong>axial_lr</strong> – (list) - axial conductance (<span class="math notranslate nohighlight">\(10^{-9}\ m^4.MPa^{-1}.s^{-1}\)</span>) for root of order &gt; 0, 2 lists of float (Default value = None)</p></li>
+<li><p><strong>k0_lr</strong> – (float) - radial donductivity  (<span class="math notranslate nohighlight">\(10^{-9}\ m.MPa^{-1}.s^{-1}\)</span>) for root of order &gt; 0 (Default value = None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (MTG)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hydroroot.conductance.setting_k0_according_to_order">
+<span class="sig-prename descclassname"><span class="pre">hydroroot.conductance.</span></span><span class="sig-name descname"><span class="pre">setting_k0_according_to_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0_pr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k0_lr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hydroroot/conductance.html#setting_k0_according_to_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hydroroot.conductance.setting_k0_according_to_order" title="Permalink to this definition"></a></dt>
+<dd><p>Set uniform radial conductivity to roots according to their order:</p>
+<ul class="simple">
+<li><p>to k0_pr for the primary root (order == 0),</p></li>
+<li><p>to k0_lr otherwise</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – (MTG)</p></li>
+<li><p><strong>k0_pr</strong> – (float) - radial donductivity (<span class="math notranslate nohighlight">\(10^{-9}\ m.MPa^{-1}.s^{-1}\)</span>) for the primary root</p></li>
+<li><p><strong>k0_lr</strong> – (float) - radial donductivity (<span class="math notranslate nohighlight">\(10^{-9}\ m.MPa^{-1}.s^{-1}\)</span>) for root of order &gt; 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g: (MTG) - the root architecture with k0_pr and k0_lr set</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Download the source file <a class="reference download internal" download="" href="../_downloads/af4a4cd63bb392d81e1e281173acc3ef/conductance.py"><code class="xref download docutils literal notranslate"><span class="pre">../../src/hydroroot/conductance.py</span></code></a>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_analysis.html" class="btn btn-neutral float-left" title="analysis API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_display.html" class="btn btn-neutral float-right" title="display" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

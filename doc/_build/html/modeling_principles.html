@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modeling principles &mdash; HydroRoot 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HydroRoot’s API" href="api.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> HydroRoot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick-start.html">Quick start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modeling principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#boundary-conditions">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#water-transport-model">Water transport model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solutes-and-water-transport-model">Solutes and water transport model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#water-transport">Water transport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#solute-transport">Solute transport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes-on-the-numerical-resolution">Notes on the numerical resolution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">HydroRoot’s API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HydroRoot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Modeling principles</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modeling_principles.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modeling-principles">
+<h1>Modeling principles<a class="headerlink" href="#modeling-principles" title="Permalink to this heading"></a></h1>
+<p>HydroRoot has two solvers one considering only water transport and a second modeling solutes and water transport.</p>
+<section id="boundary-conditions">
+<h2>Boundary conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this heading"></a></h2>
+<p>At this stage, HydroRoot has been developed to analyze experimental data done with pressure chamber for plant
+in hydroponic solution. Therefore, the boundary conditions for the pressure are: uniform external hydrostatic pressure
+surrounding the root, and atmospheric pressure at the base of the de-topped root.</p>
+</section>
+<section id="water-transport-model">
+<h2>Water transport model<a class="headerlink" href="#water-transport-model" title="Permalink to this heading"></a></h2>
+<p>The following lines are taken, or inspired, from Boursiac <em>et al.</em> 2022 <a class="reference internal" href="references.html#boursiac2022" id="id1"><span>[boursiac2022]</span></a>.</p>
+<p>The hydraulic aspects of HydroRoot consists in two main components: the radial water flow between the external
+medium and the xylem vessels and the axial transport through the xylem vessels. Following Doussan and
+colleagues (Doussan et al., 1998a; Doussan et al., 1998b), the root is discretized as a network of elementary
+segments consisting of a microcircuit containing both radial (<span class="math notranslate nohighlight">\(k\)</span>) and axial (<span class="math notranslate nohighlight">\(K\)</span>)
+hydraulic conductances. The elementary segments are represented by the MTG vertices. For instance, at the ith vertex, the
+local radial flux is written as follow</p>
+<div class="math notranslate nohighlight">
+\[j_{i} = k_{i}\left( P_{e_{i}} - P_{i} \right)S_{i}\]</div>
+<p>and the local axial flow is given by</p>
+<div class="math notranslate nohighlight">
+\[J_{i} = K_{i}\ \frac{\left( P_{out_{i}} - P_{i} \right)}{l_{i}}\]</div>
+<p><span class="math notranslate nohighlight">\(P_{e_{i}}, P_{i}\ \text{and}\ P_{out_{i}}\)</span> are the water hydrostatic pressure of the external medium at vertex <em>i</em>, in
+the xylem vessels of vertex <em>i</em> and in the xylem vessels of the vertex downstream to vertex <em>i</em>, respectively.
+<span class="math notranslate nohighlight">\(S_{i}\ \text{and}\ l_{i}\)</span> are, respectively, the surface area and the length of the elementary segments.</p>
+<p>By analogy with Ohm’s law, the hydraulic architecture may be assimilated to an electrical network (Doussan et al., 1998a;
+Prusinkiewicz et al., 2007). According to the boundary conditions (uniform pressure around the root
+and atmospheric pressure at its base), we are able to calculate the equivalent resistance of the network and then calculate
+the outflow rate. In brief, let us consider an elementary segment <em>i</em>, with <span class="math notranslate nohighlight">\(R_{i} = L_{i}/K_{i}\)</span> and
+<span class="math notranslate nohighlight">\(r_{i} = 1/\left( k_{i}S_{i} \right)\)</span> as axial and radial resistances, respectively. Its equivalent resistance
+<span class="math notranslate nohighlight">\({R_{eq}}_{i}\)</span> is calculated as follows, assuming that the apical equivalent resistance <span class="math notranslate nohighlight">\(R_{eq_{i - 1}\ }\)</span> is known:</p>
+<div class="math notranslate nohighlight">
+\[\frac{1}{{R_{eq}}_{i}} = \frac{1}{R_{eq_{i - 1}\ } + r_{i}} + \frac{1}{R_{i}}\]</div>
+<p>By implementing this equation, step by step from the tips, and by
+considering a branched root as a parallel network, we end up with an
+equivalent resistance for the whole network, and as a consequence, an
+equivalent hydraulic conductance <span class="math notranslate nohighlight">\(K_{eq}\)</span> (Albasha et al., 2019;
+Prusinkiewicz et al., 2007). The basal outgoing flux (<em>J</em><sub>v</sub>) is
+then calculated according to:</p>
+<div class="math notranslate nohighlight">
+\[J_{v} = K_{eq}\text{(}P_{e} - P_{base}\text{)}\]</div>
+</section>
+<section id="solutes-and-water-transport-model">
+<h2>Solutes and water transport model<a class="headerlink" href="#solutes-and-water-transport-model" title="Permalink to this heading"></a></h2>
+<p>The following lines are taken or inspired from Bauget <em>et al.</em> 2022 <a class="reference internal" href="references.html#bauget2022" id="id2"><span>[bauget2022]</span></a>.</p>
+<p>In this solver, solute transport equations are added to the hydraulic model. This change leads to a
+major difference in the resolution of the equation system on the whole
+RSA. Thus, the hydraulic architecture can no longer be modeled by an
+analogous electrical network (Boursiac <em>et al.</em>, 2022a) and the coupled
+solute and water transport equations had to be solved in a matrix form.</p>
+<p>The root is discretized in cylindrical elementary volumes (Figure 1), considered as representative elementary
+volumes (REV) of diameter, <span class="math notranslate nohighlight">\(d\)</span> and length <span class="math notranslate nohighlight">\(l\)</span>. The local transport equations
+described below are considered in each REV. Each REV can be seen as two
+concentric media: the peripheral tissues (from epidermis to pericycle)
+through which radial transports happen, and a central medium (stele with
+xylem vessels) where the sap flows axially.</p>
+<dl class="simple">
+<dt>In the following model two type of solutes are considered:</dt><dd><ul class="simple">
+<li><p>the permeating solutes, that are able to be transported through the peripheral tissues</p></li>
+<li><p>the non-permeating solutes, that are not able to pass through these tissues</p></li>
+</ul>
+</dd>
+</dl>
+<p>In the following, the subscript S refer to the permeating solutes and np to the non-permeating ones.</p>
+<section id="water-transport">
+<h3>Water transport<a class="headerlink" href="#water-transport" title="Permalink to this heading"></a></h3>
+<p>The axial flow is unchanged, but a term due to osmotic potential difference is added to the
+radial water flow rate, that can be modeled as follows:</p>
+<div class="math notranslate nohighlight">
+\[j = k\left( \Delta\Psi_{H} + \Delta\Psi_{np} + \sigma \Delta\Psi_{S} \right)S\]</div>
+<p>where <span class="math notranslate nohighlight">\(j\)</span> is the local radial water flow rate, <span class="math notranslate nohighlight">\(k\)</span> the radial hydraulic conductivity.
+<span class="math notranslate nohighlight">\(\Delta\Psi_{H}\)</span>, <span class="math notranslate nohighlight">\(\Delta\Psi_{np}\)</span> and <span class="math notranslate nohighlight">\(\Delta\Psi_{S}\)</span> are the hydrostatic water
+potential difference between the bathing solution and the xylem sap, the osmotic water potential difference due to the
+non-permeating solute and the osmotic water potential difference due to the permeating solutes, respectively. σ is the effective reflection coefficient. <span class="math notranslate nohighlight">\(S\)</span>
+(<span class="math notranslate nohighlight">\(S = \pi\ d\ l\)</span>) is the external surface area of the REV. Expressing the water potentials, we obtain:</p>
+<div class="math notranslate nohighlight">
+\[j = k\left( P_{e} - P - \pi_{np}^{ext} + \pi_{np} - \sigma RT\left( C_{e} - C \right) \right)S\]</div>
+<p><span class="math notranslate nohighlight">\(P_e\)</span> and <span class="math notranslate nohighlight">\(P\)</span> are the hydrostatic pressure of the bathing solution and within the xylem vessels, respectively.
+<span class="math notranslate nohighlight">\(\pi_{np}^{ext}\)</span> and <span class="math notranslate nohighlight">\(\pi_{np}\)</span> are the np contribution to the osmotic pressure of the bathing solution and
+inside the xylem vessels, respectively. Note, <span class="math notranslate nohighlight">\(\pi_{np}\)</span> is most of the time equal to 0 because these molecules can
+not penetrate the root tissues. However, in the particular case of a cut and flow experiment [boursiac2022], they can enter
+the xylem vessels through the cut tips of the root.
+<span class="math notranslate nohighlight">\(C_e\)</span> and <span class="math notranslate nohighlight">\(C\)</span> are the permeating solute concentration in the bathing solution and in the xylem vessels,
+respectively. <span class="math notranslate nohighlight">\(R\)</span> is the gas constant, <span class="math notranslate nohighlight">\(T\)</span> the temperature (set to 298°K here).</p>
+<p>The axial sap flow rate was modeled with a Hagen-Poiseuille’s law type:</p>
+<div class="math notranslate nohighlight">
+\[J = K(\mu)\frac{\Delta P}{l}\]</div>
+<p>where <span class="math notranslate nohighlight">\(J\)</span> is the axial sap flow rate, <span class="math notranslate nohighlight">\(K(μ)\)</span> the axial conductance that
+depends on sap viscosity, <span class="math notranslate nohighlight">\(ΔP\)</span> the local pressure difference between two REVs, <span class="math notranslate nohighlight">\(l\)</span>
+the length of the REV. The axial conductance is inversely proportional
+to the fluid viscosity <span class="math notranslate nohighlight">\(μ\)</span>, as illustrated for example by the
+conductance in a cylindrical capillary of radius <span class="math notranslate nohighlight">\(r\)</span>:
+<span class="math notranslate nohighlight">\(K(\mu) = \pi r^{4}/(8\mu)\)</span>. The sap is commonly considered having
+water viscosity. However, when np penetrates the root vasculature in
+cut-and-flow experiments, the viscosity may significantly increase with the
+np concentration and may have to be taken into account.</p>
+</section>
+<section id="solute-transport">
+<h3>Solute transport<a class="headerlink" href="#solute-transport" title="Permalink to this heading"></a></h3>
+<p>The solute transport model is inspired by the model of Fiscus (Fiscus,
+1977). The radial solute flux is modeled as follows:</p>
+<div class="math notranslate nohighlight">
+\[j_{s} = \left\lbrack J_{s}^{*} - P_{s}\left( C - C_{e} \right) \right\rbrack S\]</div>
+<p>where <span class="math notranslate nohighlight">\(j_s\)</span> (mol.s<sup>-1</sup>) is the radial solute flux, <span class="math notranslate nohighlight">\(J_s^*\)</span>
+(mol.m<sup>-2</sup>.s<sup>-1</sup>) is the solute active uptake rate and
+<cite>P_s</cite> (m.s<sup>-1</sup>) is the radial permeability of the root
+peripheral tissues. As above, <span class="math notranslate nohighlight">\(C\)</span> and <span class="math notranslate nohighlight">\(C_e\)</span> correspond to the
+solute concentration in the xylem vessels and in the bathing solution,
+respectively. <span class="math notranslate nohighlight">\(S\)</span> is the external surface area of the REV.</p>
+<p>Since solutes are transported along xylem vessels by advection, axial
+solute flux can be expressed as</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[J_{s} = JC\]</div>
+</div></blockquote>
+<p>When np penetrates the root in cut-and-flow experiments, its axial flux
+has the same form:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[J_{np} = JC_{np}\]</div>
+</div></blockquote>
+<p>where <span class="math notranslate nohighlight">\(C_{np}\)</span> is the np concentration in the xylem vessels.</p>
+</section>
+<section id="notes-on-the-numerical-resolution">
+<h3>Notes on the numerical resolution<a class="headerlink" href="#notes-on-the-numerical-resolution" title="Permalink to this heading"></a></h3>
+<p><strong>Boundary conditions:</strong></p>
+<p>At the base, we consider a Dirichlet boundary condition for the pressure
+and Neumann boundary condition for the concentration:</p>
+<div class="math notranslate nohighlight">
+\[P_{1} = P_{atm}\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial C}{\partial x} = 0\]</div>
+<p>in other words, root base is at atmospheric pressure and solute and np
+concentrations at the outlet are the same as in the first node.</p>
+<p><strong>Discretization of the transport equations:</strong></p>
+<p>The root system architecture (RSA) is represented by a Multiscale Tree
+Graph (MTG) where the nodes are the discretized representation of
+representative elementary volumes (REV). In the following, REV are
+numbered from root base to tip.</p>
+<p>In each REV, mass conservation is independently applied for water,
+permeating solutes and non-permeating solutes. that gives for a REV numbered i:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{l}
+            J_{i} &amp; = \sum_{j}^{}J_{j} + k_{i}\left\lbrack P_{e} - P_{i} - \pi_{np}^{ext} + {\pi_{np}^{}}_{i}- \sigma RT\left( C_{e} - C_{i} \right) \right\rbrack S_{i} \\
+            J_{i}Χ_{i} &amp; = \sum_{j}^{}{J_{j}Χ_{j}} + \left\lbrack J_{s}^{*} - P_{s}\left( C_{i} - C_{e} \right) \right\rbrack S_{i} \\
+            J_{i}{Χ_{np}}_{i} &amp;= \sum_{j}^{}{J_{j}{Χ_{np}}_{j}}
+\end{array}
+    \right.\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_e, \pi_{np}^{ext} \text{and}\ C_e\)</span> are the hydrostatic
+pressure, the osmotic pressure due to the np and the solute
+concentration of the external medium, respectively. The variables with
+subscript <em>i</em> refer to the REV <em>i</em>: <span class="math notranslate nohighlight">\(k_i\)</span> is the radial hydraulic
+conductivity, <span class="math notranslate nohighlight">\(P_i\)</span> the sap hydrostatic pressure,
+<span class="math notranslate nohighlight">\({\pi_{np}}_{i}\)</span> the osmotic pressure corresponding to the
+local np concentration in sap (<span class="math notranslate nohighlight">\({C_{np}}_{i})\)</span>, <span class="math notranslate nohighlight">\(C_i\)</span> the
+solute concentration in sap. <span class="math notranslate nohighlight">\(S_i\)</span> is the surface area of the REV.
+<span class="math notranslate nohighlight">\(J_i\)</span> is the outgoing xylem sap flow and <span class="math notranslate nohighlight">\(J_j\)</span> is the xylem sap flow
+coming from node <span class="math notranslate nohighlight">\(j\)</span>, which stands for one of the children of node <span class="math notranslate nohighlight">\(i\)</span>.
+This can be the next node on root axis, or any first node of a lateral
+root branched on node <span class="math notranslate nohighlight">\(i\)</span>. <span class="math notranslate nohighlight">\(k_i\)</span> is the radial conductivity. <span class="math notranslate nohighlight">\(σ\)</span> is the
+effective reflection coefficient, <span class="math notranslate nohighlight">\(R\)</span> the gas constant, and <span class="math notranslate nohighlight">\(T\)</span> the
+temperature. <span class="math notranslate nohighlight">\(J_s^*\)</span> is the solute active uptake rate and <span class="math notranslate nohighlight">\(P_s\)</span> is
+the radial permeability of the root peripheral tissues. <span class="math notranslate nohighlight">\(J_i\ \text{and}\ J_j\)</span> are proportional to the local pressure gradient as follows:</p>
+<div class="math notranslate nohighlight">
+\[J_{i} = K_{i}\frac{\left( P_{i + 1} - P_{i} \right)}{l_{i}}\]</div>
+<div class="math notranslate nohighlight">
+\[J_{j} = K_{j}\frac{\left( P_{j} - P_{i} \right)}{l_{j}}\]</div>
+<p>with <span class="math notranslate nohighlight">\(K\)</span> being the axial conductance, <span class="math notranslate nohighlight">\(l\)</span> the REV length according to
+the subscript.</p>
+<p><span class="math notranslate nohighlight">\(Χ_i\)</span> is the solute concentration according to the sap flow direction,
+with
+<span class="math notranslate nohighlight">\(Χ_{i} = \theta_{i}C_{i} + \left( 1 - \theta_{i} \right)C_{i + 1}\)</span>,
+<span class="math notranslate nohighlight">\(\theta_i\)</span> being a factor that depends on flow direction:
+<span class="math notranslate nohighlight">\(\theta_{i} = 1\)</span> if <span class="math notranslate nohighlight">\(P_{i} &gt; P_{i - 1}\)</span> and
+<span class="math notranslate nohighlight">\(\theta_{i} = 0\)</span> if <span class="math notranslate nohighlight">\(P_{i} &lt; P_{i - 1}\)</span>. Χ<sub>j</sub> is the
+solute concentration flowing between node i and its child j:
+<span class="math notranslate nohighlight">\(Χ_{j} = \theta_{j}C_{j} + \left( 1 - \theta_{j} \right)C_{i}\)</span>,
+with <span class="math notranslate nohighlight">\(θ\ j\)</span> following the same rules as <span class="math notranslate nohighlight">\(θ\ i\)</span> according to
+<span class="math notranslate nohighlight">\(\left( P_{j} - P_{i} \right)\)</span>. <span class="math notranslate nohighlight">\({Χ_{np}}_{i}\)</span> is the same
+variable for the np concentration.</p>
+<p>The system can be transformed as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left\{
+\begin{array}{l}
+            G_{w_{i}} = J_{i} - \sum_{j}^{}J_{j} - k_{i}\left\lbrack P_{e} - P_{i} - \pi_{np}^{ext} + {\pi_{np}^{}}_{i} - \sigma RT\left( C_{e} - C_{i} \right) \right\rbrack S_{i} = 0 \\
+            G_{s_{i}} = J_{i}Χ_{i} - \sum_{j}^{}{J_{j}Χ_{j}} - \left\lbrack J_{s}^{*} - P_{s}\left( C_{i} - C_{e} \right) \right\rbrack S_{i} = 0 \\
+            {G_{np}}_{i} = J_{i}{Χ_{np}}_{i} - \sum_{j}^{}{J_{j}{Χ_{np}}_{j}} = 0
+\end{array}
+    \right.\end{split}\]</div>
+<p>The purpose is to solve the mass balance equation for the three components water
+(w), permeating solutes (s) and non-permeating solute (np) i.e. to solve on each
+grid block i:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}G_{i} = 0\ \text{with}\ G_{i} = \begin{pmatrix}
+G_{{w}_{i}} \\
+G_{s_{i}} \\
+G_{np_{i}} \\
+\end{pmatrix}\end{split}\]</div>
+<p>or considering the whole grid system:</p>
+<div class="math notranslate nohighlight">
+\[G = \left(G_{w_1}G_{s_1}G_{np_1}, \cdots\ G_{w_i}G_{s_i}G_{np_i}, \cdots\ G_{w_n}G_{s_n}G_{np_n} \right)\]</div>
+<p>The dimension of G is 3N, N grid blocks for G<sub>w</sub>, G<sub>s</sub> and G<sub>np</sub>.</p>
+<p>The system may be expressed according to the three unknowns: the hydrostatic pressure P,
+the permeating solute C<sub>s</sub> and the non-permeating solute C<sub>np</sub>.
+The unknowns are stored in a 3N vector Y, N elements for each :</p>
+<div class="math notranslate nohighlight">
+\[Y = \left(P_{w_1}C_{s_1}C_{np_1}, \cdots\ P_{w_i}C_{s_i}C_{np_i}, \cdots\ P_{w_n}C_{s_n}C_{np_n} \right)\]</div>
+<p>Now to solve the system a Newton-Raphson is used leading to:</p>
+<div class="math notranslate nohighlight">
+\[J\ dY = - G\]</div>
+<p>dY is a 3N vector containing alternatively dP, dC<sub>s</sub> and dC<sub>np</sub>:</p>
+<div class="math notranslate nohighlight">
+\[dY = (\cdots, dP_{i-1}, d{C_s}_{i-1}, d{C_{np}}_{i-1}, dP_{i}, d{C_s}_{i}, d{C_{np}}_{i}, dP_{i+1}, d{C_s}_{i+1}, d{C_{np}}_{i+1}, \cdots)\]</div>
+<p>J is the Jacobian of G according to the three unknowns:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}     J = \begin{pmatrix}
+              &amp; \vdots &amp; \vdots &amp; \vdots &amp; &amp; \vdots &amp; \vdots &amp; \vdots &amp; &amp; \vdots &amp; \vdots &amp; \vdots &amp; \\
+             \cdots  &amp; \frac{\partial G_{w_i}}{\partial P_{i - 1}} &amp; \frac{\partial G_{w_i}}{{\partial C_s}_{i - 1}} &amp; \frac{\partial G_{w_i}}{{\partial C_{np}}_{i - 1}} &amp; &amp;
+             \frac{\partial G_{w_i}}{\partial P_{i}} &amp; \frac{\partial G_{w_i}}{{\partial C_s}_{i}} &amp; \frac{\partial G_{w_i}}{{\partial C_{np}}_{i}} &amp;  &amp;
+             \frac{\partial G_{w_i}}{\partial P_{i + 1}} &amp; \frac{\partial G_{w_i}}{{\partial C_s}_{i + 1}} &amp; \frac{\partial G_{w_i}}{{\partial C_{np}}_{i + 1}} &amp; \cdots  \\
+             \cdots  &amp; \frac{\partial G_{s_i}}{\partial P_{i - 1}} &amp; \frac{\partial G_{s_i}}{{\partial C_s}_{i - 1}} &amp; \frac{\partial G_{s_i}}{{\partial C_{np}}_{i - 1}} &amp; &amp;
+             \frac{\partial G_{s_i}}{\partial P_{i}} &amp; \frac{\partial G_{s_i}}{{\partial C_s}_{i}} &amp; \frac{\partial G_{s_i}}{{\partial C_{np}}_{i}} &amp; &amp;
+             \frac{\partial G_{s_i}}{\partial P_{i + 1}} &amp; \frac{\partial G_{s_i}}{{\partial C_s}_{i + 1}} &amp; \frac{\partial G_{s_i}}{{\partial C_{np}}_{i + 1}} &amp; \cdots  \\
+             \cdots  &amp; \frac{\partial G_{np_i}}{\partial P_{i - 1}} &amp; \frac{\partial G_{np_i}}{{\partial C_s}_{i - 1}} &amp; \frac{\partial G_{np_i}}{{\partial C_{np}}_{i - 1}} &amp; &amp;
+             \frac{\partial G_{np_i}}{\partial P_{i}} &amp; \frac{\partial G_{np_i}}{{\partial C_s}_{i}} &amp; \frac{\partial G_{np_i}}{{\partial C_{np}}_{i}} &amp; &amp;
+             \frac{\partial G_{np_i}}{\partial P_{i + 1}} &amp; \frac{\partial G_{np_i}}{{\partial C_s}_{i + 1}} &amp; \frac{\partial G_{np_i}}{{\partial C_{np}}_{i + 1}} &amp; \cdots  \\
+              &amp; \vdots &amp; \vdots &amp; \vdots &amp; &amp; \vdots &amp; \vdots &amp; \vdots &amp; &amp; \vdots &amp; \vdots &amp; \vdots &amp;
+\end{pmatrix}\end{split}\]</div>
+<p>Most of the non diagonal terms of J are zero.</p>
+<p>Finally, the linear system <span class="math notranslate nohighlight">\(J\ dY = - G\)</span> is solved by a direct LU decomposition. This is not the most efficient in term of run time but this is the most robust.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="HydroRoot’s API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Christophe Godin, Christophe Maurel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
