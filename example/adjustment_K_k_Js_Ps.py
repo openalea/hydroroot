@@ -119,7 +119,7 @@ parameter.read_file(filename)
 
 Flag_radius = True  # True if radii furnished in architecture file used them, other wise use ref_radius and so on
 Flag_Optim_K = ('K' in Flag_Optim)  # optimize axial conductance K
-Flag_Constraint = False  # use constraint dK_constraint on 1st derivative dK/dx of K
+Flag_Constraint = True  # use constraint dK_constraint on 1st derivative dK/dx of K
 Flag_Optim_Klr = ('Klr' in Flag_Optim)  # optimize axial conductance of laterals Klr if <> than PR
 Flag_Optim_klr = ('klr' in Flag_Optim)  # optimize radial conductivity of laterals klr if <> than PR
 Flag_Optim_Js = ('Js' in Flag_Optim)    # optimize pumping rate Js
@@ -218,6 +218,15 @@ def fun(x):
     JvCnf, F_JvCnF, C = Jv_cnf_calculation(g, sigma, Js, Ps)
 
     F = F_JvP + F_JvCnF
+
+    ## with COBYLA constraints are not always respected, here a hugly way to force them by increasing F when they are not respected
+    # n = len(axial_data[1])
+    # c = np.ones(n - 1)
+    # l = axial_data[0]
+    # for i in range(n - 1):
+    #     if _x[i+1] - _x[i] - dK_constraint * (l[i+1] - l[i]) < 0.0:
+    #         F += 1.0
+
     if Flag_verbose: print('{:0.3e}'.format(F), ' '.join('{:0.3e}'.format(i) for i in _x))
 
     result_cv.append([F,kpr,klr,Ps,Js] + axial_data[1])
@@ -390,7 +399,7 @@ def Jv_P_calculation(g, sigma, Js, Ps):
         JCbase = 0.0
         for ig in range(Nb_of_roots):
             g[0, ig] = flux.flux(g[0, ig], psi_e = psi_base + list_DP[idP], psi_base = psi_base, invert_model = True)
-            g[0, ig] = init_some_MTG_properties(g[0, ig], tau = Js, Cini = Cini, t = 1)
+            g[0, ig] = init_some_MTG_properties(g[0, ig], tau = Js, Cini = Cini, t = 1, Ps = Ps)
             nb_v = g[0, ig].nb_vertices()
             Fdx = 1.0
             Fdx_old = 1.
@@ -399,9 +408,9 @@ def Jv_P_calculation(g, sigma, Js, Ps):
             # array with dP and dC variation of the variables between two Newton step. Then the Newton scheme stops when
             # Fdx > eps see below
             while Fdx > eps:
-                g[0, ig], dx, data, row, col = pressure_calculation_no_non_permeating_solutes(g[0, ig], sigma = sigma, tau = Js, Ce = Ce,
+                g[0, ig], dx, data, row, col = pressure_calculation_no_non_permeating_solutes(g[0, ig], sigma = sigma, Ce = Ce,
                                                                    Pe = parameter.exp['psi_e'], Pbase = parameter.exp['psi_base'],
-                                                                   Ps = Ps, Cse = Cse, dP = list_DP[idP], C_base = 0.0)
+                                                                    Cse = Cse, dP = list_DP[idP], C_base = None)
                 Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
                 JvP[idP, ig] = g[0, ig].property('J_out')[1]
                 if abs(JvP[idP, ig] - Jv_old) < 1.0e-4:
@@ -446,7 +455,7 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
     data = row = col = None
     for ig in range(Nb_of_roots):
         g[ic, ig] = flux.flux(g[ic, ig], psi_e = psi_base + DP_cnf[ic], psi_base = psi_base, invert_model = True)
-        g[ic, ig] = init_some_MTG_properties(g[ic, ig], tau = Js, Cini = Cini, t = 1)
+        g[ic, ig] = init_some_MTG_properties(g[ic, ig], tau = Js, Cini = Cini, t = 1, Ps = Ps)
         nb_v = g[ic, ig].nb_vertices()
         Fdx = 1.0
         Fdx_old = 1.
@@ -457,10 +466,10 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
         while Fdx > eps:
             # use pressure_calculation_no_non_permeating_solutes because the root is uncut so no PEG enter the root
             g[ic, ig], dx, data, row, col = pressure_calculation_no_non_permeating_solutes(g[ic, ig], sigma = sigma,
-                                                                                           tau = Js, Ce = Ce,
+                                                                                           Ce = Ce,
                                                                                            Pe = parameter.exp['psi_e'],
                                                                                            Pbase = parameter.exp[
-                                                                                               'psi_base'], Ps = Ps,
+                                                                                               'psi_base'],
                                                                                            Cse = Cse,
                                                                                            dP = DP_cnf[ic])
             Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
@@ -484,7 +493,7 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
         data = row = col = None
         for ig in range(Nb_of_roots):
             g[ic, ig] = flux.flux(g[ic, ig], psi_e = psi_base + DP_cnf[ic], psi_base = psi_base, invert_model = True)
-            g[ic, ig] = init_some_MTG_properties(g[ic, ig], tau = Js, Cini = Cini, Cpeg_ini = Cpeg_ini, t = 1)
+            g[ic, ig] = init_some_MTG_properties(g[ic, ig], tau = Js, Cini = Cini, Cpeg_ini = Cpeg_ini, t = 1, Ps = Ps)
             nb_v = g[ic, ig].nb_vertices()
             Fdx = 1.0
             Fdx_old = 1.
@@ -494,8 +503,8 @@ def Jv_cnf_calculation(g, sigma, Js, Ps):
             # Fdx > eps see below
             while Fdx > eps:
                 g[ic, ig], dx, data, row, col = routine_calculation(g[ic, ig], sigma = sigma,
-                                                                    tau = Js, Ce = Ce, Pe = parameter.exp['psi_e'],
-                                                                    Pbase = parameter.exp['psi_base'], Ps = Ps,
+                                                                    Ce = Ce, Pe = parameter.exp['psi_e'],
+                                                                    Pbase = parameter.exp['psi_base'],
                                                                     Cse = Cse, dP = DP_cnf[ic])
                 Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
                 JvCnf[ic, ig] = g[ic, ig].property('J_out')[1]
@@ -680,6 +689,10 @@ if __name__ == '__main__':
                 list_Jext = _list[0] # basal output flux
                 _list = df_exp2[df_exp2.arch == key].filter(regex = '^dP').dropna(axis = 1).values.tolist()
                 list_DP = _list[0] # delta pressure
+                dlpr = pd.DataFrame(list(zip(list_DP, list_Jext)), columns = ['dP', 'Jv'])
+                # dlpr = dlpr.sort_values('dP')[dlpr['dP']>0.05]
+                list_DP = list(dlpr['dP'])
+                list_Jext = list(dlpr['Jv'])
 
         if Flag_w_Lpr: w_Lpr = 1.0 / len(list_DP)
         if Flag_w_cnf: w_cnf = len(cut_n_flow_length)
@@ -723,6 +736,7 @@ if __name__ == '__main__':
             g_cut[0, ig].add_property('Cpeg') # non-permeating solute concentration needed if cut-n-flow with them in the medium
             g_cut[0, ig].add_property('theta') # see init_some_MTG_properties
             g_cut[0, ig].add_property('J_s') # see init_some_MTG_properties, at a certain time I tried varying Js with C
+            g_cut[0, ig].add_property('P_s') # see init_some_MTG_properties, at a certain time I tried varying Js with C
             g_cut[0, ig].add_property('original_vid') # the indices change between the full root and the cut root a way
                                                       # to retrieve the original index see set_K_and_k
             g_cut[0, ig].add_property('mu') # the viscosity of the sap because could change from the water value when

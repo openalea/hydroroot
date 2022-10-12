@@ -9,16 +9,17 @@ from openalea.mtg.algo import orders
 
 
 def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
-    """Compute the number of segment intercepted at a given length.
+    """
+    Compute the number of segments intercepted at a given length from the base.
 
-    Parameters
-    ==========
-        - g: MTG
-        - l: length
-
-    Returns
-    =======
+    :param g: (MTG)
+    :param l: (length)
+    :param root: (int) - the root vertex from which the tree traversal start (Default value = 1)
+    :param dl: (float) - length of MTG segments (Default value = 1e-4)
+    :param max_order: (int) - maximum order of considering roots (Default value = None)
+    :returns:
         - number of segment
+
     """
     length = {}
 
@@ -49,15 +50,34 @@ def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
     return count
 
 
-def intercept(g, dists, max_order=None):
-    """Compute intercepts at a given length from collet."""
+def intercept(g, dists, dl=1e-4, max_order=None):
+    """
+    Compute intercepts (the number of segments intercepted) at given lengths from the base given as list of float
 
-    intercepts = [nb_roots(g, x, max_order=max_order) for x in dists]
+    .. seealso:: :func:`nb_roots`
+
+    :param g: (MTG)
+    :param dists: (list of Float) list of distances
+    :param dl: (float) - length of MTG segments (Default value = 1e-4)
+    :param max_order: (int) - maximum order of considering roots (Default value = None)
+    :returns:
+        - intercepts: list of number of segments intercepted according to distances in dists
+    """
+    # F. Bauget 2021-07-09 : added dl to arguments
+
+    intercepts = [nb_roots(g, x, dl = dl, max_order=max_order) for x in dists]
     return intercepts
 
 
 def read_data(data):
-    """Merge data and return a Dataframe."""
+    """
+    :Deprecated:
+
+    Merge data and return a Dataframe.
+
+    :param data: 
+
+    """
     names = ('relative_position', 'internode_length', 'LR_length', 'distance_to_tip')
 
     df = None

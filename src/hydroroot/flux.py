@@ -2,9 +2,10 @@
 #
 #       HydroRoot
 #
-#       Copyright 2012 CNRS - INRIA - CIRAD - INRA
+#       Copyright 2012-2022 CNRS - INRIA - CIRAD - INRA
 #
-#       File author(s): Mikael Lucas <mikael.lucas.at.supagro.inra.fr>
+#       File author(s): Fabrice Bauget
+#                       Mikael Lucas <mikael.lucas.at.supagro.inra.fr>
 #                       Christophe Pradal <christophe.pradal.at.cirad.fr>
 #                       Christophe Maurel
 #                       Christophe Godin
@@ -26,9 +27,7 @@ from openalea.mtg.traversal import *
 import numpy as np
 
 class Flux(object):   # edit this to also allow for flux computation instead just redistribution
-    """Compute the water potential and fluxes at each vertex of the MTG.
-
-    """
+    """Compute the water potential and fluxes at each vertex of the MTG."""
 
     def __init__(self, g,
                  Jv, psi_e, psi_base,
@@ -37,7 +36,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                  cut_and_flow=False):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
 
-        :Parameters:
+        Params:
             - `g` (MTG) - the root architecture
             - `k` (dict) - lateral conductance
             - `K` (dict) - axial conductance
@@ -66,17 +65,26 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         self.CUT_AND_FLOW = cut_and_flow
 
     def run(self):
-        """ Compute the water potential and fluxes of each segments
-
+        """Compute the water potential and fluxes of each segment
+        
         For each vertex of the root, compute :
-            - the water potential (:math:`\psi^{\text{out}}`) at the base;
+            - the water potential (:math:`\psi_{\\text{out}}`) at the base;
+            - the water potential (:math:`\psi_{\\text{in}}`) at the end;
             - the water flux (`J`) at the base;
             - the lateral water flux (`j`) entering the segment.
 
+        The vertex base is the side toward the basal direction, the vertex end is the one toward the root tip.
+
         :Algorithm:
+
             The algorithm has two stages:
+
                 - First, on each segment, an equivalent conductance is computed in post_order (children before parent).
                 - Finally, the water flux and potential are computed in pre order (parent then children).
+
+        .. note::
+            Here :math:`\psi` are the hydrostatic water potential i.e. the hydrostatic pressure.
+            There are no osmotic components.
         """
 
         g = self.g; k = self.k; K = self.K ; CONSTANT = self.CONSTANT
@@ -214,16 +222,18 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
 
 class RadialShuntFlux(Flux):
-    """ Compute the water potential and fluxes at each vertex of the MTG.
-
+    """Compute the water potential and fluxes at each vertex of the MTG.
+    
     On each vertex, the topology of the radial resistance network
     has one direct shortcut to the parent. The shortcut has two new parameters a and b.
+
+
     """
 
     def __init__(self, a=1., b=0., **kwds):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
 
-        :Parameters:
+        Params:
             - `g` (MTG) - the root architecture
             - `k` (dict) - lateral conductance
             - `K` (dict) - axial conductance
@@ -247,17 +257,19 @@ class RadialShuntFlux(Flux):
 
 
     def run(self):
-        """ Compute the water potential and fluxes of each segments
-
+        """Compute the water potential and fluxes of each segments
+        
         For each vertex of the root, compute :
             - the water potential (:math:`\psi^{\text{out}}`) at the base;
             - the water flux (`J`) at the base;
             - the lateral water flux (`j`) entering the segment.
-
+        
         :Algorithm:
             The algorithm has two stages:
                 - First, on each segment, an equivalent conductance is computed in post_order (children before parent).
                 - Finally, the water flux and potential are computed in pre order (parent then children).
+
+
         """
 
         g = self.g; k = self.k; K = self.K ; CONSTANT = self.CONSTANT
@@ -408,28 +420,24 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
          invert_model=False, k=None, K=None, CONSTANT=1.,
          shunt=False, a=1., b=0.,
          cut_and_flow=False):
-    """ flux computes water potential and fluxes at each vertex of the MTG `g`.
+    """flux computes water potential and fluxes at each vertex of the MTG `g`.
 
-        :Parameters:
-            - `g` (MTG) - the root architecture
-            - `Jv` (float) - water flux at the root base in microL/s
-            - `psi_e` - hydric potential outside the roots (pressure chamber) in MPa
-            - `psi_base` - hydric potential at the root base (e.g. atmospheric pressure for decapited plant) in MPa
-            - `invert_model` - when false, distribute output flux within the root ; when true, compute the output flux for the given root and conditions
+    :param g: MTG
+    :param Jv: float (Default value = 0.1)
+    :param psi_e: hydric potential outside the roots (Default value = 0.4)
+    :param psi_base: hydric potential at the root base (Default value = 0.101325)
+    :param invert_model: when false (Default value = False)
+    :param k: dict (Default value = None)
+    :param K: dict (Default value = None)
+    :param shunt: bool (Default value = False)
+    :param a: relative factor to the main radial path conductivity (Default value = 1.)
+    :param b: relative factor to the shortcut path conductivity (Default value = 0.)
+    :param cut_and_flow: bool (Default value = False)
+    :param cut: and flow experiment
+    :param Example: 
+    :param my_flux: flux
+    :param CONSTANT:  (Default value = 1.)
 
-
-        :Optional Parameters:
-            - `k` (dict) - lateral conductance
-            - `K` (dict) - axial conductance
-            - `shunt` (bool) : use the RadialShunt Flux (True) or the classical one (False)
-            - `a` : relative factor to the main radial path conductivity.
-            - `b` : relative factor to the shortcut path conductivity.
-            - 'cut_and_flow (bool): deprecated, used before to differentiate the Keq calculation at the tips to simulate
-                        cut and flow experiment.
-
-        :Example::
-
-            my_flux = flux(g)
     """
     if not shunt:
         f = Flux(g, Jv, psi_e, psi_base, invert_model, k=k, K=K, CONSTANT=CONSTANT, cut_and_flow=cut_and_flow)
@@ -443,14 +451,13 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
 def segments_at_length(g, l, root=1, dl=1e-4):
     """Returns all the segments intercepted at a given length.
 
-    Parameters
-    ==========
-        - g: MTG
-        - l: length
-
-    Returns
-    =======
+    :param g: MTG
+    :param l: length
+    :param root:  (Default value = 1)
+    :param dl:  (Default value = 1e-4)
+    :returns:
         - number of segment
+
     """
     length = {}
 
@@ -471,23 +478,30 @@ def segments_at_length(g, l, root=1, dl=1e-4):
 
 
 def cut(g, cut_length, threshold=1e-4):
+    """
+
+    :param g: 
+    :param cut_length: 
+    :param threshold:  (Default value = 1e-4)
+
+    """
     # Added Fabrice 2020-01-17: segment_length in parameters list
     # F. Bauget 2022-07-25: added properties deletion
-    """Cut the architecture at a given length `cut_length`.
+    """Cut the architecture at a given length cut_length.
 
-        :Parameters:
-            - `g` (MTG) - the root architecture
-            - `cut_length` (float, m) - length at which the architecture is cut from collar.
-            - 'segment_length' (float, mm) - length of the vertices
+    Params:
+        - g (MTG) - the root architecture
+        - cut_length (float, m) - length at which the architecture is cut from collar.
+        - segment_length (float, mm) - length of the vertices
 
-        :Returns:
-            - `g`(MTG) - the architecture after the cut process. This is a copy.
+    Returns:
+        - g(MTG) - the architecture after the cut process. This is a copy.
 
-        :Example::
-
-            g_cut = cut(g, 0.09) # Cut g at 9cm. For example, remove the 2 last cm of a root architecture of 11 cm (primary length).
-            and all the properties associated with them
+    :Example:
+        g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).
+        and all the properties associated with them
     """
+
     # vids = segments_at_length(g, cut_length)
     vids = segments_at_length(g, cut_length, dl = threshold)
 
@@ -505,20 +519,26 @@ def cut(g, cut_length, threshold=1e-4):
     return g_cut
 
 def cut_and_set_conductance(g, cut_length, threshold=1e-4):
+    """
+
+    :param g: 
+    :param cut_length: 
+    :param threshold:  (Default value = 1e-4)
+
+    """
     # Added Fabrice 2020-02-21: based on def cut()
     """Cut the architecture at a given length `cut_length`, and set to the axial conductance value the radial
         conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding
 
-        :Parameters:
-            - `g` (MTG) - the root architecture
-            - `cut_length` (float, m) - length at which the architecture is cut from collar.
+        Params:
+            - g (MTG) - the root architecture
+            - cut_length (float, m) - length at which the architecture is cut from collar.
             - 'threshold' (float, mm) - length threshold to select the segments to remove in segments_at_length()
 
-        :Returns:
-            - `g`(MTG) - the architecture after the cut process. This is a copy.
+        Returns:
+            - g(MTG) - the architecture after the cut process. This is a copy.
 
-        :Example::
-
+        :Example:
             g_cut = cut(g, 0.09) # Cut g at 9cm. Remove the 2 last cm of a root architecture of 11 cm (primary length).
                     k = K at the cut tips
     """
@@ -543,9 +563,14 @@ def cut_and_set_conductance(g, cut_length, threshold=1e-4):
 
 def ramification_length_law(g, root=1, dl=1e-4):
     """Returns the length of the ramified axes along the main axis.
-
+    
     X is the distance to tip along the main axis
     Y is the length of the ramification
+
+    :param g: 
+    :param root:  (Default value = 1)
+    :param dl:  (Default value = 1e-4)
+
     """
     length = {}
 

@@ -1,5 +1,8 @@
 import math
 
+import sys
+sys.path.insert(0, '../src')
+
 from hydroroot.conductance import set_conductances
 from hydroroot.main import root_builder, flux
 from hydroroot.init_parameter import Parameters
@@ -67,13 +70,13 @@ def test_pressure_calculation():
 
     g = set_conductances(g, axial_pr = parameter.hydro['axial_conductance_data'], k0_pr = parameter.hydro['k0'])
     g = flux.flux(g, psi_e = psi_e, psi_base = psi_base)
-    g = init_some_MTG_properties(g, tau = J_s, Cini = Cini, t = 1)
+    g = init_some_MTG_properties(g, tau = J_s, Cini = Cini, t = 1, Ps = P_s)
     nb_v = g.nb_vertices()
     Fdx = 1.0
     Fdx_old = 1.
     dP = psi_e - psi_base
     while Fdx > eps:
-        g, dx, data, row, col = pressure_calculation(g, sigma = Sigma, tau = J_s, Ce = Ce, Ps = P_s, Cse = Cse, dP = dP)
+        g, dx, data, row, col = pressure_calculation(g, sigma = Sigma, Ce = Ce, Cse = Cse, dP = dP)
         Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
         local_j = g.property('J_out')[1]
         if abs(Fdx - Fdx_old) < eps: break
@@ -87,7 +90,7 @@ def test_pressure_calculation():
     Fdx_old = 1.
     dP = psi_e - psi_base
     while Fdx > eps:
-        g, dx, data, row, col = pressure_calculation_no_non_permeating_solutes(g, sigma = Sigma, tau = J_s, Ce = Ce, Ps = P_s, Cse = Cse, dP = dP)
+        g, dx, data, row, col = pressure_calculation_no_non_permeating_solutes(g, sigma = Sigma, Ce = Ce, Cse = Cse, dP = dP)
         Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
         local_j2 = g.property('J_out')[1]
         if abs(Fdx - Fdx_old) < eps: break

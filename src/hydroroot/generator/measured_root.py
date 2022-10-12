@@ -18,15 +18,30 @@ def mtg_builder(
     nude_tip_length=20,
     order_max=5,
     seed=None):
-    """ Create a MTG from length laws.
+    """
+    'Deprecated'
 
+    Create a MTG from length laws.
+    
     The first law is the length of the primary root.
     The second law is the length of the ramification.
-
+    
     The primary root is of length 'total_length'.
     It is discretized following the law length_base.
-
+    
     All the variables are expressed in meters.
+
+    :param primary_length: 
+    :param primary_length_data: 
+    :param lateral_length_data: 
+    :param segment_length:  (Default value = 1e-4)
+    :param branching_variability:  (Default value = None)
+    :param branching_delay:  (Default value = None)
+    :param length_law:  (Default value = None)
+    :param nude_tip_length:  (Default value = 20)
+    :param order_max:  (Default value = 5)
+    :param seed:  (Default value = None)
+
     """
     length_base = primary_length_data
     length_lateral = lateral_length_data
@@ -85,7 +100,11 @@ def mtg_builder(
         np.random.seed(seed)
 
     def delayed_markov(timer):
-        """ markov chain with a delay between ramification """
+        """markov chain with a delay between ramification
+
+        :param timer: 
+
+        """
         if (timer <= 0) :
             return (1,branching_delay)
         else :
@@ -93,14 +112,19 @@ def mtg_builder(
             return 0,timer
 
     def create_randomized_delayed_axis(nid, n, anchors=anchors):
-        """ create an axis of length n using the delayed markov
+        """create an axis of length n using the delayed markov
             and randomized the id of the branching points in anchors
             around the theoretical branching positions
-
+        
         :Parameters:
             - nid: root node for the axis
             - n : number of vertices for this axis
             - anchors: future ramification points on this axis
+
+        :param nid: 
+        :param n: 
+        :param anchors:  (Default value = anchors)
+
         """
         n = int(n)
         axis = []
@@ -134,14 +158,18 @@ def mtg_builder(
                 anchors.append(nid)
 
     def update_randomized_delayed_axis(vid, anchors=anchors):
-        """ create an axis of length n using the delayed markov
+        """create an axis of length n using the delayed markov
             and randomized the id of the branching points in anchors
             around the theoretical branching positions
-
+        
         :Parameters:
             - nid: root node for the axis
             - n : number of vertices for this axis
             - anchors: future ramification points on this axis
+
+        :param vid: 
+        :param anchors:  (Default value = anchors)
+
         """
         _axis = list(algo.descendants(g,vid,RestrictedTo='SameAxis'))
         n = len(_axis)
@@ -222,27 +250,23 @@ def mtg_builder(
 
 
 def mtg_from_aqua_data(df, segment_length=1e-4):
-    """ Added F. Bauget 2019-12-19
-        reconstruct MTG from file in format used by aquaporin team
-        maximum order is 2
+    # Added F. Bauget 2019-12-19
+    """
+    Reconstruct MTG from pandas DataFrame with the following columns:
 
-        Author: C. Pradal
-        Modified: F. Bauget
+     * 1st col: 'db' (float) distance from base in m on the parent root where starts the lateral root
+     * 2nd col: 'lr' (float) length in m of the corresponding lateral root
+     * 3d col: 'order' (string) = '1' if parent root is the primary root, = '1-n' if the parent root is a lateral root that starts at the node n on the parent root
 
-
-        Parameters
-        ==========
-            - df: pandas dataframe, 3 columns ['db','lr','order'], db and lr are length in m
-            - segment_length: length of the vertices, default 1.e-4 in m
-
-        Returns
-        =======
+    :param df: pandas (DataFrame)
+    :param segment_length: (float) length of the vertices (Default value = 1e-4)
+    :returns:
             - g: MTG with the following properties set: edge_type, label, base_length, length
 
-         the format is: 3 columns separated by tab
-         * 1st col: "db" distance in m from base on the parent root where starts the lateral root
-         * 2nd col: "lr" length in m of the corresponding lateral root
-         * 3d col: "order" = 1 if parent root is the primary root, = 1-n if the parent root is a lateral root that starts at the node n on the parent root
+    .. note::
+        At this stage 2022-08-23 tested with a maximum order of 2
+
+    .. seealso:: :func:`hydroroot.read_file.read_archi_data`
     """
 
     g = MTG()
@@ -306,19 +330,17 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
     return g
 
 def add_branching(g, df, ramifs = None, Order = 0, segment_length = 1e-4):
-    """ F. Bauget 2019-12-19
-    add branching of a given order on the previous order
-    linked to mtg_from_aqua_data
-    Parameters:
-        - g: MTG
-        - df: pandas dataframe, 3 columns ['db','lr','order'], db and lr are length in m
-        - ramifs: dict with a list (Order, nth lateral root), and a dict [vid, lr] vid is the vertice index on the
-                    parent root from which the lateral of length lr starts
-        - Order: int the order of the new branching
-        - segment_length: float length in m of the vertices
+    """add branching of a given order on the previous order
 
-    Return:
-        - new_ramifs: dict to used as the ramifs parameter for a new call of add_branching
+    called by :func:`mtg_from_aqua_data`
+
+    :param g: MTG
+    :param df: (DataFrame)
+    :param ramifs: (dict) - dict of a list with tuple (vid, lr) vid is the vertex index on the parent root from which the lateral of length lr starts (Default value = None)
+    :param Order: (int) - the order of the new branching (Default value = 0)
+    :param segment_length: (float) - length in m of the vertices (Default value = 1e-4)
+    :returns: - new_ramifs: dict to used as the ramifs parameter for a new call of add_branching
+
     """
     new_ramifs = {}
     len_base = 0

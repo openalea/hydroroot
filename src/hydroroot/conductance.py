@@ -11,15 +11,16 @@ from hydroroot.length import fit_law
 
 def setting_k0_according_to_order(g, k0_pr, k0_lr):
     """
-    set uniform radial conductivity to roots according to their order, to the primary root if oreder == 0,
-    to the laterals otherwise
-    :Parameters:
-    	- g: (MTG) - the root architecture
-    	- k0_pr: (float, microL/(s.MPa.m2)) - uniform radial conductivity of the primary root
-    	- k0_lr: (float, microL/(s.MPa.m2)) - uniform radial conductivity of the laterals root
+    Set uniform radial conductivity to roots according to their order:
 
-    :Returns:
-        - g: (MTG) - the root architecture with k0_pr and k0_lr set
+    - to k0_pr for the primary root (order == 0),
+    - to k0_lr otherwise
+
+    :param g: (MTG)
+    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for the primary root
+    :param k0_lr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for root of order > 0
+    :returns: - g: (MTG) - the root architecture with k0_pr and k0_lr set
+
     """
     d = {k: k0_pr if g.property('order')[k] == 0 else k0_lr for k, v in list(g.property('order').items())}
     g.properties()['k0'] = d
@@ -27,19 +28,25 @@ def setting_k0_according_to_order(g, k0_pr, k0_lr):
 
 def set_conductances(g, axial_pr, k0_pr, axial_lr = None, k0_lr = None):
     """
-    Set the properties 'K_exp', 'K' and 'k', the axial conductance in [L^4 P^(-1) T^(-1)], the axial conductance in
-    [L^3 P^(-1) T^(-1)] K_exp/segment_length and the radial conductivity
-    if axial_lr is None, set 'K_exp' and 'K' whatever the roots order, otherwise set differently the root of order==1
-    idem for the radial conductivity if k0_lr is not None
+    Set the MTG properties 'K_exp', 'K' and 'k':
 
-    :Parameters:
-    	- g: (MTG)
-    	- axial_pr: (list) - the axial conductance, list of 2 lists of floats
-    	- k0_pr: (float) - the radial conductivity
-    	- axial_lr:  (list) - if not None the axial conductance of the laterals, list of 2 lists of floats
-    	- k0_lr: (float) - if not None the radial conductivity  of the laterals
-    :Returns:
-        - g (MTG)
+     - K_exp: the model input axial conductance in :math:`[L^4.P^{-1}.T^{-1}]`
+     - K: the effective axial conductance of each vertex :math:`K=K_{exp}/l\\ [L^3.P^{-1}.T^{-1}]`
+     - k: the radial conductance :math:`k=2 \pi r l k_0 \ [L^3.P^{-1}.T^{-1}]`
+
+    with r and l the radius and the length of the vertex respectively.
+    
+    if axial_lr is None, set 'K_exp' and 'K' according to axial_pr whatever the roots order, otherwise set
+    the roots of order == 0 according to axial_pr and others according to axial_lr. idem for the radial conductivity if
+    k0_lr is not None.
+
+    :param g: (MTG)
+    :param axial_pr: (list) - axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) vs distance to tip, 2 lists of float
+    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`)
+    :param axial_lr: (list) - axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) for root of order > 0, 2 lists of float (Default value = None)
+    :param k0_lr: (float) - radial donductivity  (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for root of order > 0 (Default value = None)
+    :returns: - g (MTG)
+
     """
     xa, ya = axial_pr
     axial_conductivity_law = fit_law(xa, ya)
@@ -72,6 +79,15 @@ def set_conductances(g, axial_pr, k0_pr, axial_lr = None, k0_lr = None):
     return g
 
 def compute_K_from_laws(g):
+    """
+    :deprecated:
+
+    compute the axial conductance K versus the vertex position according to some laws and to the root types: crown, seminal,
+    laterals
+
+    :param g: (MTG)
+
+    """
     K={}
     segment_length = 1e-4
     seminal_axial_conductivity_law = lambda x: 2135.05*x + 21338.63
@@ -97,18 +113,21 @@ def compute_K_from_laws(g):
     return g
 
 def compute_K(g, scale_factor=1.):
+    """
+    Compute the conductance in dimension :math:`[L^3 P^{-1} T^{-1}]` from the 'experimental' one which is
+    in :math:`[L^4 P^{-1} T^{-1}]`
+
+    In each vertex compute :math:`K = K_{exp} \\frac{\\text{scale_factor}}{\\text{vertex_length}}`
+
+    :param g: (MTG) - the root architecture
+    :param scale_factor: (float) - a factor used for sensitivity analysis (Default value = 1)
+    :returns:
+        - g (MTG) - with the property K set
+
+    """
     # Fabrice 2020-01-17: this calculation was done hydroroot.flux.run but that meant that the MTG was changed at each
     #                       flux calculation which is not relevant the MTG properties have to be fixed
-    """
-    Compute the conductance in dimension [L^3 P^(-1) T^(-1)] from the experimental one which is in [L^4 P^(-1) T^(-1)]
 
-    :parameters:
-        - 'g' (MTG) - the root architecture
-        - CONSTANT (float) - a factor used for sensitivity analysis
-    :return: g
-
-    In each vertex K = K_exp * CONSTANT / vertex_length
-    """
     length = g.property('length')
     K_exp = g.property('K_exp')
     K = {}
@@ -122,39 +141,33 @@ def compute_K(g, scale_factor=1.):
 
 def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
     """
-    Compute a conductance of a xylem element based on their radius and length.
-    
-    Parameters
-    ==========
-    radius : float (m)
-        radius of a xylem tube
+    Compute a conductance of a cylindrical element based on its radius and length.
 
-    length: float (m)
-        length of a xylem element
+    :param radius: (float)
+    :param length: (float)
+    :param viscosity: (float) (Default value = 1e-3)
 
-    viscosity : float (Pa.s)
-        dynamic viscosity of the liquid
-    
-    The poiseuille formula is:
-        :math:` conductance = \frac{\pi r^4}{8 \mu L }` 
-        with :math:`r` the radius of a pipe, 
-        :math:`\mu` the viscosity of the liquid,
-        :math:`L` the length of the pipe.
-        
-    .. seealso:: http://en.wikipedia.org/wiki/Poiseuille
+    The Poiseuille formula is, for a cylinder :math:`K = {\pi r^4} / {8 \mu l}`
+
+    with :math:`r` the radius of a pipe, :math:`\mu` the viscosity of the liquid, :math:`l` the length of the pipe.
+
     """
     return pi*(radius**4) / ( 8 * viscosity * length)
 
 
 def compute_k(g, k0 = 300.):
-    """ Compute the radial conductances (k) of each segment of the MTG.
+    """Compute the radial conductance k (:math:`m.s^{-1}.MPa^{-1}`) of each vertex of the MTG.
 
-    Parameters
-    ==========
+    .. math::
+        k = 2 \pi r l k0
 
-        - `g` - the RSA
-        - `k0` - the radial conductance for one element of surface in microL/s.MPa.m**2
-        - `length` - the length of a segment
+    with l and r the segment length and radius of the vertex
+
+    - if k0 == "k0": calculation using k0 values from g.property('k0') on each vertex
+    - if k0 is a float: use this value in the calculation
+
+    :param g: (MTG)
+    :param k0: (float or string) - "k0" or the radial conductivity in :math:`m.s^{-1}.MPa^{-1}` (Default value = 300.)
 
     """
     #print 'entering radial k fitting'
@@ -174,16 +187,24 @@ def compute_k(g, k0 = 300.):
 
 
 def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATED
-    # Fabrice 2020-01-17: changed the function name from "compute_K" to "compute_K_from_Poiseuille" because this name
-    #                     is now used to calculate the real conductance in [L^3 P^(-1) T^(-1)] from the experimental one
-    #                     in [L^4 P^(-1) T^(-1)]
-    """ Compute the axial conductances (K) in a MTG according to Poiseuille law.
+    """
+    :Deprecated:
+
+    Compute the axial conductance K in a MTG according to the Poiseuille law.
 
     The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
     and on the length of a root segment.
 
     radius_scale allows to compute the radius of a xylem pipe from the radius of a root segment.
+
+    :param g: (MTG)
+    :param nb_xylem:  (Default value = 5)
+    :param radius_scale:  (Default value = 1/10.)
+
     """
+    # Fabrice 2020-01-17: changed the function name from "compute_K" to "compute_K_from_Poiseuille" because this name
+    #                     is now used to calculate the real conductance in [L^3 P^(-1) T^(-1)] from the experimental one
+    #                     in [L^4 P^(-1) T^(-1)]
 
     radius = g.property('radius_xylem')
     if not radius:
@@ -199,10 +220,21 @@ def compute_K_from_Poiseuille(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATE
     return g
 
 def fit_property(g, x, y, prop_in, prop_out, s=3.): 
-    """ Fit a 1D spline from x, y data.
+    """
+    :Deprecated:
 
+    Fit a 1D spline from x, y data and plot it
+    
     Retrieve the values from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
+
+    :param g: 
+    :param x: 
+    :param y: 
+    :param prop_in: 
+    :param prop_out: 
+    :param s:  (Default value = 3.)
+
     """
 
     spline = UnivariateSpline(x, y, s=s)
@@ -226,10 +258,22 @@ def fit_property(g, x, y, prop_in, prop_out, s=3.):
 
 
 def fit_property_from_spline(g, spline, prop_in, prop_out): 
-    """ compute a property from another one using a spline transformation.
-
+    """compute a property from another one using a spline transformation.
+    
     Retrieve the values from the prop_in of the MTG.
-    And evaluate the spline to compute the property 'prop_out'
+    And evaluate the *spline* according to *prop_in* to compute the property *prop_out*
+
+    :param g: MTG
+    :param spline: (class scipy)
+    :param prop_in: (string)
+    :param prop_out: (string)
+
+    :Example:
+
+    Typically, we have, as input, the axial conductance versus distance to tip K(x) given as a list of 2 lists
+    of few number of floats. Then we have to calculate on each vertex the axial conductance according to it.
+    To do that, we first fit with a spline K(x) and then use the present function to use the spline to compute
+    K according to the position of the vertex.
     """
 
     #spline = UnivariateSpline(x, y, s=s)
@@ -244,12 +288,25 @@ def fit_property_from_spline(g, spline, prop_in, prop_out):
 
 
 def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False, direct_input=None):
-    """ Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
+    """
+    :Deprecated:
 
+    Fit a 1D spline from (x, y) csv extracted data or from direct input dictionary
+    
     Retrieve the values it will be applied to from the prop_in of the MTG.
     And evaluate the spline to compute the property 'prop_out'
-
+    
     Toggle plot option to visualize the spline fit
+
+    :param g: 
+    :param csvdata: 
+    :param prop_in: 
+    :param prop_out: 
+    :param k:  (Default value = 1.)
+    :param s:  (Default value = 0.)
+    :param plot:  (Default value = False)
+    :param direct_input:  (Default value = None)
+
     """
     #print 'entering K fitting'    
 
@@ -293,6 +350,15 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
 
 
 def fit_K(g, s=0.):   # DEPRECATED
+    """
+    :Deprecated:
+
+    call :func:`fit_property`
+
+    :param g:
+    :param s:  (Default value = 0.)
+
+    """
     x = np.linspace(0.,1.,100)
     y = np.linspace(50, 500, 100)+100*np.random.random(100)-50
 
@@ -307,17 +373,20 @@ def fit_K(g, s=0.):   # DEPRECATED
 # Below these function does not do very complicated things but are used in most of the scripts
 
 def radial(v = 92, acol = [], scale = 1):
-    """
-    create a list of uniform value v*scale of the same length than acol given in arguments
+    """create a list of uniform value v*scale of the same length than acol
     the purpose is to return  x-y data in a form of two lists
-    called radial because used to get x-y data with uniform y (radial conductivity) values
 
-    :Parameters:
-    	- v: (float)
-    	- acol: (float list)
-    	- scale: (float) -
-    :Returns:
-        - xr, yr (list)
+    :param v: (float) (Default value = 92)
+    :param acol: (list) 2 lists of floats (Default value = [])
+    :param scale: (float) (Default value = 1)
+    :returns: - xr, yr (list)
+
+
+    :Example:
+
+    in HydroRoot the conductivity and the conductance are properties versus distance to tip. Then if in the
+    yaml file with parameters we give a float for k0, we must transform it to a list of 2 lists of float as the axial
+    conductance.
     """
     xr = acol[0]  # at this stage kr constant so the same x than Ka
     yr = [v * scale] * len(xr)
@@ -326,22 +395,19 @@ def radial(v = 92, acol = [], scale = 1):
 
 
 def radial_step(kmin = 92, factor = 1.0, x_step = None, x_base = 1., dx = 1.0e-4, scale = 1.0):
-    """
-    Radial k as a step function.
-    Maximum value from the tip x=0 to the x_step, then minimum value from x_step + dx to x_base.
-    The maximum value = kmin * factor
+    """Radial conductivity k as a step function.
 
-    :Parameters:
-        - kmin: (Float), the minimum value in microL/(s.MPa.m**2)
-        - factor: (Float), see above
-        - x_step: (Float), the distance from tip where the step is in meter
-        - x_base: (Float), the maximum distance from tip in meter
-        - dx: (Float), elementary distance in m
-        - scale: (Float), a scale facteur
+    k is set to its maximum value (kmin * factor) from the tip (x=0) to x_step, and its minimum value kmin from x_step + dx to x_base.
 
-    :Returns:
-        - xr: (list), list of distance from the tip
-        - xr: (list), list of radial k values
+    :param kmin: Float (Default value = 92)
+    :param factor: Float (Default value = 1.0)
+    :param x_step: Float (Default value = None)
+    :param x_base: Float (Default value = 1.)
+    :param dx: Float (Default value = 1.0e-4)
+    :param scale: Float (Default value = 1.0)
+    :returns: - xr: (list), list of distance from the tip
+            - yr: (list), list of radial k values
+
     """
 
     xr = [0.0]
@@ -358,14 +424,12 @@ def radial_step(kmin = 92, factor = 1.0, x_step = None, x_base = 1., dx = 1.0e-4
 
 
 def axial(acol = [], scale = 1):
-    """
-    the purpose is to give in arguments a set of 2 lists representing a x-y data and to return it with y*scale
+    """the purpose is to give in arguments a set of 2 lists representing a x-y data and to return it with y*scale
 
-    :Parameters:
-    	- acol: (list) - list of two float list of the same length
-    	- scale: (float) - the number that multiply the 2d list
-    :Returns:
-        - x, y (list) - 2 lists
+    :param acol: list (Default value = [])
+    :param scale: float (Default value = 1)
+    :returns: - x, y (list) - 2 lists
+
     """
     x, y = acol
     y = [a * scale for a in y]
