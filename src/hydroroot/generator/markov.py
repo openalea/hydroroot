@@ -11,12 +11,15 @@ from hydroroot.law import length_law
 #from random import choice
 
 def my_seed():
-    """ generate my own seed function to capture the seed value. """
+    """generate my own seed function to capture the seed value."""
     return int(int(_hexlify(_urandom(2500)), 16) % 100000000)
 
 def linear(n=5):
-    """
-    Create a MTG with just one linear axis without properties.
+    """Create a MTG with just one linear axis without properties.
+
+    :param n: (int) - number of vertices (Default value = 5)
+    :returns: g (MTG)
+
     """
     g = MTG()
     root = g.root
@@ -33,18 +36,25 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                        nude_tip_length=200, order_max=5,
                        seed=None, censure_variability = False,  **kwargs):
     """
-    Parameters
-    ----------
-        - g : MTG
-        - vid : id of the root of the MTG where the generating tree will be added
-        - nb_vertices : number of element of the main axis
-        - branching_variability : probability of ramification at exact mean branching position
-        - branching_delay : reference distance between successive branching axis
-        - length_law : spline given the length of lateral ramification
-        - nude_tip_length : length at root tip with no ramification
-        - LR_length_law : distribution of LR length along axis length
-        - seed : Seed for random number generator (default=None).
-        - censure_variability : allow if True to constrain lateral number of vertices to nb_vertices according to the order
+    Build a tree by modeling the stochastic process of lateral root branching by a first-order Markov chain on growing root axes.
+    The building process is constrained by the arguments, see parameter descriptions.
+
+    if `g` :code:`not None` then add the new tree to `g` at the vertex `vid`
+
+    :param g: (MTG) (Default value = None)
+    :param vid: (int) - the vertex id to which the new tree is added if not zero (Default value = 0)
+    :param nb_vertices: (int) - the number of vertices in the main axis (Default value = 1500)
+    :param branching_variability: (float) - variability on branching_delay and lateral lengths, :math:`\\in [0, 1]` (Default value = 0.1)
+    :param branching_delay: (float) - number of vertex between branching (Default value = 20)
+    :param length_law: function giving a length according to the branching position (Default value = None)
+    :param nude_tip_length: (float) - distance from tip without branching in vertices number (Default value = 200)
+    :param order_max: (int) - maximum root order (Default value = 5)
+    :param seed: (int) - a seed for the random generators (Default value = None)
+    :param censure_variability: (boolean) - deprecated because constrained by length_law- if True avoids to get a lateral longer than its parent (Default value = False)
+    :returns:
+        - g (MTG)
+
+    .. seealso:: :func:`hydroroot.law.length_law`, :func:`hydroroot.law.histo_relative_law`, :func:`hydroroot.main.hydroroot_mtg`
     """
     # Modified FB 2020-03-10 : added flag in routine argument censure_variability see below
     if g is None:
@@ -62,11 +72,15 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
     decrease = [ (1.-order/100.) for order in range(1, int(order_max)+1)]
     def markov():
-        """ simple random markov chain - unused now """
+        """simple random markov chain - unused now"""
         return 1 if random.random() < branching_variability else 0
 
     def delayed_markov(timer):
-        """ markov chain with a delay between ramification """
+        """markov chain with a delay between ramification
+
+        :param timer: 
+
+        """
         if (timer <= 0) :
             return (1,branching_delay)
         else :
@@ -74,9 +88,13 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
             return 0,timer
 
     def random_delayed_markov(timer):
-        """ random markov chain with a delay between
+        """random markov chain with a delay between
             possible ramification and uniform random variation
-            of branching position around mean position """
+            of branching position around mean position
+
+        :param timer: 
+
+        """
         if (timer <= int(branching_variability*branching_delay)) :
             return (1,branching_delay) if (random.random() < (1-branching_variability)) else (0,timer)
         else :
@@ -84,7 +102,13 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
             return 0,timer
 
     def create_axis(nid, n, anchors=anchors):
-        """ create a random axis of length n and record the id of the branching points in anchors """
+        """create a random axis of length n and record the id of the branching points in anchors
+
+        :param nid: (int) - root node for the axis
+        :param n: (int) - number of vertices for this axis
+        :param anchors: (list) (Default value = anchors) - list of id of future ramification points on this axis
+
+        """
         axis = [markov() for i in range(n)]
         for i in range(1,int(min(branching_delay,n))+1):
             axis[-i] = 0
@@ -96,13 +120,13 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 anchors.append(nid)
 
     def create_delayed_axis(nid, n, anchors=anchors):
-        """ create an axis of length n using the delayed markov
+        """create an axis of length n using the delayed markov
             and record the id of the branching points in anchors
 
-        :Parameters:
-            - nid: root node for the axis
-            - n : number of vertices for this axis
-            - anchors: future ramification points on this axis
+        :param nid: (int) - root node for the axis
+        :param n: (int) - number of vertices for this axis
+        :param anchors: (list) (Default value = anchors) - list of id of future ramification points on this axis
+
         """
         axis = []
         branch, time = delayed_markov(0)
@@ -120,14 +144,14 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
                 anchors.append(nid)
 
     def create_randomized_delayed_axis(nid, n, anchors=anchors):
-        """ create an axis of length n using the delayed markov
+        """create an axis of length n using the delayed markov
             and randomized the id of the branching points in anchors
             around the theoretical branching positions
+        
+        :param nid: (int) - root node for the axis
+        :param n: (int) - number of vertices for this axis
+        :param anchors: (list) (Default value = anchors) - list of id of future ramification points on this axis
 
-        :Parameters:
-            - nid: root node for the axis
-            - n : number of vertices for this axis
-            - anchors: future ramification points on this axis
         """
         n = int(n)
         axis = []
@@ -221,7 +245,12 @@ def markov_binary_tree(g=None, vid=0, nb_vertices=1500,
 
 
 def shuffle_axis(g=None, shuffle=False):
-    """ For each subtree of a MTG, change its root node to another node of the same axis.
+    """For each subtree of a MTG, change its root node to another node of the same axis.
+
+    :param g:  (Default value = None)
+    :param shuffle:  (Default value = False)
+    :returns: - g
+
     """
     max_scale = g.max_scale()
     if shuffle:
@@ -250,18 +279,26 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
                delta = 2e-3, nude_length = 2e-3, primary_length = 0.13, segment_length = 1e-4, order_max = 4):
     """generate a MTG according to the input parameters using length_data (mendatory) for the branching
 
-    :Parameters:
-        - seed: (int) the seed for the random generator in the markof chain
-        - length_data: (Dataframe) pandas dataframe columns names 'LR_length_mm', 'relative_distance_to_tip' sorted by 'relative_distance_to_tip'
-        - branching_variability: (float) probability of ramification at exact mean branching position
-        - branching_delay: (float) reference distance between successive branching axis
-        - nude_length: (float) length at root tip with no ramification
-        - primary_length: (float) primary root length
-        - segment_length: (float) length of the vertices, default 1.e-4
-        - order_max: (int) maximum lateral roots order
+    Preprocessing variables before calling :func:`markov_binary_tree`:
 
-    :Returns:
+        - nb_vertices: primary root length in vertex number
+        - branching_delay: distance between branching in vertex number
+        - nb_nude_vertices: distance from tip without branching in vertex number
+        - length_law: the function giving the lateral length according to its position on the parent branch
+    
+    :param seed: (int) - the seed for the random generator in the markof chain (Default value = None)
+    :param length_data: (Dataframe) - pandas dataframe columns names 'LR_length_mm' and 'relative_distance_to_tip' sorted by 'relative_distance_to_tip' (Default value = None)
+    :param branching_variability: (float) - variability on branching_delay and lateral lengths, :math:`\\in [0, 1]` (Default value = 0.25)
+    :param delta: (float) - reference distance (m) between successive branching axis (Default value = 2e-3)
+    :param nude_length: (float) - length (m) at root tip with no ramification (Default value = 2e-3)
+    :param primary_length: (float) - primary root length (m) (Default value = 0.13)
+    :param segment_length: (float) - length of the vertices (m) (Default value = 1e-4)
+    :param order_max: (int) - maximum lateral roots order (Default value = 4)
+    
+    :returns:
         - g: MTG with the following properties set: edge_type, label, position
+
+    .. seealso:: :func:`hydroroot.law.length_law`, :func:`hydroroot.law.histo_relative_law`, :func:`hydroroot.main.root_builder`
     """
 
     # nude length and branching delay in terms of number of vertices
@@ -270,16 +307,21 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 
     nb_vertices = int(primary_length / segment_length)
 
-    length_max_secondary = length_data[0].LR_length_mm.max() * 1e-3  # in m
+    # F. Bauget 2022-08-12: added if-else to be able to use the function without length data, useful for usage demo
+    if length_data:
+        length_max_secondary = length_data[0].LR_length_mm.max() * 1e-3  # in m
 
-    law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
-    law_order2 = length_law(length_data[1], scale_x = length_max_secondary / 100., scale = segment_length)
+        law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
+        law_order2 = length_law(length_data[1], scale_x = length_max_secondary / 100., scale = segment_length)
+        _length_law = [law_order1, law_order2]
+    else:
+        _length_law = None
 
     g = markov_binary_tree(
         nb_vertices = nb_vertices,
         branching_variability = branching_variability,
         branching_delay = branching_delay,
-        length_law = [law_order1, law_order2],
+        length_law = _length_law,
         nude_tip_length = nb_nude_vertices,
         order_max = order_max,
         seed = seed)

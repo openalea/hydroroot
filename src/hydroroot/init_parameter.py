@@ -5,12 +5,13 @@ Created on Tue Dec  3 10:45:01 2019
 
 @author: F. Bauget
 
-Work in progress
-
 Parameters class:
-    init: set the default values
-    Methods: read_file read the Yaml configuration file containing the model parameters into a Class.
-            Calls other methods to perform some initialization
+    :init: set the default values
+
+    :Methods:
+        - read_file: read the Yaml configuration file containing the model parameters into a Class.
+        - init_calculation: perform some initialization
+        - parameters_to_list: convert some parameters to list if they are not
 """
 
 # F. Bauget 2021-05-04: added solute parameters
@@ -22,44 +23,42 @@ import glob
 
 
 class Parameters():
-    """
-    Init Parameters class. Set setting default values and structure
-    Parameters contains 5 dictionaries grouping inputs in 5 gategories:
-        -   archi: all inputs related to the architecture generation or reconstruction
-                *  read_architecture: Bool, True = read the architecture from a data (i.e. reconstructed MTG)
-                *  input_dir:  string, input directory of the architecture file
-                *  input_file: list of string,  architecture files
-                *  seed: integer or list of integer, seed for the Markov generator, if none seed is generated
-                *  length_file: list of strings, files name (included relative path) containing data used to calculate 
-                            length laws for the laterals generation
-                *  length_data: float data containing in the files above
-                *  primary_length: float or list of float, length of the primary root
-                *  branching_delay: float or list of float, average distance between to branching
-                *  branching_variability: float, add variability in the delay
-                *  order_max: integer, maximum laterals order 
-                *  segment_length: float, length of the vertices
-                *  nude_length: float or list of float, length from the tip without any branching
-                *  ref_radius: float, radius of the primary root
-                *  order_decrease_factor: float, decrease factor apply to the radius to account for its decrease 
-                            with lateral order
-        - hydro: inputs related to the hydrodynamics
-                *  k0: float, the radial conductivity
-                *  axial_conductance_data: list of 2 list of float, the axial conductance vs distance from the tip
-        - solute: inputs related to solutes transport eather permating or not
-                *  J_s: float, active pumping rate
-                *  P_s: float, permeability coefficient
-                *  Cse: float, concentration of permeating solutes
-                *  Ce: float, concentration of non-permeating solutes
-                *  sigma: float, reflextion coefficient
-        - exp: inputs related to the experimental conditions and measurements
-                *  jv: float, measured flux at the base
-                *  psi_e: float, water potential surrounding the root
-                *  psi_base: float, water potential at the base
-        - output: inputs related to the simulations and its output
-                *  radfold: float or list of float, in factor to k0
-                *  axfold: float or list of float, in factor to axial_conductance_data
-                *  intercepts: list of float, distance from base to calculate the number of intercepts
-                *  run_nb: int, number of simulation with the same set of input
+    """Init Parameters class. Set setting default values and structure
+
+    :param archi: all inputs related to the architecture generation or reconstruction
+    :param read_architecture: Bool
+    :param input_dir: string
+    :param input_file: list of string
+    :param seed: integer or list of integer
+    :param length_file: list of strings
+    :param length_data: float data containing in the files above
+    :param primary_length: float or list of float
+    :param branching_delay: float or list of float
+    :param branching_variability: float
+    :param order_max: integer
+    :param segment_length: float
+    :param nude_length: float or list of float
+    :param ref_radius: float
+    :param order_decrease_factor: float
+    :param hydro: inputs related to the hydrodynamics
+    :param k0: float
+    :param axial_conductance_data: list of 2 list of float
+    :param solute: inputs related to solutes transport eather permating or not
+    :param J_s: float
+    :param P_s: float
+    :param Cse: float
+    :param Ce: float
+    :param sigma: float
+    :param exp: inputs related to the experimental conditions and measurements
+    :param jv: float
+    :param psi_e: float
+    :param psi_base: float
+    :param output: inputs related to the simulations and its output
+    :param radfold: float or list of float
+    :param axfold: float or list of float
+    :param intercepts: list of float
+    :param run_nb: int
+
     """
     def __init__(self):
         # default values
@@ -101,11 +100,14 @@ class Parameters():
             'run_nb': 1}
 
     def read_file(self, filename = None):
-        """
-        Read the input yaml file and perform some initialization
-            see init_calculation
-        :param filename: the input yaml file with the parameters
-        :return: itself
+        """Read the input yaml file, set the class variables and perform some initialization
+        see :func:`~init_parameter.Parameters.init_calculation`
+
+        :param filename: string (Default value = None)
+        :param return: itself
+        :param Some: instance variables are converted to list if not they are not list in the yaml file
+        :param branching_delay: nude_length
+
         """
 
         # read the file as a dictionary
@@ -142,10 +144,12 @@ class Parameters():
         self.init_calculation()
 
     def init_calculation(self):
-        """
-        Set self.archi['length_data'] by reading the two files self.archi['length_file']
+        """Set self.archi['length_data'] by reading the two files self.archi['length_file']
         Set the seed to None if seed is not an integer nor a list of integer
+        
         :return: itself
+
+
         """
 
         # set the data used to calculate the length laws
@@ -176,13 +180,19 @@ class Parameters():
             self.archi['seed'] = [None]
 
     def parameters_to_list(self, parameter):
-        """
-        transform parameter to a list
-            *   in the yaml file it is possible to use the following syntaxe "range(start, end, step)"
-                then a test checks this syntax and the corresponding list is calculated
-            *   if it is a float or integer, then it is transform to a list of one single element
+        """transform parameter to a list
+
         :param parameter: the parameter to transform to a list
-        :return:
+        :param return: 
+        :param parameter: list
+        :param In: the yaml file it is possible to use the following syntaxe
+        :param this: syntax and the corresponding list is calculated
+        :param to: a list of one single element
+        :param For: example
+        :param range: 
+        :param 0: 02 is converted to
+        :param see: func
+
         """
         if type(parameter) != list:
             if type(parameter) == str:
