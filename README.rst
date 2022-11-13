@@ -54,7 +54,7 @@ Conda Installation
 ++++++++++++++++++
 ::
 
-    conda create -n hydroroot -c conda-forge -c openalea openalea.hydroroot
+    conda create -n hydroroot -c conda-forge -c openalea3 openalea.hydroroot
 
 
 Requirements 
