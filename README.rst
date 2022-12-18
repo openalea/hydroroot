@@ -78,3 +78,13 @@ Usage
 Documentation
 ~~~~~~~~~~~~~
 https://hydroroot.rtfd.io
+
+Citations
+~~~~~~~~~
+
+If you use Hydroroot for your research, please cite:
+
+1. Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel, Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport, Plant Physiology, Volume 190, Issue 2, October 2022, Pages 1289–1306, https://doi.org/10.1093/plphys/kiac281
+
+2. Fabrice Bauget, Virginia Protto, Christophe Pradal, Yann Boursiac, Christophe Maurel, A root functional-structural model allows to assess effects of water deficit on water and solute transport parameters, Journal of Experimental Botany, 2022;, erac471, https://doi.org/10.1093/jxb/erac471
+
