@@ -86,8 +86,15 @@ __all__.append('_fitlen')
 
 _flux=Factory(name='flux',
            nodemodule='hydro',
-           #nodemodule='hydroroot.flux',
            nodeclass='flux',
+           inputs=[dict(name='g'),
+                   dict(name='Jv', interface='IStr', unit = 'microL/s', value='0.1'),
+                   dict(name='Pe', interface='IStr', unit = 'MPa', value='0.4'),
+                   dict(name='Pbase', interface='IStr', unit = 'MPa', value='0.101325'),
+                   dict(name='invert_model', interface='IBool', value=True),
+                   dict(name='k', interface='IStr', value=None, hide = True),
+                   dict(name='K', interface='IStr', value=None, hide = True),
+              ],
             )
 __all__.append('_flux')
 
@@ -100,12 +107,30 @@ _plot=Factory(name='plot root',
                    dict(name='r_tip', interface='IStr', value='5e-5'),
                    dict(name='visitor', interface='IFunction'),
                    dict(name='property', interface='IStr', value='radius'),
-                   dict(name='colormap', interface='IStr', value='spectral'),
+                   dict(name='colormap', interface='IStr', value='jet'),
                    dict(name='lognorm', interface='IBool', value=True),
                     ],
 
             )
 __all__.append('_plot')
+
+_root_scene=Factory(name='root scene',
+              nodemodule='hydro',
+              nodeclass='mtg_scene',
+           inputs=[dict(name='g'),
+                   dict(name='has_radius', interface='IBool', value=True, hide=True),
+                   dict(name='r_base', interface='IStr', value='1e-4'),
+                   dict(name='r_tip', interface='IStr', value='5e-5'),
+                   dict(name='visitor', interface='IFunction'),
+                   dict(name='property', interface='IStr', value='radius'),
+                   dict(name='colormap', interface='IStr', value='jet'),
+                   dict(name = 'colormap minimum', interface = 'IStr', value = None),
+                   dict(name = 'colormap maximum', interface = 'IStr', value = None),
+                   dict(name = 'prune', interface = 'IStr', value = None, hide = True),
+                   dict(name='lognorm', interface='IBool', value=True),
+                    ],
+            )
+__all__.append('_root_scene')
 
 _cb=Factory(name='colorbar',
            nodemodule='hydro',
@@ -169,8 +194,8 @@ fpfc=Factory(name='fit_property_from_csv',
                    dict(name='csvdata'),
                    dict(name='prop_in', interface='IStr'),
                    dict(name='prop_out', interface='IStr'),
-                   dict(name='smoothing degree', value='3'),
-                   dict(name='smoothing factor', value='0.'),
+                   dict(name='smoothing degree', interface='IFloat', value=1.0),
+                   dict(name='smoothing factor', interface='IFloat', value=0.0),
                    dict(name='plot', interface='IBool',value=True),
                    dict(name='direct_input'),
                    ],
@@ -188,3 +213,21 @@ rcf=Factory(name='readCSVFile',
             )
 __all__.append('rcf')
 
+
+raf=Factory(name='read_archi_data',
+           nodemodule='hydro',
+           nodeclass='read_archi_data',
+           inputs=[{'interface': IFileStr, 'name': 'file', 'value': None, 'desc': ''}],
+           outputs = [dict(name='dataframe')],
+            )
+__all__.append('raf')
+
+mtg_from_df=Factory(name='mtg_from_aqua_data',
+            nodemodule='hydro',
+            nodeclass='mtg_from_aqua_data',
+            inputs=[dict(name='df'),
+                    dict(name='vertex length', interface='IFloat', unit = 'm', value = 1e-4),
+                    ],
+            outputs = [dict(name = 'g')],
+            )
+__all__.append('mtg_from_df')
