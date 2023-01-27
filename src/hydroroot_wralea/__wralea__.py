@@ -93,7 +93,7 @@ __all__.append('_flux')
 
 _plot=Factory(name='plot root',
               nodemodule='hydro',
-              nodeclass='plot',
+              nodeclass='plot_old',
            inputs=[dict(name='g'), 
                    dict(name='has_radius', interface='IBool', value=True, hide=True),
                    dict(name='r_base', interface='IStr', value='1e-4'),
