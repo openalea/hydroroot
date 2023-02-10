@@ -124,10 +124,10 @@ _root_scene=Factory(name='root scene',
                    dict(name='visitor', interface='IFunction'),
                    dict(name='property', interface='IStr', value='radius'),
                    dict(name='colormap', interface='IStr', value='jet'),
+                   dict(name='lognorm', interface='IBool', value=False),
                    dict(name = 'colormap minimum', interface = 'IStr', value = None),
                    dict(name = 'colormap maximum', interface = 'IStr', value = None),
                    dict(name = 'prune', interface = 'IStr', value = None, hide = True),
-                   dict(name='lognorm', interface='IBool', value=True),
                     ],
             )
 __all__.append('_root_scene')
