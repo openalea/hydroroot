@@ -423,20 +423,18 @@ def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
     """flux computes water potential and fluxes at each vertex of the MTG `g`.
 
     :param g: MTG
-    :param Jv: float (Default value = 0.1)
-    :param psi_e: hydric potential outside the roots (Default value = 0.4)
-    :param psi_base: hydric potential at the root base (Default value = 0.101325)
-    :param invert_model: when false (Default value = False)
-    :param k: dict (Default value = None)
-    :param K: dict (Default value = None)
-    :param shunt: bool (Default value = False)
-    :param a: relative factor to the main radial path conductivity (Default value = 1.)
-    :param b: relative factor to the shortcut path conductivity (Default value = 0.)
-    :param cut_and_flow: bool (Default value = False)
-    :param cut: and flow experiment
-    :param Example: 
-    :param my_flux: flux
-    :param CONSTANT:  (Default value = 1.)
+    :param Jv: float used when invert_model is False (Default value = 0.1)
+    :param psi_e: hydrostatic pressure outside the roots (Default value = 0.4)
+    :param psi_base: hydrostatic pressure at the root base (Default value = 0.101325)
+    :param invert_model: when false distribute a given output into the root system,
+    True compute the water output for the given root system and conditions (Default value = False)
+    :param k: dict radial conductivity along the MTG (Default value = None)
+    :param K: dict axial conductance along the MTG (Default value = None)
+    :param shunt: bool call RadialShuntFlux deprecated (Default value = False)
+    :param a: if shunt relative factor to the main radial path conductivity (Default value = 1.)
+    :param b: if shunt relative factor to the shortcut path conductivity (Default value = 0.)
+    :param cut_and_flow: bool (Default value = False) deprecated unused
+    :param CONSTANT:  (Default value = 1.) deprecated unused
 
     """
     if not shunt:
