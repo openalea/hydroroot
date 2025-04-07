@@ -54,7 +54,7 @@ then calculated according to:
 Solutes and water transport model
 -------------------------------------------------------------
 
-The following lines are taken or inspired from Bauget *et al.* 2022 [bauget2022]_.
+The following lines are taken or inspired from Bauget *et al.* 2023 [bauget2023]_.
 
 In this solver, solute transport equations are added to the hydraulic model. This change leads to a
 major difference in the resolution of the equation system on the whole
