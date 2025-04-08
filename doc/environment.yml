@@ -16,6 +16,7 @@ dependencies:
   - sphinx-favicon
   - sphinx-rtd-theme
   - nbsphinx
+  - myst_parser
   - pip
   - pip:
     - -e ..
