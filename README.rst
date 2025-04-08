@@ -1,6 +1,19 @@
 OpenAlea.HydroRoot 
 ==================
 
+
+.. image:: https://github.com/openalea/hydroroot/actions/workflows/conda-package-build.yml/badge.svg
+    :alt: CI status
+    :target: https://github.com/openalea/hydroroot/actions/workflows/conda-package-build.yml
+    
+.. image:: https://readthedocs.org/projects/hydroroot/badge/?version=latest
+    :target: https://hydroroot.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+    
+.. image:: https://anaconda.org/openalea3/openalea.hydroroot/badges/version.svg   
+    :target: https://anaconda.org/openalea3/openalea.hydroroot
+
+
 Software
 ~~~~~~~~~~~~
 
