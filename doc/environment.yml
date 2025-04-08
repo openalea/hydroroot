@@ -13,3 +13,10 @@ dependencies:
   - yaml
   - pyyaml
   - rsml
+  - sphinx_rtd_theme
+  - readthedocs-sphinx-ext
+  - nbsphinx
+  - nbsphinx-link
+  - pip
+  - pip:
+    - -e ..
