@@ -13,6 +13,9 @@ dependencies:
   - yaml
   - pyyaml
   - rsml
+  - sphinx-favicon
+  - sphinx-rtd-theme
+  - nbsphinx
   - pip
   - pip:
     - -e ..
