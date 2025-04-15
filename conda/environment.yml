@@ -12,6 +12,3 @@ dependencies:
   - yaml
   - pyyaml
   - rsml
-  - pip
-  - pip:
-    - -e ..

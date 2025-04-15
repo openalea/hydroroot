@@ -1,0 +1,70 @@
+# FB 2025-04-14: based on ADEL and hydroshoot, sphinx pkg in environment.yml
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openalea.hydroroot"
+authors = [
+  { name = "Christophe Pradal" },
+  { name = "Yann Boursiac" },
+  { name = "Fabrice Bauget" },
+  { name = "Mikael Lucas" },
+  { name = "Christophe Godin" },
+  { name = "Christophe Maurel" },
+]
+description = "OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root architecture system generator package."
+#readme = "README.rst"
+license = {file = "LICENSE.txt"}
+requires-python = ">=3.6"
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: CeCILL-C License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+dynamic = ["readme"]
+version = "2.0.1"
+dependencies = [
+    "pandas",
+    "matplotlib",
+    "numpy",
+    "scipy",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+notebook = ["jupyter"]
+doc = [
+  "sphinx-favicon",
+  "sphinx-rtd-theme",
+  "pydata-sphinx-theme",
+  "myst-parser",
+  "sphinx-favicon",
+  "nbsphinx",
+]
+
+[project.urls]
+Homepage = "https://hydroroot.rtfd.io/"
+"Bug Tracker" = "https://github.com/openalea/hydroroot/issues"
+Discussions = "https://github.com/openalea/hydroroot/discussions"
+Changelog = "https://github.com/openalea/hydroroot/releases"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.rst"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"hydroshoot_data" = ["*"]
