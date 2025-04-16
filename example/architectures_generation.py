@@ -5,6 +5,15 @@
 #
 # Date: 2019-12-03
 # Modified by F. Bauget
+#
+# Date: 2025-04-16
+# this is just an example of several architectures generation according to parameters_architecture_generation.yml
+# that presents range of values for different parameter (primary_length, branching_delay, etc.)
+# so loops are done on the different parameters and a direct simulation for each architecture is done
+# in parameters_architecture_generation the parameter run_nb can also be changed to do several run with the same parameter
+# set (does not mean same architecture because the seeds will be different)
+
+# "%run architectures_generation parameters_architecture_generation.yml" in a python console
 ###############################################################################
 
 import pandas as pd

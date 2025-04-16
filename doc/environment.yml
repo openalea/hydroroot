@@ -5,6 +5,7 @@ channels:
 dependencies:
   - openalea.mtg
   - openalea.plantgl
+  - openalea.deploy
   - pandas
   - matplotlib
   - numpy

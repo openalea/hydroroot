@@ -19,6 +19,7 @@ requirements:
   run:
     - openalea.mtg
     - openalea.plantgl
+    - openalea.deploy
     - pandas
     - matplotlib
     - numpy
@@ -41,8 +42,8 @@ test:
     - cd test
     - pytest -v
 
-#about:
-#  home: {{ data.get('url') }}
-#  license: CeCILL-C
-#  summary: {{ data.get('description') }}
+about:
+  summary: "OpenAlea.HydroRoot is a hydraulic root architecture modelling"
+  license: "cecill-c"
+  license_file: LICENSE.txt
 
