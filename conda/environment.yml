@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - openalea3
 dependencies:
+  - python
   - openalea.mtg
   - openalea.plantgl
   - openalea.deploy
@@ -13,6 +14,3 @@ dependencies:
   - yaml
   - pyyaml
   - rsml
-  - pip
-  - pip:
-    - -e ..

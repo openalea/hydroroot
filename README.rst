@@ -28,7 +28,7 @@ Authors
 
 Institutes  
 ----------
-CIRAD / INRA / inria / CNRS
+CIRAD / INRAE / inria / CNRS
 
 Status
 ------
@@ -38,7 +38,7 @@ License
 -------
 CecILL-C
 
-**URL** : http://openalea.rtfd.io
+**URL** : https://hydroroot.rtfd.io
 
 About
 ~~~~~~
@@ -52,14 +52,17 @@ OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root archite
 Content
 -------
 
-The OpenAlea.HydroRoot package contains a root architecture simulation model coupled with an hydraulic solver. 
+The OpenAlea.HydroRoot package contains a root architecture simulation model coupled with a water and solute transport
+solver. It contains a pure hydraulic solver that is solved using resistance network analogy. It also contains a water
+and solute transport solver that is more complex and see the root as continuous medium.
 
 Example
 -------
 
-Heat map representaion of the incoming local radial flows on an arabidopsis root. 
-![Alt Text](example/data/fig-6E.png)
+Heat map representation of the incoming local radial flows on an arabidopsis root.
 
+.. image:: example/data/fig-6E.png
+   :alt: Alt Text
 Installation
 ------------
 
@@ -99,5 +102,5 @@ If you use Hydroroot for your research, please cite:
 
 1. Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel, Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport, Plant Physiology, Volume 190, Issue 2, October 2022, Pages 1289–1306, https://doi.org/10.1093/plphys/kiac281
 
-2. Fabrice Bauget, Virginia Protto, Christophe Pradal, Yann Boursiac, Christophe Maurel, A root functional-structural model allows to assess effects of water deficit on water and solute transport parameters, Journal of Experimental Botany, 2022;, erac471, https://doi.org/10.1093/jxb/erac471
+2. Fabrice Bauget, Virginia Protto, Christophe Pradal, Yann Boursiac, Christophe Maurel, A root functional–structural model allows assessment of the effects of water deficit on water and solute transport parameters, Journal of Experimental Botany, Volume 74, Issue 5, 13 March 2023, Pages 1594–1608, https://doi.org/10.1093/jxb/erac471
 

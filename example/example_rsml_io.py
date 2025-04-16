@@ -5,6 +5,25 @@
 #
 # Test import-export rsml
 ###############################################################################
+""""
+Script for testing rsml i/o
+run %run example_rsml_io parameters_test_rsml_io.yml
+
+- import 'data/arabidopsis-simple.rsml' file from https://rootsystemml.github.io/examples/arabidopsis_simple
+  into continuous mtg representation
+- set the resolution according to the unit precised in the rsml, in Hydroroot lengths are in meter
+- transform the continuous mtg to discrete mtg usable in Hydroroot according to resolution
+- calculation of g properties (radius, mylength) and  flux
+
+- export discrete mtg to rsml
+- re-import rsml to continuous mtg, transform the latter to discrete mtg
+- re-do calculation of g properties (radius, mylength) and  flux
+
+- compare both calculations should be zero
+
+run in python console
+%run example_rsml_io.py parameters_example_rsml_io.yml
+"""
 
 import glob
 import rsml
@@ -92,22 +111,7 @@ def hydro_calculation(g, axfold = 1., radfold = 1., axial_data = None, k_radial 
     return g, Keq, Jv
 
 if __name__ == '__main__':
-    """"
-    Script for testing rsml i/o
-    run %run example_rsml_io parameters_test_rsml_io.yml
-    
-    - import 'data/arabidopsis-simple.rsml' file from https://rootsystemml.github.io/examples/arabidopsis_simple
-      into continuous mtg representation
-    - set the resolution according to the unit precised in the rsml, in Hydroroot lengths are in meter
-    - transform the continuous mtg to discrete mtg usable in Hydroroot according to resolution
-    - calculation of g properties (radius, mylength) and  flux
-    
-    - export discrete mtg to rsml
-    - re-import rsml to continuous mtg, transform the latter to discrete mtg
-    - re-do calculation of g properties (radius, mylength) and  flux
-    
-    - compare both calculations
-    """
+
     axfold = parameter.output['axfold'][0]
     radfold = parameter.output['radfold'][0]
 

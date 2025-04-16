@@ -13,11 +13,13 @@ from hydroroot.generator.measured_root import mtg_from_aqua_data # Added F. Baug
 
 from openalea.mtg.traversal import pre_order2
 
-def test_archi_data(plant_id=8):
-
+def deprecated_test_archi_data(plant_id=8):
+    # FB 25-04-16: hydroroot_from_data is deprecated and parameters like primary_length_data
+    # and lateral_length_data also.
     share = shared_data(hydroroot, share_path='share')
     #data = (share/'plants').glob('length*.csv')[1:]
-    data = [share/'plants0216'/'length%d.csv'%plant_id]
+    filename = 'length%d.csv'%plant_id
+    data = [share/'plants0216'/filename]
 
 
     def read_data(data=data):

@@ -113,4 +113,4 @@ output:
     #number of run with the same set of parameters i.e. number of different seeds
     #integer
     #enable only if read_architecture is false
-    run_nb: 56
+    run_nb: 2
