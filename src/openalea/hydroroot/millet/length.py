@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 
-from openalea.hydroroot.millet.read_file import readCSVFile
+from openalea.hydroroot.read_file import readCSVFile
 
 
 def fit_length(csvdata, length='1e-4', k=1, s=0.):

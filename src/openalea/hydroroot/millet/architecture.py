@@ -58,6 +58,7 @@ def millet_mtg(
     # crown
     nb_crown=2,
     crown_length= 50,
+    segment_length=1e-4,
     **kwargs):
     """ Generate a Millet architecture.
 
@@ -89,7 +90,7 @@ def millet_mtg(
 
     nude_tip_length = (nb_vertices*15) / 75 # for a root 75cm-root we computed a 15cm nude tip length, so for a given root length we infer the corresponding length of apical zone
     # Review : this has to be set as input parameter
-    segment_length = 1e-4
+    #segment_length = 1e-4
     anchors = []  # list of Future branching points
     branching_positions = []  # list of distances to the apex of branching points
     collet_ids=[]
@@ -187,13 +188,14 @@ def millet_mtg(
     create_randomized_delayed_axis(g.node(collet_ids[-1]), nb_vertices, label='Seminal')
 
 
+    position_index = g.property('position_index')
     #Be sure that below a root length of 15cm, there is no branching
-    if nb_vertices <= nude_tip_length:
+    if nb_vertices <= int(nude_tip_length):
         pass
     else:
-        while anchors:   # while they are branching point left
+        while anchors and (len(g) < nb_vertices*10):   # while they are branching point left
+            # Review 11/07/25: we need a stop criteria
             nid = anchors.pop(0) 
-            position_index = g.property('position_index')
             pos_index = nid.position_index # distance to the tip
             nid_order = algo.order(g,nid._vid)
             if nid_order < order_max:  # check if maximal branching order was reached

@@ -10,6 +10,8 @@ from collections import defaultdict
 from openalea.mtg import *
 #from openalea.mtg import algo
 
+from openalea.hydroroot.read_file import readCSVFile
+
 import numpy as np
 from scipy.interpolate import UnivariateSpline
 import pylab
@@ -144,7 +146,6 @@ def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False,
     """
     #print 'entering K fitting'    
 
-    from .read_file import readCSVFile
     if isinstance(csvdata, str):
         csvdata = readCSVFile(csvdata)
 
