@@ -90,3 +90,5 @@ Changelog = "https://github.com/openalea/hydroroot/releases"
 
 [project.entry-points."wralea"]
 "hydroroot" = "openalea.hydroroot_wralea"
+"millet" = "openalea.millet_wralea"
+
