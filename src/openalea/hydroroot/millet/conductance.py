@@ -1,0 +1,195 @@
+
+""""
+# Conductance module for HydroRoot.Millet
+
+"""
+
+from math import pi
+from collections import defaultdict
+
+from openalea.mtg import *
+#from openalea.mtg import algo
+
+import numpy as np
+from scipy.interpolate import UnivariateSpline
+import pylab
+
+
+def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
+    """
+    Compute a conductance of a xylem element based on their radius and length.
+    
+    Parameters
+    ==========
+    radius : float (m)
+        radius of a xylem tube
+
+    length: float (m)
+        length of a xylem element
+
+    viscosity : float (Pa.s)
+        dynamic viscosity of the liquid
+    
+    The poiseuille formula is:
+        :math:` conductance = \frac{\pi r^4}{8 \mu L }` 
+        with :math:`r` the radius of a pipe, 
+        :math:`\mu` the viscosity of the liquid,
+        :math:`L` the length of the pipe.
+        
+    .. seealso:: http://en.wikipedia.org/wiki/Poiseuille
+    """
+    return pi*(radius**4) / ( 8 * viscosity * length)
+
+
+def compute_k(g, k0 = 300.):
+    """ Compute the radial conductances (k) of each segment of the MTG.
+
+    Parameters
+    ==========
+
+        - `g` - the RSA
+        - `k0` - the radial conductance for one element of surface in microL/s.MPa.m**2
+        - `length` - the length of a segment
+
+    """
+    #print 'entering radial k fitting'
+
+    radius = g.property('radius')
+    length = g.property('length')
+    if k0 == 'k0':
+        k0 = g.property('k0')
+        k = dict((vid, radius[vid] * 2 * pi * length[vid] * k0[vid]) for vid in g.vertices(scale=g.max_scale()))
+    else:
+        k = dict((vid, radius[vid] * 2 * pi * length[vid] * k0) for vid in g.vertices(scale=g.max_scale()))
+
+    g.properties()['k'] = k
+    #print 'exiting radial k fitting'
+    return g
+
+
+def compute_K(g, nb_xylem=5, radius_scale = 1/10.):  # DEPRECATED
+    """ Compute the axial conductances (K) in a MTG according to Poiseuille law.
+
+    The conductance depends on the radius of each xylem pipe, the number of xylem pipes,
+    and on the length of a root segment.
+
+    radius_scale allows to compute the radius of a xylem pipe from the radius of a root segment.
+    """
+
+    radius = g.property('radius_xylem')
+    if not radius:
+        full_radius = g.property('radius')
+        radius = dict( (vid,r*radius_scale) for vid,r in full_radius.iteritems())
+    nb_xylem = g.property('nb_xylem')
+    length= g.property('length')
+    if not nb_xylem:
+        nb_xylem = defaultdict(lambda : 5)
+    K = dict((vid, nb_xylem[vid]*poiseuille(radius[vid], length[vid])) 
+                for vid in g.vertices(scale=g.max_scale()))
+    g.properties()['K'] = K
+    return g
+
+def fit_property(g, x, y, prop_in, prop_out, s=3.): 
+    """ Fit a 1D spline from x, y data.
+
+    Retrieve the values from the prop_in of the MTG.
+    And evaluate the spline to compute the property 'prop_out'
+    """
+
+    spline = UnivariateSpline(x, y, s=s)
+    keys = g.property(prop_in).keys()
+    x_values = np.array(g.property(prop_in).values())
+
+    y_values = spline(x_values)
+
+    g.properties()[prop_out] = dict(zip(keys,y_values))
+
+    xx = np.linspace(0,1,1000)
+    yy = spline(xx)
+
+    pylab.clf()
+    pylab.plot(x, y)
+    pylab.plot(xx, yy)
+    pylab.show()
+
+    #print 'Update figure ', yy.min(), yy.max()
+    return g
+
+
+def fit_property_from_spline(g, spline, prop_in, prop_out): 
+    """ compute a property from another one using a spline transformation.
+
+    Retrieve the values from the prop_in of the MTG.
+    And evaluate the spline to compute the property 'prop_out'
+    """
+
+    #spline = UnivariateSpline(x, y, s=s)
+    keys = g.property(prop_in).keys()
+    x_values = np.array(g.property(prop_in).values())
+
+    y_values = spline(x_values)
+
+    g.properties()[prop_out] = dict(zip(keys, y_values))
+
+    return g
+
+
+def fit_property_from_csv(g, csvdata, prop_in, prop_out, k=1., s=0., plot=False, direct_input=None):
+    """ Fit a 1D spline from (x, y) csv extracted data or from direct input dictionnary
+
+    Retrieve the values it will be applied to from the prop_in of the MTG.
+    And evaluate the spline to compute the property 'prop_out'
+
+    Toggle plot option to visualize the spline fit
+    """
+    #print 'entering K fitting'    
+
+    from .read_file import readCSVFile
+    if isinstance(csvdata, str):
+        csvdata = readCSVFile(csvdata)
+
+    if direct_input is None:
+        x_name = csvdata.dtype.names[0]
+        y_name = csvdata.dtype.names[1]
+        x = list(csvdata[x_name])
+        y = list(csvdata[y_name])
+    else:
+        x, y = [], []
+        for key in sorted(direct_input.keys()):   # dictionnary key are not ordered by default
+            x.append(key)
+            y.append(direct_input[key])
+
+    spline = UnivariateSpline(x, y, k=k, s=s)
+    fit_property_from_spline(g, spline, prop_in, prop_out)
+
+    if plot:
+        x_n = np.array(g.property(prop_in).values())
+        #y_n = np.array(g.property(prop_out).values())
+
+        xx = np.linspace(min(x_n), max(x_n), 1000)
+        yy = spline(xx)
+
+        # plot the reference (x_values,y_values) data and the fitted spline
+        pylab.clf()
+        pylab.plot(x, y, 'x')
+        #pylab.plot(x_values, y_values)
+        pylab.plot(xx, yy, '-')
+        pylab.show()
+
+        #print 'Update figure ', xx.min(), yy.max()
+
+    #print 'exiting K fitting'
+
+    return g
+
+
+def fit_K(g, s=0.):   # DEPRECATED
+    x = np.linspace(0.,1.,100)
+    y = np.linspace(50, 500, 100)+100*np.random.random(100)-50
+
+    if s == 0.:
+        s = None
+    fit_property(g,x,y,'relative_position', 'K', s=s)
+
+
+    return g
