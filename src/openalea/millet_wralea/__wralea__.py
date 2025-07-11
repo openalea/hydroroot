@@ -8,7 +8,7 @@ __license__ = 'CeCILL-C'
 __author__ = None
 __institutes__ = None
 __description__ = ''
-__url__ = 'http://openalea.gforge.inria.fr'
+__url__ = 'http://openalea.rtfd.io'
 
 __editable__ = 'True'
 __icon__ = ''
