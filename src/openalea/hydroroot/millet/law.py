@@ -17,8 +17,7 @@ from openalea.mtg import algo
 from openalea.mtg.algo import orders, axis
 from openalea.mtg.traversal import pre_order2_with_filter, post_order2
 
-from openalea.hydroroot.millet import length
-from openalea.hydroroot.millet import radius
+from openalea.hydroroot import length, radius
 from openalea.hydroroot.millet import conductance
 
 
