@@ -25,9 +25,11 @@
 
 - openalea.hydroroot.millet.conductance.fit_property_from_spline used in millet.law.add_soil that is used in example/millet/Water flux-Copy1.ipynb, very similar with hydroroot the only difference `dict(list(zip(keys, y_values)))` in hydroroot
 - openalea.hydroroot.law.expovariate_law is a kind of duplicate of openalea.hydroroot.millet.law.expovariate_law + openalea.hydroroot.millet.law.read_data. None of them are used but read_data is used by openalea.hydroroot.millet.law.age_law that is not used
+    - big difference millet law gave things in nb of vertices, hydroroot in meter, note that none of them are correct because of discretize function see below
 - openalea.hydroroot.millet.law.discretize is not sctrickly a duplicate but return the same than openalea.hydroroot.law.discretize, and it is used only in openalea.hydroroot.millet.law.expovariate_law that is not used.
+    - both descritize function seem not correct to be verified
 - openalea.hydroroot.millet.law.compute_age_with_constant_growth_speed is a duplicate of openalea.hydroroot.millet.age.compute_age_with_constant_growth_speed and there are not used
-
+- openalea.hydroroot.millet.law.radius_from_computed_diameters == openalea.hydroroot.radius.radius we should change the later by the former
 
 ***Remark:***
 

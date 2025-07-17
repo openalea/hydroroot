@@ -89,7 +89,7 @@ def hydrolic(g,
     g = flux.flux(g, Jv, psi_e, psi_base, invert_model=True)
 
     Keqs = g.property('Keq')
-    v_base = g.component_roots_at_scale_iter(g.root, scale=1).next()
+    v_base = next(g.component_roots_at_scale_iter(g.root, scale=1))
     Keq = Keqs[v_base]
 
     if HAS_SOIL:

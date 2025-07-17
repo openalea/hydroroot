@@ -30,7 +30,7 @@ from openalea.mtg.traversal import pre_order2_with_filter, post_order2
 
 
 def root_base(g):
-    return g.component_roots_iter(g.root).next()
+    return next(g.component_roots_iter(g.root))
 
 
 def add_branching_linear_axis(g, parent_id, nb_segments, **kwds):

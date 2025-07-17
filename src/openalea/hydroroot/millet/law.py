@@ -214,7 +214,7 @@ def compute_diameter(g,
 def radius_from_computed_diameters(g):
     radius = {}
     diameters= g.property('diam')
-    for i,j in diameters.iteritems():
+    for i,j in diameters.items():
         radius[i] = (j/2.)*1e-4
     g.properties()['radius'] = radius
 
@@ -378,7 +378,7 @@ def developmental_age(g, nude_tip_length=15):
 
     age_max = age[1]
 
-    k, v = np.array(age.keys()), np.array(age.values())
+    k, v = np.array(list(age.keys())), np.array(list(age.values()))
     v = age_max - v
 
     age = dict(zip(list(k), list(v)))
@@ -424,7 +424,7 @@ def add_soil(g, soil_data):
 
     # Compute absolute z coordinate and normalize
     vids = g.property('xyz').keys()
-    zs = np.array([pt.z * segment_length for pt in g.property('xyz').itervalues()])
+    zs = np.array([pt.z * segment_length for pt in g.property('xyz').values()])
     zs/=zs.max()
     zs = zs.tolist()
     # Fit data on z coordinate to compute psi_e on each vertex

@@ -74,3 +74,6 @@ nosetests.xml
 
 # Doc build
 doc/_build
+
+# baugetfa
+tmp*

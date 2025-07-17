@@ -21,7 +21,7 @@ def radius(g):
     """
     radius = {}
     diameters= g.property('diam')
-    for i,j in diameters.iteritems():
+    for i,j in diameters.items():
         radius[i] = j/2
     g.properties()['radius'] = radius
 

@@ -28,7 +28,7 @@ def compute_age_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,del
 
 
     age={}
-    root = g.component_roots_at_scale_iter(g.root, scale=max_scale).next()
+    root = next(g.component_roots_at_scale_iter(g.root, scale=max_scale))
     for v in post_order2(g, root):
         if g.is_leaf(v):
             age[v] = sr_age
