@@ -156,7 +156,7 @@ def compute_angle(g):
 
 
 def test(save_image= False, dir='C:/Users/ndour/Desktop/mon dossier/my_Ph.D/Plant_images_BD/Film_MTG'):
-    from millet import architecture
+    from openalea.hydroroot.millet import architecture
     g = architecture.millet_mtg(nb_vertices=200)
     g = architecture.developmental_age(g,15)
     compute_angle(g)

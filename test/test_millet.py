@@ -1,4 +1,4 @@
-from millet.architecture import millet_mtg
+from openalea.hydroroot.millet.architecture import millet_mtg
 
 
 def test_mtg():
@@ -11,8 +11,8 @@ def test_mtg():
     assert len(labels) == len(g) - 1
 
     # test if we have both crown and seminal
-    diff_labels = set(labels.itervalues())
+    diff_labels = set(labels.values())
     assert len(diff_labels) == 3
-    print diff_labels
+    # print(diff_labels)
 test_mtg()
 

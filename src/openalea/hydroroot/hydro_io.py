@@ -80,15 +80,15 @@ def export_mtg_to_rsml(g_discrete, filename = None, segment_length = 1.0e-4):
     :param g_c: MTG
     :param filename: string (Default value = None)
     :param segment_length: float (Default value = 1.0e-4)
-    :param Remark: g_discrete from hydroroot has length and radius in
+    :param Remark: g_discrete from openalea.hydroroot has length and radius in
     :param Remark: At this stage
     :param in: hydroponic solution
     :param Does: not overwrite the MTG in input
     :param 1st: use a turtle to get position in 3D
-    :param use: functions from hydroroot
+    :param use: functions from openalea.hydroroot
     :param in: display
     :param 2d: insert scales
-    :param MTG: from hydroroot has only segment scale
+    :param MTG: from openalea.hydroroot has only segment scale
     :param add: the axes scale
     :param add: the plant scale
     :param end: up with
