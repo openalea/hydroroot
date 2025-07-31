@@ -68,8 +68,8 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         """Compute the water potential and fluxes of each segment
         
         For each vertex of the root, compute :
-            - the water potential (:math:`\psi_{\\text{out}}`) at the base;
-            - the water potential (:math:`\psi_{\\text{in}}`) at the end;
+            - the water potential (:math:`\\psi_{\\text{out}}`) at the base;
+            - the water potential (:math:`\\psi_{\\text{in}}`) at the end;
             - the water flux (`J`) at the base;
             - the lateral water flux (`j`) entering the segment.
 
@@ -83,7 +83,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 - Finally, the water flux and potential are computed in pre order (parent then children).
 
         .. note::
-            Here :math:`\psi` are the hydrostatic water potential i.e. the hydrostatic pressure.
+            Here :math:`\\psi` are the hydrostatic water potential i.e. the hydrostatic pressure.
             There are no osmotic components.
         """
 
@@ -260,7 +260,7 @@ class RadialShuntFlux(Flux):
         """Compute the water potential and fluxes of each segments
         
         For each vertex of the root, compute :
-            - the water potential (:math:`\psi^{\text{out}}`) at the base;
+            - the water potential (:math:`\\psi^{\text{out}}`) at the base;
             - the water flux (`J`) at the base;
             - the lateral water flux (`j`) entering the segment.
         
