@@ -33,7 +33,7 @@ def water_solute_model(parameter, df_archi =None, df_law =None,
     :param df_law: DataFrame list (None) - DataFrame with the length law data (see below structure description)
     :param df_cnf: DataFrame (None) - cut and flow data to fit (see below structure description)
     :param df_JvP: DataFrame (None) - Jv(P) data to fit (see below structure description)
-    :param Data_to_Optim: string list (None) - list of parameters to adjust, if None perform direct simulation, if [] equivalent to ['K', 'k', 'Js', 'Ps']
+    :param Data_to_Optim: string list (None) - list of parameters to adjust, if None perform direct simulation, empty list is equivalent to ['K', 'k', 'Js', 'Ps']
     :param Flag_verbose: boolean (False) - if True print intermediary results, optimization details, final simulation outputs, etc.
     :param data_to_use: string ('all') - data to fit either 'JvP' (Jv(P)), 'cnf' (cut and flow), or 'all' both
     :param output: string (None) - if not None output filename
@@ -48,7 +48,7 @@ def water_solute_model(parameter, df_archi =None, df_law =None,
         - d: DataFrame with results
         - g_cut: dictionary with MTG at each cut
 
-    - Data_to_Optim list of:
+    **Data_to_Optim list**
         - 'K': optimize axial conductance K
         - 'k': optimize radial conductivity k
         - 'Js': optimize pumping rate Js
@@ -57,37 +57,38 @@ def water_solute_model(parameter, df_archi =None, df_law =None,
         - 'klr': optimize radial conductivity of laterals klr if <> than PR
         - 'sigma': optimize the reflection coefficient
 
-        the routine with for example ['K', 'k', 'Js', 'Ps'] works with successive adjustment.
+        ['K', 'k', 'Js', 'Ps'] will optimize the four parameters in the list.
         But, having too many parameters with this routine using local optimizer from scipy may not lead to any results.
 
-    - df_archi column names:
+    **df_archi column names**
         - distance_from_base_(mm), lateral_root_length_(mm), order
 
-    - df_law:
+    **df_law**
         - list of 2 dataframe with the length law data: the first for the 1st order laterals on the primary root, the
           2nd for the laterals on laterals whatever their order (2nd, 3rd, ...)
         - column names: LR_length_mm , relative_distance_to_tip
 
-    - df_cnf column names:
+    **df_cnf column names**
         - arch: sample name that must be contained in the 'input_file' of the yaml file
         - dP_Mpa: column with the working cut and flow pressure (in relative to the base) if constant, may be empty see below
         - J0, J1, ..., Jn: columns that start with 'J' containing the flux values, 1st the for the full root, then 1st cut, 2d cut, etc.
         - lcut1, ...., lcutn: columns starting with 'lcut' containing the maximum length to the base after each cut, 1st cut, 2d cut, etc. (not the for full root)
         - dP0, dP1,.., dPn: column starting with 'dP' containing the working pressure (in relative to the base) of each steps (if not constant): full root, 1st cut, 2d cut, etc.
-    - df_JvP column names:
+
+    **df_JvP column names**
         - arch: sample name that must be contained in the 'input_file' of the yaml file
         - J0, J1, ..., Jn: columns that start with 'J' containing the flux values of each pressure steps
         - dP0, dP1,.., dPn: column starting with 'dP' containing the working pressure (in relative to the base) of each steps
 
-    - outputfile (csv):
-        - column names: 'max_length', 'Jexp cnf (uL/s)', 'Jv cnf (uL/s)', 'surface (m2)', 'length (m)', 'dp', 'Jexp(P)', 'Jv(P)', 'Cbase',
-                        'kpr', 'klr', 'Js', 'Ps', 'F cnf','F Lpr', 'x pr', 'K1st pr', 'x lr', 'K1st lr', 'K pr', 'K lr'
+    **outputfile (csv)**
+        - column names: 'max_length', 'Jexp cnf (uL/s)', 'Jv cnf (uL/s)', 'surface (m2)', 'length (m)', 'dp', 'Jexp(P)', 'Jv(P)', 'Cbase', 'kpr', 'klr', 'Js', 'Ps', 'F cnf','F Lpr', 'x pr', 'K1st pr', 'x lr', 'K1st lr', 'K pr', 'K lr'
+
         i.e.: max length from the cut to the base, J cnf exp, J cnf sim, root surface, total root length, pressure (Jv(P),
         J exp Jv(P), J sim Jv(P), solute concentration at the base (Jv(P)), radial conductivity PR, radial conductivity LR,
         pumping rate, permeability, objective fct cnf, objective fct Jv(P), x pr distance to tip for PR, K 1st guess for PR,
         the same for laterals if different, then axial conductances for PR and LR.
 
-    :Remark:
+    **Remark**
         - radial conductivity: single value or list of 2 values [kpr, klr]: 1st value for PR and 2nd for LR
         - axial conductance: it is possible to add K for LR
     """
@@ -1062,47 +1063,45 @@ def pure_hydraulic_model(parameter = Parameters(), df_archi = None, df_law =None
         - df: DataFrame with results
         - g_cut: dictionary with MTG at each cut
 
-    - df_archi column names:
+
+    **df_archi column names**
         - distance_from_base_(mm), lateral_root_length_(mm), order
 
-    - df_law:
+    **df_law**
         - list of 2 dataframe with the length law data: the first for the 1st order laterals on the primary root, the
           2nd for the laterals on laterals whatever their order (2nd, 3rd, ...)
         - column names: LR_length_mm , relative_distance_to_tip
 
-    The adjustment is performed as follows:
-        1. pre-optimization with the adjustment of axfold and radfold, K and k factor,
-        if only k adjustment is asked then step 1 is not performed
-        2. loop of two successive adjustments: 1st K adjustment then k adjustment.
-        The loop stop when change of k is below dk_max
+    **The adjustment is performed as follows**
+        1. pre-optimization with the adjustment of axfold and radfold, K and k factor, if only k adjustment is asked then step 1 is not performed
+        2. loop of two successive adjustments: 1st K adjustment then k adjustment. The loop stop when change of k is below dk_max
 
-    Data_to_Optim list of string:
-        - 'K': optimize axial conductance K
-        - 'k': optimize radial conductivity k
-        - [] <=> ['K', 'k']
+    **Data_to_Optim list of string**
+        - 'K': optimize axial conductance K only
+        - 'k': optimize radial conductivity k only
+        - [ ] empty list or ['K', 'k']: optimize K and k
 
-    df_exp: column names:
+    **df_exp column names**
         - arch: sample name that must be contained in the 'input_file' of the yaml file
         - J0, ..., Jn: columns containing the flux values of the full root, 1st cut, 2d cut, etc.
-        - lcut1, ...., lcutn: columns containing the maximum length to the base after each cut, 1st cut, 2d cut, etc.
-          (the primary length of the full root is calculated from the architecture)
+        - lcut1, ...., lcutn: columns containing the maximum length to the base after each cut, 1st cut, 2d cut, etc. (the primary length of the full root is calculated from the architecture)
 
 
-    outputfile:
-        - column names: 'plant', 'cut length (m)', 'max_length', 'k (10-8 m/s/MPa)', 'length (m)',
-                        'surface (m2)', 'Jv (uL/s)', 'Jexp (uL/s)'
+    **outputfile**
+        - column names: 'plant', 'cut length (m)', 'max_length', 'k (10-8 m/s/MPa)', 'length (m)', 'surface (m2)', 'Jv (uL/s)', 'Jexp (uL/s)'
         - if 'K' in Data_to_Optim add the following: 'x', 'K 1st', 'K optimized' the initial and adjusted K(x)
 
-    :Remark:
+    **Remark**
         The routine is designed to work with a single value (float) for parameter.hydro['k0'].
 
-    :example:
-        parameter = Parameters()
-        filename='parameters_fig-2-B.yml'
-        parameter.read_file(filename)
-        fn = 'data/arabido_cnf_data.csv'
-        df_exp = pd.read_csv(fn, sep = ',', keep_default_na = True)
-        df = pure_hydraulic_model(parameter,df_exp=df_exp, Flag_verbose=True, Data_to_Optim = ['k', 'K'])
+    **example**
+
+    >>> parameter = Parameters()
+    >>> filename='parameters_fig-2-B.yml'
+    >>> parameter.read_file(filename)
+    >>> fn = 'data/arabido_cnf_data.csv'
+    >>> df_exp = pd.read_csv(fn, sep = ',', keep_default_na = True)
+    >>> df = pure_hydraulic_model(parameter,df_exp=df_exp, Flag_verbose=True, Data_to_Optim = ['k', 'K'])
 
     """
     if Data_to_Optim is None:

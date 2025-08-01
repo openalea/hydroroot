@@ -126,7 +126,8 @@ nbsphinx_thumbnails = {
     "example/example_parameter_class": "_static/example_parameter.png",
     "example/example_k_adjustment": "_static/example_k_adjust.png",
     "example/example_solute_water_transport": "_static/example_solute.png",
-    "example/Boursiac2022/boursiac2022": "_static/boursiac2022.png"
+    "example/examples_cut_and_flow": "_static/example_cnf.png",
+    "example/Boursiac2022/boursiac2022": "_static/boursiac2022.png",
 }
 
 # Add infomation about github repository
