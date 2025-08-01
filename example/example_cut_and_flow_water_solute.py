@@ -31,7 +31,7 @@ Inputs:
             - J0, J1, ..., Jn: columns that start with 'J' containing the flux values, 1st the for the full root, then 1st cut, 2d cut, etc.
             - lcut1, ...., lcutn: columns starting with 'lcut' containing the maximum length to the base after each cut, 1st cut, 2d cut, etc. (not the for full root) 
             - dP0, dP1,.., dPn: column starting with 'dP' containing the working pressure (in relative to the base) of each steps (if not constant): full root, 1st cut, 2d cut, etc.
-    - data/maize_Lpr_data.csv: may be changed see begining of main, csv file containing data of Jv(P) data of with
+    - data/maize_JvP_data.csv: may be changed see begining of main, csv file containing data of Jv(P) data of with
             the following columns:
             - arch: sample name that must be contained in the 'input_file' of the yaml file
             - J0, J1, ..., Jn: columns that start with 'J' containing the flux values of each pressure steps
@@ -110,7 +110,7 @@ if df_exp.shape[1] == 1:
 
 ### Jv(P) DATA
 # fn = 'data/tomato_Lpr_data.csv'
-fn = 'data/maize_Lpr_data.csv'
+fn = 'data/maize_JvP_data.csv'
 df_exp2 = pd.read_csv(fn, sep = ';', keep_default_na = True)
 if df_exp2.shape[1] == 1:
     df_exp2 = pd.read_csv(fn, sep = ',', keep_default_na = True)
@@ -138,6 +138,8 @@ if 'Jexp(P)' in list(dresults.columns):
     d.plot.line('dp', 'Jv(P)', ax = axs[0, 0], label = 'Jv(P)')
     j = np.array(d.loc[:, ['Jv(P)', 'Jexp(P)']])
     axs[0, 0].set_ylim(j.min(),j.max())
+    axs[0,0].set_xlabel('P (Mpa)')
+    axs[0,0].set_ylabel('Jv (uL/s)')
 
 #Jv CnF data and fit
 if 'Jexp cnf (uL/s)' in list(dresults.columns):
@@ -146,6 +148,8 @@ if 'Jexp cnf (uL/s)' in list(dresults.columns):
     d.plot.line('max_length', 'Jv cnf (uL/s)', ax = axs[0, 1], label = 'Jv(P)')
     j = np.array(d.loc[:, ['Jv cnf (uL/s)', 'Jexp cnf (uL/s)']])
     axs[0, 1].set_ylim(j.min(),j.max())
+    axs[0,1].set_xlabel('max length (m)')
+    axs[0,1].set_ylabel('Jv (uL/s)')
 
 #K 1st guess and optim
 d = dresults[['x pr', 'K1st pr', 'K pr']].dropna()
@@ -153,10 +157,15 @@ d.plot.scatter('x pr', 'K1st pr', ax = axs[1, 0], label = 'K1st')
 d.plot.line('x pr', 'K pr', ax = axs[1, 0], label = 'K adjusted')
 axs[1, 0].set_ylim(min(d['K1st pr'].min(), d['K pr'].min()),
                    max(d['K1st pr'].max(), d['K pr'].max()))
+axs[1,0].set_xlabel('dist. to tip (m)')
+axs[1,0].set_ylabel('K (10-9 m4/(s.Mpa)')
 
 #radial k 1st guess and optim
 d = pd.DataFrame({'lab':['k', 'k adjusted'], 'val':[parameter.hydro['k0'], dresults['kpr'][0]]})
 d.plot.bar(x='lab', y='val', rot=0, ax = axs[1, 1])
+axs[1,1].set_ylabel('k (10-9 m/(s.MPa)')
+axs[1,1].xaxis.label.set_visible(False)
+axs[1,1].get_legend().remove()
 
 fig.patch.set_facecolor('lightgrey')
 fig.tight_layout()

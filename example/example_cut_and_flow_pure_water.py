@@ -90,16 +90,30 @@ dresults, g = pure_hydraulic_model(parameter = parameter, df_exp = df_exp, Data_
                                    Flag_verbose = Flag_verbose, Flag_radius = False, Flag_Constraint = False,
                                    dK_constraint = 0.0)
 
+# 4 plots in one
+################
+fig, axs = plt.subplots(2,2)
+axs[0,0].axis('off')
 ### Display the plot J vs Lcut
-ax = dresults.plot.scatter('cut length (m)', 'Jexp (uL/s)', c = 'black')
-dresults.plot.line('cut length (m)', 'Jv (uL/s)', c = 'purple', ax = ax)
+dresults.plot.scatter('max_length', 'Jexp (uL/s)', c = 'black', ax = axs[0,1], label = 'Jexp(P) cnf')
+dresults.plot.line('max_length', 'Jv (uL/s)', c = 'purple', ax = axs[0,1], label = 'Jv(P)')
+axs[0,1].set_xlabel('max length (m)')
+axs[0,1].set_ylabel('Jv (uL/s)')
 
 ### Plot K vs x and comparing radial k between 1st guess and optim value
-ax_K = dresults.plot.line('x', 'K 1st', c = 'black')
-dresults.plot.line('x', 'K optimized', c = 'purple', ax = ax_K)
+dresults.plot.scatter('x', 'K 1st', c = 'black', ax = axs[1,0], label = 'K1st')
+dresults.plot.line('x', 'K optimized', c = 'purple', ax = axs[1,0], label = 'K adjusted')
+axs[1,0].set_xlabel('dist. to tip (m)')
+axs[1,0].set_ylabel('K (10-9 m4/(s.Mpa))')
 
-d = pd.DataFrame({'lab':['k', 'k adjusted'], 'val':[parameter.hydro['k0'], dresults['k (10-9 m/s/MPa)'][0]]})
-d.plot.bar(x='lab', y='val', rot=0)
+d = pd.DataFrame({'radial':['k', 'k adjusted'], 'val':[parameter.hydro['k0'], dresults['k (10-9 m/s/MPa)'][0]]})
+d.plot.bar(x='radial', y='val', rot=0, ax = axs[1,1])
+axs[1,1].set_ylabel('k (10-9 m/(s.MPa))')
+axs[1,1].xaxis.label.set_visible(False)
+axs[1,1].get_legend().remove()
+
+fig.patch.set_facecolor('lightgrey')
+fig.tight_layout()
 
 plt.show(block=False)
 
