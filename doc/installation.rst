@@ -21,7 +21,7 @@ If you want notebook support, run for example:
 
 ::
 
-    conda install jupyterlab
+    mamba install jupyterlab
 
 Developer installation
 -------------------------
@@ -34,6 +34,7 @@ Just run the following command:
 
     mamba create -f conda/environment.yml
     mamba activate hydroroot
+    pip install -e .
 
-This will create a conda environment called *hydroroot* with the proper dependencies and
-will install openalea.hydroroot with `pip install -e` the develop mode. The second command activate the environment.
+This will first create a conda environment called *hydroroot* with the proper dependencies, then the environment will be activated,
+and finally openalea.hydroroot will be installed in develop mode. As above to have notebook support run `mamba install jupyterlab`.
