@@ -31,7 +31,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
     def __init__(self, g,
                  Jv, psi_e, psi_base,
-                 invert_model=False,
+                 invert_model=True,
                  k=None, K=None, CONSTANT=1.,
                  cut_and_flow=False):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
@@ -162,7 +162,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             #compute psi according to Millman theorem, then compute radial flux
                 parent = g.parent(v)
                 brothers = g.children_iter(parent)
-                children = g.children_iter(v)
+                children = g.children(v) # prefer list because used twice
 
                 Keq_brothers = sum( Keq[cid] for cid in brothers)
                 Keq_children = sum( Keq[cid] for cid in children)
@@ -173,20 +173,17 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     J_out[v] = Jv
                 else:
                     psi_out[v] = psi_in[parent]
-                    # J_out[v] = (J_out[parent] - j[parent]) / ( 1.0 + Keq_brothers / Keq[v]  ) # only if no_soil
+                    J_out[v] = (J_out[parent] - j[parent]) / ( 1.0 + Keq_brothers / Keq[v]  ) # only if no_soil
 
                 if not self.HAS_SOIL:
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                     j[v] = (psi_e - psi_in[v]) * k[v]
                 else:
                     # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
-                    KeqPeq = 0.0
-                    for cid in children:
-                        KeqPeq += Peq[cid]*Keq[cid]
+                    KeqPeq = sum( Peq[cid]*Keq[cid] for cid in children )
                     psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
                     j[v] = (psi_e[v] - psi_in[v]) * k[v]
 
-                J_out[v] = Keq[v] * (psi_out[v] - psi_in[v]) # should be ok
             #print 'exiting Jv distribution'
 
         else :  # compute the water output for the given root system and conditions
@@ -195,7 +192,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem from root base to root tips
                 parent = g.parent(v)
-                children = g.children_iter(v)
+                children = g.children(v) # here I prefer list because I used it several times
                 if parent is None:
                     assert v == v_base
                     psi_out[v] = psi_base
@@ -206,9 +203,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 else:
                     # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
-                    KeqPeq = 0.0
-                    for cid in children:
-                        KeqPeq += Peq[cid]*Keq[cid]
+                    KeqPeq = sum( Peq[cid]*Keq[cid] for cid in children )
                     psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
 
             #print 'exiting Psi computation'
@@ -235,7 +230,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             if not self.HAS_SOIL:
                 Jv_global = Keq[v_base] * (psi_e - psi_base)
             else:
-                Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
+                Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base) # TODO to be corrected: False not psi_e[vbase]
 
             # print "Local Computation Water Flux Jvl = ", J_out[v_base]
             # print "Global Computation Water Flux Jvg = ", Jv_global
@@ -437,15 +432,15 @@ class RadialShuntFlux(Flux):
                 Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
 
 
-def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
-         invert_model=False, k=None, K=None, CONSTANT=1.,
+def flux(g, Jv=0.1, psi_e=None, psi_base=0.101325,
+         invert_model=True, k=None, K=None, CONSTANT=1.,
          shunt=False, a=1., b=0.,
          cut_and_flow=False):
     """flux computes water potential and fluxes at each vertex of the MTG `g`.
 
     :param g: MTG
     :param Jv: float used when invert_model is False (Default value = 0.1)
-    :param psi_e: hydrostatic pressure outside the roots (Default value = 0.4)
+    :param psi_e: hydrostatic pressure outside the roots (Default value = None), if None in Flux has_soil will be True
     :param psi_base: hydrostatic pressure at the root base (Default value = 0.101325)
     :param invert_model: when false distribute a given output into the root system,
     True compute the water output for the given root system and conditions (Default value = False)

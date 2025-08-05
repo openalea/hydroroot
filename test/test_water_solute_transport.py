@@ -66,7 +66,7 @@ def test_pressure_calculation():
     eps = 1.0e-9
 
     g = set_conductances(g, axial_pr = parameter.hydro['axial_conductance_data'], k0_pr = parameter.hydro['k0'])
-    g = flux.flux(g, psi_e = psi_e, psi_base = psi_base)
+    g = flux.flux(g, psi_e = psi_e, psi_base = psi_base, invert_model=True)
     g = init_some_MTG_properties(g, tau = J_s, Cini = Cini, t = 1, Ps = P_s)
     nb_v = g.nb_vertices()
     Fdx = 1.0
@@ -80,7 +80,7 @@ def test_pressure_calculation():
         Fdx_old = Fdx
 
     g = set_conductances(g, axial_pr = parameter.hydro['axial_conductance_data'], k0_pr = parameter.hydro['k0'])
-    g = flux.flux(g, psi_e = psi_e, psi_base = psi_base)
+    g = flux.flux(g, psi_e = psi_e, psi_base = psi_base, invert_model=True)
     g = init_some_MTG_properties(g, tau = J_s, Cini = Cini, t = 1)
     nb_v = g.nb_vertices()
     Fdx = 1.0
