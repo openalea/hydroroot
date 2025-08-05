@@ -96,6 +96,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
         # Add properties
         g.add_property('Keq')
+        if self.HAS_SOIL: g.add_property('Peq') # equivalent external psi, because it changes if psi_e is not uniform
         g.add_property('psi_in')
         g.add_property('psi_out')
         g.add_property('j')
@@ -136,6 +137,17 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             Keq[v] = 1./(r+R)
         #print 'exiting Keq computation'
 
+        # calculation of the equivalent external psi, because it changes if psi_e is not uniform
+        if self.HAS_SOIL:
+            Peq = g.property('Peq')
+            for v in traversal.post_order2(g, v_base):
+                kids = g.children(v)
+                Peq[v] = psi_e[v]
+                _k =  k[v]
+                for cid in kids:
+                    Peq[v] = (Peq[v]*Keq[cid] + Peq[cid]*_k)/(_k + Keq[cid])
+                    _k = Keq[cid]
+
         # Water flux and water potential computation
         psi_out = g.property('psi_out')
         psi_in = g.property('psi_in')
@@ -161,15 +173,20 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     J_out[v] = Jv
                 else:
                     psi_out[v] = psi_in[parent]
-                    J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / Keq_brothers )
+                    # J_out[v] = (J_out[parent] - j[parent]) / ( 1.0 + Keq_brothers / Keq[v]  ) # only if no_soil
 
                 if not self.HAS_SOIL:
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                     j[v] = (psi_e - psi_in[v]) * k[v]
                 else:
-                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    KeqPeq = 0.0
+                    for cid in children:
+                        KeqPeq += Peq[cid]*Keq[cid]
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
                     j[v] = (psi_e[v] - psi_in[v]) * k[v]
 
+                J_out[v] = Keq[v] * (psi_out[v] - psi_in[v]) # should be ok
             #print 'exiting Jv distribution'
 
         else :  # compute the water output for the given root system and conditions
@@ -188,7 +205,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 if not self.HAS_SOIL:
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 else:
-                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    KeqPeq = 0.0
+                    for cid in children:
+                        KeqPeq += Peq[cid]*Keq[cid]
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
 
             #print 'exiting Psi computation'
         # F. Bauget 2021-06-11 : commented annoying print
