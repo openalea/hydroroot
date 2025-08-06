@@ -143,7 +143,7 @@ def test_cut_and_flow():
     g_cut = flux.cut_and_set_conductance(g, 0.04, threshold = 1e-4)
     check_length(g_cut, 0.04, segment_length=1e-4)
 
-    g_cut = flux.flux(g_cut, cut_and_flow=True, invert_model=True)
+    g_cut = flux.flux(g_cut, psi_e=0.4, cut_and_flow=True, invert_model=True)
     v_base = 1
     psi_e = 0.4
     psi_base = 0.101325
