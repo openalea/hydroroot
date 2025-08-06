@@ -145,7 +145,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 Peq[v] = psi_e[v]
                 _k =  k[v]
                 for cid in kids:
-                    Peq[v] = (Peq[v]*Keq[cid] + Peq[cid]*_k)/(_k + Keq[cid])
+                    Peq[v] = (Peq[v]*_k + Peq[cid]*Keq[cid])/(_k + Keq[cid])
                     _k = Keq[cid]
 
         # Water flux and water potential computation
