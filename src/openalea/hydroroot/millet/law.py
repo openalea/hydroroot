@@ -8,10 +8,11 @@ Created on Tue Feb 17 12:56:51 2015
 """
 
 import random
-
 import numpy as np
-from scipy.optimize import curve_fit
+import pandas as pd
 import pylab
+
+from scipy.optimize import curve_fit
 
 from openalea.mtg import algo
 from openalea.mtg.algo import orders, axis
@@ -22,8 +23,9 @@ from openalea.hydroroot.millet import conductance
 
 
 
-def read_data(data_xy, scale_x, scale_y,sort = True):
+def read_data_deprecated(data_xy, scale_x, scale_y,sort = True):
     # sort by position
+    #  8/27/25 xy.sort(axis=0) does sort both x and y we do not want that
     xy = data_xy
     if sort == True:
         xy.sort(axis=0)
@@ -37,6 +39,18 @@ def read_data(data_xy, scale_x, scale_y,sort = True):
 
     return x,y
 
+def read_data(data_xy, scale_x, scale_y,sort = True):
+    # sort by position
+
+    if sort == True:
+        data_xy = data_xy.sort_values(data_xy.columns[0])
+
+    x = np.array(data_xy[data_xy.columns[0]]) * scale_x
+    y = np.array(data_xy[data_xy.columns[1]]) * scale_y
+    x = x.tolist()
+    y = y.tolist()
+
+    return x,y
 
 
 def expovariate_law(data_xy, size=5e-2, segment_length =1e-4, plot=False):
@@ -49,7 +63,7 @@ def expovariate_law(data_xy, size=5e-2, segment_length =1e-4, plot=False):
 
     Parameters
     ==========
-        - data_xy:
+        - data_xy: DatFrame
         - size:
         - scale_x:
         - scale_y:
