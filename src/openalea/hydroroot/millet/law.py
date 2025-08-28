@@ -158,20 +158,20 @@ def diameter_law(data_xy, function=None, segment_length = 1e-4, plot= True):
 def compute_radius_from_laws(g,
                      seminal_RootDiameter_law=None,
                      crown_RootDiameter_law=None,
-                     lr_RootDiameter_law=None):
+                     lr_RootDiameter_law=None,
+                     segment_length = 1e-4):
     
     
     #g= radius.compute_length(g)
     #g= radius.compute_relative_position(g)
     #position = g.property('position')
     #order= g.property('order')
-    segment_length = 1e-4
 
     for v in g.vertices_iter(g.max_scale()):
         node = g.node(v)
         pos = node.position/segment_length #convert position which is expressed in m to number of vertex
         #We use a logarithmic law that takes position as input to estimate diameter so the position can be null
-        if pos <= 1 or node._vid in [0,2,3]: 
+        if node._vid in [0,1,2,3]: 
             node.radius = 270.*1e-6
         else:
             if node.label == 'Crown':
