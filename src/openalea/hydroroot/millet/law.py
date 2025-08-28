@@ -171,7 +171,7 @@ def compute_radius_from_laws(g,
         node = g.node(v)
         pos = node.position/segment_length #convert position which is expressed in m to number of vertex
         #We use a logarithmic law that takes position as input to estimate diameter so the position can be null
-        if node._vid in [0,1,2,3]: 
+        if node._vid in [0,1,2,3]:
             node.radius = 270.*1e-6
         else:
             if node.label == 'Crown':
