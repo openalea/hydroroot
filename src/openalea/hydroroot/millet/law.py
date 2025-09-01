@@ -19,7 +19,7 @@ from openalea.mtg.algo import orders, axis
 from openalea.mtg.traversal import pre_order2_with_filter, post_order2
 
 from openalea.hydroroot import length, radius
-from openalea.hydroroot.millet import conductance
+from openalea.hydroroot import conductance
 
 
 
@@ -171,7 +171,7 @@ def compute_radius_from_laws(g,
         node = g.node(v)
         pos = node.position/segment_length #convert position which is expressed in m to number of vertex
         #We use a logarithmic law that takes position as input to estimate diameter so the position can be null
-        if node._vid in [0,1,2,3]:
+        if pos <= 1 or node._vid in [0,1,2,3]: #pos <= 1 to avoid ln(0) in RootDiameter_law
             node.radius = 270.*1e-6
         else:
             if node.label == 'Crown':
@@ -428,13 +428,11 @@ def developmental_age(g, nude_tip_length=15):
 ###########################################################################################################
 
 
-def add_soil(g, soil_data):
+def add_soil(g, soil_data, segment_length = 1.e-4):
 
     """ add a soil a hetergeneous water potential """
 
     x,y = soil_data
-
-    segment_length = 1.e-4
 
     # Compute absolute z coordinate and normalize
     vids = g.property('xyz').keys()

@@ -114,6 +114,7 @@ def mtg_turtle_time(g, time, update_visitor=None, time_property='age' ):
                 pass
             if g.edge_type(v) == '+':
                 turtle.push()
+                turtle.setId(v)
             return True
 
         def pop_turtle(v):

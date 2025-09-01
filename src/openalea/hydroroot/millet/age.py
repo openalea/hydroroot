@@ -54,7 +54,8 @@ def compute_age_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,del
         else:
             date = delta_cr_appareance
             cr = algo.axis(g, v)
-            len_cr = len(list(cr))
+            cr = list(cr)
+            len_cr = len(cr)
             p= g.parent(v)
             age[v] = age[p]+ delta_cr_appareance
             age_first_vertex_cr = age[v]

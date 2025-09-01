@@ -60,12 +60,12 @@ def plot_mtg(g, static,
 #############################################################################################################
 
 def plot_property(g, static=True,
-                  save_image=True, 
+                  save_image=False,
                   prop_cmap='radius', 
                   cmap='jet',
                   lognorm=True,
                   dir='C:/Users/ndour/Desktop/mon_dossier/my_Ph.D/Plant_images_BD/Film_MTG/architecture+j'):
-
+    from openalea.hydroroot.display import my_colormap
     #r_base, r_tip = float(r_base), float(r_tip)
 
     #if not has_radius:
@@ -85,26 +85,36 @@ def plot_property(g, static=True,
         g, scene = turtle.mtg_turtle_time(g,age_max)
 
         # Compute color from radius
-        colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
+        my_colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
 
-        shapes = dict( (sh.getId(),sh) for sh in scene)
+        # F. Bauget 2025-08-28: WIP python 2 to 3, got "AttributeError: 'Shape' object has no attribute 'getId'"
+        # shapes = dict( (sh.getId(),sh) for sh in scene)
+        shapes = scene.todict()
 
         colors = g.property('color')
-        for vid in colors:
-            shapes[vid].appearance = pgl.Material(colors[vid])
-        scene = pgl.Scene(shapes.values())
+        for vid in shapes:
+            # shapes[vid].appearance = pgl.Material(colors[vid])
+            for sh in shapes[vid]:
+                sh.appearance = pgl.Material('Color%d' % vid, colors[vid])
+        # scene = pgl.Scene(shapes.values())
+        scene = pgl.Scene([sh for shid in shapes.values() for sh in shid])
         Viewer.display(scene)
 
     else:
         for t in l:
             g, scene = turtle.mtg_turtle_time(g,t)
             # Compute color from radius
-            colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
-            shapes = dict( (sh.getId(),sh) for sh in scene)
+            my_colormap(g,prop_cmap, cmap=cmap, lognorm=lognorm)
+            # F. Bauget 2025-08-28: WIP python 2 to 3, got "AttributeError: 'Shape' object has no attribute 'getId'"
+            # shapes = dict( (sh.getId(),sh) for sh in scene)
+            shapes = scene.todict()
             colors = g.property('color')
             for vid in shapes:
-                shapes[vid].appearance = pgl.Material(colors[vid])
-            scene = pgl.Scene(shapes.values())
+                # shapes[vid].appearance = pgl.Material(colors[vid])
+                for sh in shapes[vid]:
+                    sh.appearance = pgl.Material('Color%d'%vid, colors[vid])
+            # scene = pgl.Scene(shapes.values())
+            scene = pgl.Scene([sh for shid in shapes.values() for sh in shid])
             Viewer.display(scene)
             if save_image==True:
                 Viewer.saveSnapshot(dir+'/millet_%04d.png'%t)
