@@ -35,13 +35,13 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering",
 ]
 dynamic = ["version"]
 #version = "2.0.1"
 dependencies = [
     "pandas",
-    "matplotlib",
     "numpy",
     "scipy",
     "pyyaml",
@@ -59,7 +59,8 @@ dependencies = [
     "openalea.plantgl",
     "oawidgets",
     "yaml",
-    "rsml"
+    "rsml",
+    "matplotlib-base" # does not exist in pip
 ]
 
 [project.optional-dependencies]

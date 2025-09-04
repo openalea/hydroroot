@@ -11,12 +11,11 @@
 import argparse
 import time
 import glob
-import tempfile, os
 import pandas as pd
 
+from openalea.plantgl.algo.view import view
 import openalea.plantgl.all as pgl
 from openalea.mtg import turtle as turt
-from IPython.display import Image, display
 
 from openalea.hydroroot.init_parameter import Parameters
 from openalea.hydroroot.display import get_root_visitor
@@ -47,7 +46,7 @@ filename = args.inputfile
 output = args.outputfile
 parameter.read_file(filename)
 
-def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
+def order_scene(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
     """
     It is a copy of hydroroot.display.plot but the colors for the root according their order are hardcoded
     Display the architecture in plantGL Viewer with roots colors according to there order
@@ -92,9 +91,7 @@ def plot(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=None):
                 sh.appearance =pgl.Material(colors[vid])
     scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
 
-    pgl.Viewer.display(scene)
-    if name is not None:
-            pgl.Viewer.frameGL.saveImage(name)
+    return scene
         
 if __name__ == '__main__':
 
@@ -105,19 +102,13 @@ if __name__ == '__main__':
 
     # g has radius, here we set fictive radii just for visual comfort
     alpha = 0.2  # radius in millimeter identical for all orders
-    plot(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
-    pgl.Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
-    fn = tempfile.mktemp(suffix = '.png')
-    pgl.Viewer.saveSnapshot(fn)
-    pgl.Viewer.stop()
-    img = Image(fn)
-    os.unlink(fn)
-    display(img)
+    s = order_scene(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
+    view(s)
 
     dseeds = pd.read_csv('data_figures/sup-fig-5-B.csv')
 
     for id in dseeds.index:
-        seed = dseeds.seed[id]
+        seed = int(dseeds.seed[id]) # otherwise this a numpy.int64 and the function random.seed does not like it
         primary_length = dseeds.primary_length[id]
         delta = dseeds.delta[id]
         nude_length = dseeds.nude_length[id]
@@ -131,11 +122,5 @@ if __name__ == '__main__':
 
         # g has radius, here we set fictive radii just for visual comfort
         alpha = 0.2  # radius in millimeter identical for all orders
-        plot(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
-        pgl.Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
-        fn = tempfile.mktemp(suffix = '.png')
-        pgl.Viewer.saveSnapshot(fn)
-        pgl.Viewer.stop()
-        img = Image(fn)
-        os.unlink(fn)
-        display(img)
+        s = order_scene(g, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
+        view(s)

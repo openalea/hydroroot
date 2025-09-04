@@ -30,10 +30,11 @@ def cont_radius(g, r_base, r_tip):
     Set radius for elements of a mtg with an increase rate computed from
     given base and tip radius in a continuous way.
 
-    :param g: 
-    :param r_base: 
-    :param r_tip: 
-
+    :param g: (MTG)
+    :param r_base: (float) - radius of the base
+    :param r_tip: (float) - radius of the tip
+    :return:
+        - g
     """
     r_base, r_tip = float(r_base), float(r_tip)
 
@@ -75,9 +76,11 @@ def discont_radius(g, r_base, r_tip):
     Radius can be discontinuous e.g. for a young/small lateral on an old root,
     the young root radius is very small initially compared to the old one.
 
-    :param g: 
-    :param r_base: 
-    :param r_tip: 
+    :param g: (MTG)
+    :param r_base: (float) - radius of the base
+    :param r_tip: (float) - radius of the tip
+    :return:
+        - g
 
     """
     r_base, r_tip = float(r_base), float(r_tip)
@@ -121,10 +124,14 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
     ref_radius: reference radius of the primary root (in m)
     order_decrease_factor: radius decrease factor applied when increasing order
 
-    :param g: 
-    :param ref_radius:  (Default value = 1e-4)
-    :param order_decrease_factor:  (Default value = 0.5)
+    :param g: (MTG)
+    :param ref_radius: the radius of the primary root (Default value = 1e-4)
+    :param order_decrease_factor: then the decrease factor per order (Default value = 0.5)
+    :return:
+        - g
 
+    if primary root as a radius :math:`r`, the first order lateral has a radius of :math:`r \\beta`, the second order lateral
+    :math:`r \\beta^2`, with :math:`\\beta` the order decrease factor
     """
     #print 'entering MTG radius setting'
     max_scale = g.max_scale()
@@ -149,8 +156,10 @@ def ordered_radius(g, ref_radius=1e-4, order_decrease_factor=0.5):
 def compute_length(g, length = 1.e-4):
     """Set the length of each vertex of the MTG
 
-    :param g: 
-    :param length:  (Default value = 1.e-4)
+    :param g: (MTG)
+    :param length: (float) - vertices length (Default value = 1.e-4)
+    :return:
+        -g
 
     """
     #print 'entering MTG length setting'
@@ -161,9 +170,13 @@ def compute_length(g, length = 1.e-4):
     return g
 
 def compute_surface(g):
-    """Compute the total surface of the MTG (in square meters)
+    """Compute the total surface of the MTG
+     in hydroroot length unit is the m so the surface is in square meters
 
-    :param g: 
+    :param g: (MTG)
+    :return:
+        - g
+        - surface in square length unit of g.property('radius') and g.property('length')
 
     """
     #print 'entering surface computation'
@@ -179,10 +192,13 @@ def compute_surface(g):
     return g, surf
 
 def compute_volume(g):
-    """Compute the total volume of the MTG (in cubic meters)
-    If there is a varying volume the equation is rather:
+    """Compute the total volume of the MTG
+     in hydroroot length unit is the m so the volume is in cubic meters
 
-    :param g: 
+    :param g: (MTG)
+    :return:
+        - g
+        - volume in cubic length unit of g.property('radius') and g.property('length')
 
     """
     #print 'entering volume computation'
@@ -200,10 +216,12 @@ def compute_volume(g):
 def compute_relative_position(g):
     """Compute the position of each segment relative to the axis bearing it.
     Add the properties "position" and "relative_position" to the MTG.
-    g.properties()['position'] is in meter the distance from the tip to the axis bearing it
-    g.properties()['relative_position'] is in relative distance from the tip to the axis bearing it (base is 1, tip is 0)
+    g.properties()['position'] is in meter the distance from the tip in unit of g.property('length'), in hydroroot must be m
+    g.properties()['relative_position'] is the distance from the tip relative to the axis bearing it (base is 1, tip is 0)
 
-    :param g: 
+    :param g: (MTG)
+    return:
+        - g
 
     """
     #print 'entering MTG node positionning computation'

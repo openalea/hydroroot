@@ -86,14 +86,7 @@ def plot_old(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
     :param lognorm: True log scale normalization (Default value = False)
     :param prune: float (Default value = None)
     :returns: scene
-    
-    
-    Exemple:
 
-    >>> from openalea.plantgl.all import *
-        >>> s = plot()
-        >>> shapes = dict( (x.getId(), x.geometry) for x in s)
-        >>> Viewer.display(s)
     """
     if visitor is None:
         visitor = get_root_visitor(prune=prune)
@@ -192,7 +185,8 @@ def mtg_scene(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
 
 def my_colormap_old(g, property_name, cmap='jet',lognorm=True):
     """
-
+    deprecated : the difference with my_colormap is that it cannot set the min-max of the property_name
+    Compute the property \'color\' based on a given property and a colormap.
     :param g: 
     :param property_name: 
     :param cmap:  (Default value = 'jet')
@@ -209,7 +203,7 @@ def my_colormap_old(g, property_name, cmap='jet',lognorm=True):
     #my_colorbar(values, _cmap, norm)
 
     colors = (_cmap(values)[:,0:3])*255
-    colors = np.array(colors,dtype=np.int).tolist()
+    colors = np.array(colors,dtype=int).tolist()
 
     g.properties()['color'] = dict(list(zip(keys,colors)))
 

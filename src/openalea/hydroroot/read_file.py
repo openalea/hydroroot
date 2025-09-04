@@ -15,7 +15,11 @@ def read_archi_data(fn):
     """Read a csv (tab separated) file with the architecture in the following format
 
     :param fn: (string) - the architecture filename in csv format with tab as delimiter
-    :returns: - DataFrame
+    :returns:
+        - DataFrame, with columns from the csv plus:
+            - a column 'db', the distance to base in m, and
+            - a column 'lr', the lateral root lengths in m
+            - a column 'radius', if 'averaged_diameter_(mm)' the radius in m
 
     :file structure:
 
@@ -28,6 +32,8 @@ def read_archi_data(fn):
     - order = 1 for laterals of 1st order ob the primary
     - order = n-m for the lateral number m on the lateral number n of 1st order
     - order = n-m-o for the lateral number o of the previous one
+
+    Column 'averaged_diameter_(mm)' is optional
 
     Each branch finish with a nude part, i.e. a distance from base (the tip value) and a zero length
     The 'averaged_diameter_(mm)' is not mandatory, if present allow calculation of radii for each laterals

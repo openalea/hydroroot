@@ -64,11 +64,11 @@ def expovariate_law(data_xy, size=5e-2, scale_x=1e-2, scale_y=1e3, plot=False):
 
 
 def discretize(x, y, size=5e-2):
-    """Discretize by 5cm-intervals by using equal amplitudes method
+    """Discretize by intervals of size `size` by using equal amplitudes method
 
-    :param x: 
-    :param y: 
-    :param size:  (Default value = 5e-2)
+    :param x: (float list) - abscissa
+    :param y: (float list)
+    :param size: bins size (Default value = 5e-2)
 
     """
 
@@ -100,10 +100,10 @@ def discretize(x, y, size=5e-2):
 
 def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):
     """
-
+    deprecated
     :param x: 
     :param y: 
-    :param size:  (Default value = 5e-2)
+    :param size: the bin size (Default value = 5e-2)
     :param scale_x:  (Default value = 0.16/100.)
     :param scale_y:  (Default value = 1e-3)
     :param plot:  (Default value = False)
@@ -134,22 +134,26 @@ def multi_law(x, y, size=5e-2, scale_x=0.16/100., scale_y=1e-3, plot=False):
 
 def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, plot=False, uniform=False):
     """
+    Return a function return_law(position, scale=scale) that compute a value from y values (see below) binned according to x divided in bins of size `size`.
 
-    :param x: list of float
-    :param y: list of float
-    :param size: float (Default value = 5e-2)
-    :param scale_x: float (Default value = 1.)
-    :param scale_y: float (Default value = 1e-3)
-    :param scale: float (Default value = 1e-4)
+    :param x: (list of float)
+    :param y: (list of float)
+    :param size: (float) - bins size (Default value = 5e-2)
+    :param scale_x: (float) - a factor that multiplies x values (Default value = 1.)
+    :param scale_y: (float) - a factor that multiplies y values (Default value = 1e-3)
+    :param scale: (float) - a number that divides the length given by the function (Default value = 1e-4)
     :param plot: unused (Default value = False)
-    :param uniform: string or boolean (Default value = False)
-    :param position: expo
-    :param min: and max
-    :param return: func
-    :param Algorithm: 
-    :param First: discretize the X values in different intervals of size
-    :param Compute: the histogram from the set of points include in each interval
-    :param Return: a function that compute a value in a given histogram
+    :param uniform: (string or boolean) - 'expo', True or False see below (Default value = False)
+    :returns:
+        - return_law
+
+    Algorithm:
+      - First, discretize the x values in different intervals of size `size`.
+      - Compute the mean of the set of points included in each interval.
+      - Return a function that computes for a given interval at position `position` :
+        - if uniform='expo', randomly a value from an exponential distribution with mean equals to <y> in this interval
+        - if uniform=False, randomly one of the y values in the interval
+        - if uniform=True, a value randomly chosen between min(y) and max(y) in the interval
 
     """
 
@@ -165,8 +169,8 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
     def return_law(position, scale=scale):
         """
 
-        :param position: 
-        :param scale:  (Default value = scale)
+        :param position: (float)
+        :param scale: - (Default value = scale)
 
         """
         for i, x_min in enumerate(X):
@@ -199,18 +203,20 @@ def histo_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3, scale=1e-4, pl
 
 def reference_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3):
     """
+    Return a spline that interpolates the binned mean of y, see below for the calculation.
 
-    :param x: 
-    :param y: 
-    :param size:  (Default value = 5e-2)
-    :param scale_x:  (Default value = 1.)
-    :param scale_y:  (Default value = 1e-3)
+    :param x: (list of float)
+    :param y: (list of float)
+    :param size: (float) - bins size (Default value = 5e-2)
+    :param scale_x: (float) - a factor that multiplies x values (Default value = 1.)
+    :param scale_y: (float) - a factor that multiplies y values (Default value = 1e-3)
     :returns:
+        - spline
 
     :Algorithm:
       - First, discretize the X values in different intervals of size `size`.
-      - Compute the histogram from the set of points include in each interval.
-      - Return a function that compute a value in a given histogram
+      - Compute the mean of the set of points included in each interval.
+      - interpolate with a spline y(x)
 
     """
 
@@ -230,12 +236,19 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'ex
     """Build the function giving the lateral length according to its position on the parent branch
 
     :param pd: DataFrame
-    :param scale_x: float (Default value = 1 / 100.)
-    :param scale_y: float (Default value = 1.)
-    :param scale: float (Default value = 1e-4)
-    :param uniform: boolean or string (Default value = 'expo')
+    :param scale_x: (float) - a factor that multiplies size and x values (Default value = 1 / 100.)
+    :param scale_y:  (float) - a factor that multiplies y values (Default value = 1.)
+    :param scale: (float) number that will divide the given length, so for instance it used to
+     divide the returned length (by `histo_relative_law`) by the segment length to get it in number of segment (Default value = 1e-4)
+    :param uniform: boolean or string (Default value = 'expo') see :func:`~law.py.histo_relative_law`
     :param size:  (Default value = 5)
-    :returns: - a function giving the lateral length according to its position
+    :returns:
+        - a function giving the lateral length according to its position
+
+    Remark:
+    This is specific to the length law files:
+         * 1st col: "LR_length_mm(mm)" lateral lengths in mm
+         * 2nd col: "relative_distance_to_tip" relative distance to tip in % so between 0 and 100.
 
     """
     x = pd.relative_distance_to_tip.tolist()
@@ -243,7 +256,7 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'ex
 
     # size of the windows: in %
     size *= scale_x
-
+    # TODO : change '1.e-3 * scale_y' to scale_y
     _length_law = histo_relative_law(x, y,
                                      size = size,
                                      scale_x = scale_x,

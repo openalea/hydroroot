@@ -14,15 +14,16 @@ from openalea.hydroroot import display
 def export_mtg_to_aqua_file(g, filename = "out.csv"):
     """Export a MTG architecture in a csv file into format used by aquaporin team
 
-    :param g: MTG
-    :param filename: string (Default value = "out.csv")
-    :param The: file format is 3 columns separated by tab
-    :param 1st: col
-    :param 2nd: col
-    :param 3d: col
-    :param It: uses only the mtg properties
-    :param simulated: architecture
-    :param At: this stage
+    :param g: (MTG)
+    :param filename: (string) - the name of the output file (Default value = "out.csv")
+
+     the format is 3 columns separated by tab:
+         * 1st col: "distance_from_base_(mm)" distance in mm from base on the parent root where starts the lateral root
+         * 2nd col: "lateral_root_length_(mm)" length in mm of the corresponding lateral root
+         * 3d col: "order" = 1 if parent root is the primary root, = 1-n if the parent root is a lateral root that starts at the node n on the parent root
+
+    It uses only the mtg properties 'position', 'order' and 'edge_type' because they are the only ones saved in simulated architecture
+    At this stage (2019-12-20) only up to the 2d order
 
     """
 
@@ -77,25 +78,30 @@ def export_mtg_to_rsml(g_discrete, filename = None, segment_length = 1.0e-4):
     """Export a discrete MTG architecture into a rsml file or return a continuous MTG according to the parameters (see below)
     only the geometry is exported no other properties
 
-    :param g_c: MTG
-    :param filename: string (Default value = None)
-    :param segment_length: float (Default value = 1.0e-4)
-    :param Remark: g_discrete from openalea.hydroroot has length and radius in
-    :param Remark: At this stage
-    :param in: hydroponic solution
-    :param Does: not overwrite the MTG in input
-    :param 1st: use a turtle to get position in 3D
-    :param use: functions from openalea.hydroroot
-    :param in: display
-    :param 2d: insert scales
-    :param MTG: from openalea.hydroroot has only segment scale
-    :param add: the axes scale
-    :param add: the plant scale
-    :param end: up with
-    :param 3d: convert the discrete MTG to continuous
-    :param MTG: without the finest scale
-    :param 4th: write to the file
-    :param g_discrete: 
+    :param g_discrete: (MTG) - the discrete MTG to export
+    :param filename: (string) - the name of the output file (Default value = None) , if None return a continuous MTG
+    :param segment_length: (float) - length of the MTG segments in m (Default value = 1.0e-4)
+    :returns:
+        - g the continuous MTG if filename is None otherwise write it to the filename
+
+    Remark:
+
+    - g_discrete from hydroroot has length and radius in (m)
+    - Does not overwrite the MTG in input
+
+    Process:
+
+    - 1st: use a turtle to get position in 3D
+            - use functions from hydroroot.display
+            - in display.get_root_visitor_with_point() g property "position3d" is created
+    - 2d: insert scales
+            - MTG from hydroroot has only segment scale, the finest
+            - add the axes scale
+            - add the plant scale
+            - end up with: plant scale = 1, axes scale = 2, segments scale = 3
+    - 3d: convert the discrete MTG to continuous
+            - MTG without the finest scale, and with polylines to discribe axes
+    - 4th: write to the file
 
     """
 
@@ -144,13 +150,6 @@ def export_mtg_to_rsml(g_discrete, filename = None, segment_length = 1.0e-4):
         return g
 
 def import_rsml_to_discrete_mtg(g_c, segment_length = 1.0e-4, resolution = 1.0e-4):
-    """
-
-    :param g_c: 
-    :param segment_length:  (Default value = 1.0e-4)
-    :param resolution:  (Default value = 1.0e-4)
-
-    """
     # F. Bauget 2020-03-18 : RSML continuous from rsml2mtg()  to hydroroot disctrete copied from rsml
     # don't use parent node because rsml from other places don't have them but only coordinates of polylines
     """
@@ -166,10 +165,11 @@ def import_rsml_to_discrete_mtg(g_c, segment_length = 1.0e-4, resolution = 1.0e-
           and the vertices of the parent axe and take the shortest distance to select the branshing vertex on the axe
 
 
-    Params:
-        - `g_c` (MTG) - the continuous MTG to convert
-        - `segment_length` (Float) - the segment length in meter (m)
-        - `resolution` (float) - the resolution of the polylines coordinates, in polylines unit per meter (unit/m)
+    :params g_c: (MTG) - the continuous MTG to convert
+    :params segment_length: (Float) - the segment length in meter (m)
+    :params resolution: (float) - the resolution of the polylines coordinates, in polylines unit per meter (unit/m)
+    :returns:
+        - g discrete MTG
 
     Remark: At this stage (2022-08-22) only the root length and the branching position are used to simulate architecture
     in hydroponic solution. The exact position in 3D is not stored in the discrete MTG form.

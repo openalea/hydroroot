@@ -13,12 +13,12 @@ def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
     Compute the number of segments intercepted at a given length from the base.
 
     :param g: (MTG)
-    :param l: (length)
+    :param l: (length) - the length in m at which to count the intercepts
     :param root: (int) - the root vertex from which the tree traversal start (Default value = 1)
-    :param dl: (float) - length of MTG segments (Default value = 1e-4)
+    :param dl: (float) - length in m of MTG segments (Default value = 1e-4)
     :param max_order: (int) - maximum order of considering roots (Default value = None)
     :returns:
-        - number of segment
+        - number of segments
 
     """
     length = {}
@@ -57,8 +57,8 @@ def intercept(g, dists, dl=1e-4, max_order=None):
     .. seealso:: :func:`nb_roots`
 
     :param g: (MTG)
-    :param dists: (list of Float) list of distances
-    :param dl: (float) - length of MTG segments (Default value = 1e-4)
+    :param dists: (list of Float) list of distances in m
+    :param dl: (float) - length in m of MTG segments (Default value = 1e-4)
     :param max_order: (int) - maximum order of considering roots (Default value = None)
     :returns:
         - intercepts: list of number of segments intercepted according to distances in dists

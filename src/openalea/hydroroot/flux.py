@@ -477,20 +477,12 @@ def segments_at_length(g, l, root=1, dl=1e-4):
 
 def cut(g, cut_length, threshold=1e-4):
     """
-
-    :param g: 
-    :param cut_length: 
-    :param threshold:  (Default value = 1e-4)
-
-    """
-    # Added Fabrice 2020-01-17: segment_length in parameters list
-    # F. Bauget 2022-07-25: added properties deletion
-    """Cut the architecture at a given length cut_length.
+    Cut the architecture at a given length cut_length.
 
     Params:
         - g (MTG) - the root architecture
         - cut_length (float, m) - length at which the architecture is cut from collar.
-        - segment_length (float, mm) - length of the vertices
+        - threshold (float, mm) - length threshold to select the segments to remove corresponds to the length of the vertices
 
     Returns:
         - g(MTG) - the architecture after the cut process. This is a copy.
@@ -518,20 +510,13 @@ def cut(g, cut_length, threshold=1e-4):
 
 def cut_and_set_conductance(g, cut_length, threshold=1e-4):
     """
-
-    :param g: 
-    :param cut_length: 
-    :param threshold:  (Default value = 1e-4)
-
-    """
-    # Added Fabrice 2020-02-21: based on def cut()
-    """Cut the architecture at a given length `cut_length`, and set to the axial conductance value the radial
-        conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding
+    Cut the architecture at a given length `cut_length`, and set to the axial conductance value the radial
+    conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding
 
         Params:
             - g (MTG) - the root architecture
             - cut_length (float, m) - length at which the architecture is cut from collar.
-            - 'threshold' (float, mm) - length threshold to select the segments to remove in segments_at_length()
+            - 'threshold' (float, m) - length threshold to select the segments to remove in segments_at_length()
 
         Returns:
             - g(MTG) - the architecture after the cut process. This is a copy.
