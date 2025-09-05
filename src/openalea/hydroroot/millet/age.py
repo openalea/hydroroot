@@ -103,7 +103,7 @@ def compute_age_with_constant_growth_speed_cpl(g,
             age_base = 0.
             if pid is None:
                 age_base = 0.
-            elif g.label(v)=='Crown':
+            elif g.label(pid)=='Crown':
                 age_base = age[pid] + delta_cr_appearance
             else:
                 age_base = age[pid] + delta_lr_appearance
@@ -114,6 +114,7 @@ def compute_age_with_constant_growth_speed_cpl(g,
             age_tip = sr_age
 
             delta_age = (age_tip - age_base) / len_axis
+            print('### debug', age_tip, age_base)
 
             if delta_age < 0.:
                 print('WARNING: age is negative. Please increase seminal age or decrease delta lr appearance.')
