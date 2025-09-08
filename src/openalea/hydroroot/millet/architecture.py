@@ -103,7 +103,7 @@ def millet_mtg(
     collet_ids.append(vid)
 
     for i in range(nb_crown):
-        vid= g.add_child(vid,label='collet',edge_type='<')
+        vid= g.add_child(vid,label='collet',edge_type='<', order = 0)
         collet_ids.append(vid)
 
 
@@ -171,7 +171,7 @@ def millet_mtg(
             # if ramif :
             #     anchors.append(nid)
             #     branching_positions.append(nid_position_index)
-            order = algo.order(g,nid._vid)
+            order = nid.order
             nid = nid.add_child(order=order, edge_type='<',**kwds)
             nid.position_index = position
             if ramif :
@@ -197,7 +197,7 @@ def millet_mtg(
             # Review 11/07/25: we need a stop criteria
             nid = anchors.pop(0) 
             pos_index = nid.position_index # distance to the tip
-            nid_order = algo.order(g,nid._vid)
+            nid_order = nid.order
             if nid_order < order_max:  # check if maximal branching order was reached
 
                 # if there is a length law, use it to compute lateral root length at this position

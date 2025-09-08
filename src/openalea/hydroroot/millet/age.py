@@ -114,7 +114,6 @@ def compute_age_with_constant_growth_speed_cpl(g,
             age_tip = sr_age
 
             delta_age = (age_tip - age_base) / len_axis
-            print('### debug', age_tip, age_base)
 
             if delta_age < 0.:
                 print('WARNING: age is negative. Please increase seminal age or decrease delta lr appearance.')
