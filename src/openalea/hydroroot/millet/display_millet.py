@@ -20,7 +20,7 @@ from openalea.plantgl import *
 import openalea.plantgl.all as pgl
 
 from openalea.hydroroot.millet import turtle, law
-
+from openalea.hydroroot.display import my_colormap
 ########################################################################################
 
 
@@ -65,7 +65,7 @@ def plot_property(g, static=True,
                   cmap='jet',
                   lognorm=True,
                   dir='C:/Users/ndour/Desktop/mon_dossier/my_Ph.D/Plant_images_BD/Film_MTG/architecture+j'):
-    from openalea.hydroroot.display import my_colormap
+
     #r_base, r_tip = float(r_base), float(r_tip)
 
     #if not has_radius:
