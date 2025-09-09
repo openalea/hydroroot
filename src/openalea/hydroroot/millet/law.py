@@ -191,8 +191,9 @@ def compute_radius_from_laws(g,
 def compute_diameter(g,
                      seminal_RootDiameter_law=None,
                      crown_RootDiameter_law=None,
-                     lr_RootDiameter_law=None):
-    segment_length = 1e-4
+                     lr_RootDiameter_law=None,
+                     segment_length = 1e-4):
+
     diameters = {}
     order= g.property('order')
     g = radius.compute_length(g, segment_length)
