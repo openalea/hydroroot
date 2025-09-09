@@ -105,6 +105,7 @@ def mtg_turtle_time(g, time, update_visitor=None, time_property='age' ):
 
     def traverse_with_turtle_time(g, vid, time, visitor=visitor):
         turtle = PglTurtle()
+        turtle.down(180)
         def push_turtle(v):
             try:
                 start_tt = start_dates.get(v, time+1)
