@@ -57,8 +57,8 @@ def mtg_turtle_time(g, time, update_visitor=None, time_property='age' ):
     def visitor(g, v, turtle,time):
 
         n = g.node(v)
-        radius = n.radius * 1.e1
-        length = n.length * 1.e3
+        radius = n.radius #* 1.e1
+        length = n.length #* 1.e3
         #LR_root_angle=30
         if g.edge_type(v) == '+':         #For crown root angles, the size is weak, so we use a mean to estimate their branching
             if n.label=='Crown':
