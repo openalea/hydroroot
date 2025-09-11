@@ -1,14 +1,9 @@
 ===============
 Quick start
 ===============
-If the package HydroRoot is not installed, the following examples can be run by cloning the sources from git and then sourcing the src directory in Ipython console for instance like this:
 
-.. code-block:: python
-
-    import sys
-    sys.path.extend(['../src']) # if run from the example folder for instance
-
-assuming the dependencies installed.
+Generating a root
+^^^^^^^^^^^^^^^^^
 
 Build a root and display it in the PlantGL viewer.
 
@@ -20,12 +15,11 @@ Build a root and display it in the PlantGL viewer.
     g, primary_length, total_length, surface, seed = root_builder(order_max=1)
     plot(g)
 
+Hydraulic simulation
+^^^^^^^^^^^^^^^^^^^^
 
 Build a root, run the hydraulic solver and display the eat map representation of the incoming
 local radial flows on an arabidopsis root in the PlantGL viewer.
-
-K (:math:`10^{-9}\ m^4.s^{-1}.MPa^{-1}`)  and k (:math:`10^{-9}\ m.s^{-1}.MPa^{-1}`) are the axial and radial conductances,
-versus distance to tip (m), respectively.
 
 .. code-block:: python
 
@@ -36,5 +30,13 @@ versus distance to tip (m), respectively.
     g, surface, volume, Keq, Jv_global = hydroroot(axial_conductivity_data = K, radial_conductivity_data=k, order_max = 1)
     plot(g, prop_cmap = 'j')
 
-See also the jupyter notebook *boursiac2022.ipynb* in *example/Bourisac2022* for examples. This notebook is aimed to run different simulations to
-generate figures and tables of Bourisac et al. 2022 [boursiac2022]_, illustrating the some HydroRoot capabilities.
+K (:math:`10^{-9}\ m^4.s^{-1}.MPa^{-1}`)  and k (:math:`10^{-9}\ m.s^{-1}.MPa^{-1}`) are the axial and radial conductances,
+versus distance to tip (m), respectively.
+
+Notebook examples
+^^^^^^^^^^^^^^^^^
+
+See examples in the :ref:`gallery-label` that illustrate some HydroRoot capabilities.
+
+See also the jupyter notebook *boursiac2022.ipynb* in *example/Bourisac2022* that is aimed to run different simulations to
+generate figures and tables of Bourisac et al. 2022 [boursiac2022]_.
