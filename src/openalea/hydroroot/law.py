@@ -247,8 +247,9 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'ex
 
     Remark:
     This is specific to the length law files:
-         * 1st col: "LR_length_mm(mm)" lateral lengths in mm
-         * 2nd col: "relative_distance_to_tip" relative distance to tip in % so between 0 and 100.
+
+    * 1st col: "LR_length_mm(mm)" lateral lengths in mm
+    * 2nd col: "relative_distance_to_tip" relative distance to tip in % so between 0 and 100.
 
     """
     x = pd.relative_distance_to_tip.tolist()
