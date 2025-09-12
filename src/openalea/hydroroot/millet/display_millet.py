@@ -25,8 +25,9 @@ from openalea.hydroroot.display import my_colormap
 
 
 def plot_mtg(g, static, 
-             save_image=False, 
-             dir='C:/Users/ndour/Desktop/mon_dossier/my_Ph.D/Plant_images_BD/Film_MTG/architecture'):
+             save_image=False,
+             t_fixed = None,
+             name=None):
     """
     Plot an MTG at final stage or during its development.
 
@@ -45,8 +46,12 @@ def plot_mtg(g, static,
     g =law.developmental_age(g,15)
     ages = g.property('age')
     age_max = max(ages.values())
-    l= np.linspace(1,age_max,50)
-    l=map(int,l)
+    if t_fixed is None:
+        l= np.linspace(1,age_max,50)
+        l=map(int,l)
+    else:
+        age_max = int(t_fixed)
+
     if static == True:
         g, scene = turtle.mtg_turtle_time(g,age_max)
         Viewer.display(scene)
@@ -54,17 +59,18 @@ def plot_mtg(g, static,
         for t in l:
             g, scene = turtle.mtg_turtle_time(g,t)
             Viewer.display(scene)
-            if save_image==True:
-                Viewer.saveSnapshot(dir+'/millet_%04d.png'%t)
+            if save_image and name is not None:
+                Viewer.saveSnapshot(name)
 
 #############################################################################################################
 
 def plot_property(g, static=True,
                   save_image=False,
+                  t_fixed = None,
                   prop_cmap='radius', 
                   cmap='jet',
                   lognorm=True,
-                  dir='C:/Users/ndour/Desktop/mon_dossier/my_Ph.D/Plant_images_BD/Film_MTG/architecture+j'):
+                  dir=None):
 
     #r_base, r_tip = float(r_base), float(r_tip)
 
@@ -78,8 +84,11 @@ def plot_property(g, static=True,
     age = g.property('age')
     age_max = max(age.values())
 
-    l= np.linspace(1,age_max,75)
-    l=map(int,l)
+    if t_fixed is None:
+        l= np.linspace(1,age_max,50)
+        l=map(int,l)
+    else:
+        age_max = int(t_fixed)
 
     if static == True:
         g, scene = turtle.mtg_turtle_time(g,age_max)
@@ -116,7 +125,7 @@ def plot_property(g, static=True,
             # scene = pgl.Scene(shapes.values())
             scene = pgl.Scene([sh for shid in shapes.values() for sh in shid])
             Viewer.display(scene)
-            if save_image==True:
+            if save_image and dir is not None:
                 Viewer.saveSnapshot(dir+'/millet_%04d.png'%t)
 
 
