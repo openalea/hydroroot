@@ -92,3 +92,4 @@ Changelog = "https://github.com/openalea/hydroroot/releases"
 
 [project.entry-points."wralea"]
 "openalea.hydroroot" = "openalea.hydroroot_wralea"
+
