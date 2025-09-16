@@ -91,4 +91,4 @@ Changelog = "https://github.com/openalea/hydroroot/releases"
 "hydroroot_data" = ["*"]
 
 [project.entry-points."wralea"]
-"hydroroot" = "openalea.hydroroot_wralea"
+"openalea.hydroroot" = "openalea.hydroroot_wralea"
