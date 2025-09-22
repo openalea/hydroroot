@@ -8,7 +8,7 @@ def readCSVFile(filename):
     :returns: - data (array) - record array of (x, y) values, column headers recorded in dtype
 
     """
-    data = np.recfromcsv(filename,delimiter=';')
+    data = np.genfromtxt(filename,delimiter=';',names=True)
     return data
 
 def read_archi_data(fn):
