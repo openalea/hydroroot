@@ -13,6 +13,17 @@ from math import pi
 
 
 
+def radius(g):
+    """
+    calculate the radius from the property diameter
+    :param g:
+    :return:
+    """
+    radius = {}
+    diameters= g.property('diam')
+    for i,j in diameters.items():
+        radius[i] = j/2
+    g.properties()['radius'] = radius
 
 def cont_radius(g, r_base, r_tip):
     """Compute the radius of each segment of a root system.
