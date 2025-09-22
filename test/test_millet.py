@@ -14,5 +14,6 @@ def test_mtg():
     diff_labels = set(labels.values())
     assert len(diff_labels) == 3
     # print(diff_labels)
-test_mtg()
+if __name__ == '__main__':
+    test_mtg()
 
