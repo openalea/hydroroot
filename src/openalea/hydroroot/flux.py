@@ -161,10 +161,10 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem, then compute radial flux
                 parent = g.parent(v)
-                brothers = g.children_iter(parent)
+                brothers = g.children_iter(parent) # not only brothers, v also
                 children = g.children(v) # prefer list because used twice
 
-                Keq_brothers = sum( Keq[cid] for cid in brothers)
+                Keq_brothers = sum( Keq[cid] for cid in brothers if cid != v)
                 Keq_children = sum( Keq[cid] for cid in children)
 
                 if parent is None:
@@ -364,7 +364,7 @@ class RadialShuntFlux(Flux):
                 brothers = g.children_iter(parent)
                 children = g.children_iter(v)
 
-                Keq_brothers = sum( Keq[cid] for cid in brothers)
+                Keq_brothers = sum( Keq[cid] for cid in brothers if cid != v)
                 Keq_children = sum( Keq[cid] for cid in children)
 
                 if parent is None:
