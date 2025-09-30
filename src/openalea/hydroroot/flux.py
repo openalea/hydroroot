@@ -138,6 +138,11 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         #print 'exiting Keq computation'
 
         # calculation of the equivalent external psi, because it changes if psi_e is not uniform
+        # Calculation below verified on 9/30/25:
+        # We have at Pin_i of parent i in parallel the radial k_i and all children Keq_{i-1}
+        # 1. we have with k_i and 1st child (k_i + Keq_{i-1})(Peq_i - Pin_i) = Keq_{i-1}(Peq_i - Pin_i) + k_i(Pe_i - Pin_i)
+        #    if we arrange everything Pin_i disappears and we get Peq_i = (Keq_{i-1}*Peq_i + k_i*Pe_i) / (k_i + Keq_{i-1})
+        # 2. the 2d child is in parallel with a bove and so on finally we get the loop below
         if self.HAS_SOIL:
             Peq = g.property('Peq')
             for v in traversal.post_order2(g, v_base):
