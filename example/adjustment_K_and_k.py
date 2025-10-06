@@ -60,11 +60,11 @@ from openalea.plantgl.all import *
 from openalea.mtg import *
 from oawidgets.plantgl import PlantGL
 
-from hydroroot import flux, conductance, radius
-from hydroroot.main import hydroroot_flow, root_builder
-from hydroroot.init_parameter import Parameters
-from hydroroot.read_file import read_archi_data
-from hydroroot.display import mtg_scene
+from openalea.hydroroot import flux, conductance, radius
+from openalea.hydroroot.main import hydroroot_flow, root_builder
+from openalea.hydroroot.init_parameter import Parameters
+from openalea.hydroroot.read_file import read_archi_data
+from openalea.hydroroot.display import mtg_scene
 from ipywidgets import interact, fixed
 
 from openalea.plantgl.algo.view import view
