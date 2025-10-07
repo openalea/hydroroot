@@ -62,7 +62,7 @@ dependencies = [
     "openalea.plantgl",
     "openalea.oawidgets",
     "yaml",
-    "rsml",
+    "openalea.rsml",
     "matplotlib-base" # does not exist in pip
 ]
 

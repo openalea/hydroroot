@@ -3,7 +3,7 @@ import numpy as np
 from openalea.mtg import *
 from openalea.hydroroot import display
 from path import Path
-from rsml.continuous import toporder
+from openalea.rsml.continuous import toporder
 
 data = Path('./data/200703-YBFB-Col-2.mtg')
 # gini = MTG(data)
@@ -30,7 +30,7 @@ root_id = next(g.component_roots_iter(g.root))
 g = g.insert_scale(inf_scale=1, partition=lambda v: v==root_id, default_label='P')
 
 #3 Transform to rsml 
-from rsml import continuous, io, plot
+from openalea.rsml import continuous, io, plot
 
 gcopy = g.copy()
 
