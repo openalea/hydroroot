@@ -259,7 +259,7 @@ def mtg_from_aqua_data(df, segment_length=1e-4):
      * 3d col: 'order' (string) = '1' if parent root is the primary root, = '1-n' if the parent root is a lateral root that starts at the node n on the parent root
 
     :param df: pandas (DataFrame)
-    :param segment_length: (float) length of the vertices (Default value = 1e-4)
+    :param segment_length: (float) length of the vertices in hydroroot should be in m (Default value = 1e-4)
     :returns:
             - g: MTG with the following properties set: edge_type, label, base_length, length
 

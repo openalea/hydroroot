@@ -85,7 +85,7 @@ if __name__ == '__main__':
     count = 0
     # sensibility analyse using multiplying factor on K and k
     for id in dseeds.index:
-        seed = dseeds.seed[id]
+        seed = int(dseeds.seed[id]) # otherwise this a numpy.int64 and the function random.seed does not like it
         primary_length = dseeds.primary_length[id]
         delta = dseeds.delta[id]
         nude_length = dseeds.nude_length[id]

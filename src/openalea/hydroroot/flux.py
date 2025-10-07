@@ -31,7 +31,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
     def __init__(self, g,
                  Jv, psi_e, psi_base,
-                 invert_model=False,
+                 invert_model=True,
                  k=None, K=None, CONSTANT=1.,
                  cut_and_flow=False):
         """ Flux computes water potential and fluxes at each vertex of the MTG `g`.
@@ -96,6 +96,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
 
         # Add properties
         g.add_property('Keq')
+        if self.HAS_SOIL: g.add_property('Peq') # equivalent external psi, because it changes if psi_e is not uniform
         g.add_property('psi_in')
         g.add_property('psi_out')
         g.add_property('j')
@@ -136,6 +137,22 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             Keq[v] = 1./(r+R)
         #print 'exiting Keq computation'
 
+        # calculation of the equivalent external psi, because it changes if psi_e is not uniform
+        # Calculation below verified on 9/30/25:
+        # We have at Pin_i of parent i in parallel the radial k_i and all children Keq_{i-1}
+        # 1. we have with k_i and 1st child (k_i + Keq_{i-1})(Peq_i - Pin_i) = Keq_{i-1}(Peq_i - Pin_i) + k_i(Pe_i - Pin_i)
+        #    if we arrange everything Pin_i disappears and we get Peq_i = (Keq_{i-1}*Peq_i + k_i*Pe_i) / (k_i + Keq_{i-1})
+        # 2. the 2d child is in parallel with a bove and so on finally we get the loop below
+        if self.HAS_SOIL:
+            Peq = g.property('Peq')
+            for v in traversal.post_order2(g, v_base):
+                kids = g.children(v)
+                Peq[v] = psi_e[v]
+                _k =  k[v]
+                for cid in kids:
+                    Peq[v] = (Peq[v]*_k + Peq[cid]*Keq[cid])/(_k + Keq[cid])
+                    _k = Keq[cid]
+
         # Water flux and water potential computation
         psi_out = g.property('psi_out')
         psi_in = g.property('psi_in')
@@ -149,10 +166,10 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem, then compute radial flux
                 parent = g.parent(v)
-                brothers = g.children_iter(parent)
-                children = g.children_iter(v)
+                brothers = g.children_iter(parent) # not only brothers, v also
+                children = g.children(v) # prefer list because used twice
 
-                Keq_brothers = sum( Keq[cid] for cid in brothers)
+                Keq_brothers = sum( Keq[cid] for cid in brothers if cid != v)
                 Keq_children = sum( Keq[cid] for cid in children)
 
                 if parent is None:
@@ -161,13 +178,15 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                     J_out[v] = Jv
                 else:
                     psi_out[v] = psi_in[parent]
-                    J_out[v] = (J_out[parent] - j[parent]) * ( Keq[v] / Keq_brothers )
+                    J_out[v] = (J_out[parent] - j[parent]) / ( 1.0 + Keq_brothers / Keq[v]  ) # only if no_soil
 
                 if not self.HAS_SOIL:
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                     j[v] = (psi_e - psi_in[v]) * k[v]
                 else:
-                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    KeqPeq = sum( Peq[cid]*Keq[cid] for cid in children )
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
                     j[v] = (psi_e[v] - psi_in[v]) * k[v]
 
             #print 'exiting Jv distribution'
@@ -178,7 +197,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             for v in traversal.pre_order2(g, v_base):
             #compute psi according to Millman theorem from root base to root tips
                 parent = g.parent(v)
-                children = g.children_iter(v)
+                children = g.children(v) # here I prefer list because I used it several times
                 if parent is None:
                     assert v == v_base
                     psi_out[v] = psi_base
@@ -188,7 +207,9 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 if not self.HAS_SOIL:
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 else:
-                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
+                    KeqPeq = sum( Peq[cid]*Keq[cid] for cid in children )
+                    psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
 
             #print 'exiting Psi computation'
         # F. Bauget 2021-06-11 : commented annoying print
@@ -214,7 +235,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             if not self.HAS_SOIL:
                 Jv_global = Keq[v_base] * (psi_e - psi_base)
             else:
-                Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
+                Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base) # TODO to be corrected: False not psi_e[vbase]
 
             # print "Local Computation Water Flux Jvl = ", J_out[v_base]
             # print "Global Computation Water Flux Jvg = ", Jv_global
@@ -348,7 +369,7 @@ class RadialShuntFlux(Flux):
                 brothers = g.children_iter(parent)
                 children = g.children_iter(v)
 
-                Keq_brothers = sum( Keq[cid] for cid in brothers)
+                Keq_brothers = sum( Keq[cid] for cid in brothers if cid != v)
                 Keq_children = sum( Keq[cid] for cid in children)
 
                 if parent is None:
@@ -416,15 +437,15 @@ class RadialShuntFlux(Flux):
                 Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base)
 
 
-def flux(g, Jv=0.1, psi_e=0.4, psi_base=0.101325,
-         invert_model=False, k=None, K=None, CONSTANT=1.,
+def flux(g, Jv=0.1, psi_e=None, psi_base=0.101325,
+         invert_model=True, k=None, K=None, CONSTANT=1.,
          shunt=False, a=1., b=0.,
          cut_and_flow=False):
     """flux computes water potential and fluxes at each vertex of the MTG `g`.
 
     :param g: MTG
     :param Jv: float used when invert_model is False (Default value = 0.1)
-    :param psi_e: hydrostatic pressure outside the roots (Default value = 0.4)
+    :param psi_e: hydrostatic pressure outside the roots (Default value = None), if None in Flux has_soil will be True
     :param psi_base: hydrostatic pressure at the root base (Default value = 0.101325)
     :param invert_model: when false distribute a given output into the root system,
     True compute the water output for the given root system and conditions (Default value = False)
@@ -477,20 +498,12 @@ def segments_at_length(g, l, root=1, dl=1e-4):
 
 def cut(g, cut_length, threshold=1e-4):
     """
-
-    :param g: 
-    :param cut_length: 
-    :param threshold:  (Default value = 1e-4)
-
-    """
-    # Added Fabrice 2020-01-17: segment_length in parameters list
-    # F. Bauget 2022-07-25: added properties deletion
-    """Cut the architecture at a given length cut_length.
+    Cut the architecture at a given length cut_length.
 
     Params:
         - g (MTG) - the root architecture
         - cut_length (float, m) - length at which the architecture is cut from collar.
-        - segment_length (float, mm) - length of the vertices
+        - threshold (float, mm) - length threshold to select the segments to remove corresponds to the length of the vertices
 
     Returns:
         - g(MTG) - the architecture after the cut process. This is a copy.
@@ -518,20 +531,13 @@ def cut(g, cut_length, threshold=1e-4):
 
 def cut_and_set_conductance(g, cut_length, threshold=1e-4):
     """
-
-    :param g: 
-    :param cut_length: 
-    :param threshold:  (Default value = 1e-4)
-
-    """
-    # Added Fabrice 2020-02-21: based on def cut()
-    """Cut the architecture at a given length `cut_length`, and set to the axial conductance value the radial
-        conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding
+    Cut the architecture at a given length `cut_length`, and set to the axial conductance value the radial
+    conductance at the cut tips. The hypothesis is that the xylem channels are directly open to the surrounding
 
         Params:
             - g (MTG) - the root architecture
             - cut_length (float, m) - length at which the architecture is cut from collar.
-            - 'threshold' (float, mm) - length threshold to select the segments to remove in segments_at_length()
+            - 'threshold' (float, m) - length threshold to select the segments to remove in segments_at_length()
 
         Returns:
             - g(MTG) - the architecture after the cut process. This is a copy.

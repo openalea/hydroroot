@@ -9,18 +9,20 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0,  Ce = 0.0, Cse = 0.0, dP = 
     """the system of equation under matrix form is solved using a Newton-Raphson schemes, at each step a system A dx = b
     is solved by LU decomposition.
 
+    Remark: it is har   d coded for PEG 8000 as non-permeating solute
+
     :param g: MTG
-    :param Temp: float (Default value = 298)
-    :param sigma: float (Default value = 1.0)
-    :param Ce: float (Default value = 0.0)
-    :param Cse: float (Default value = 0.0)
-    :param dP: float (Default value = None)
-    :param Pe: float (Default value = 0.4)
-    :param Pbase: float (Default value = 0.1)
-    :param data: numpy array (Default value = None)
-    :param row: numpy array (Default value = None)
-    :param col: numpy array (Default value = None)
-    :param C_base: float (Default value = None)
+    :param Temp: (float) - temperature in Kelvin (Default value = 298)
+    :param sigma: (float) - the reflexion coefficient between 0 and 1 (Default value = 1.0)
+    :param Ce: (float) -  external non-permeating solute concentration in mol/microL (Default value = 0.0)
+    :param Cse: (float) - external permeating solute concentration in mol/microL (Default value = 0.0)
+    :param dP: (float) - difference of hydrostatic pressure between root base and external solution in MPa (Default value = None)
+    :param Pe: (float) - external hydrostatic pressure in MPa (Default value = 0.4)
+    :param Pbase: (float) - base hydrostatic pressure in MPa (Default value = 0.1)
+    :param data: (numpy array) array with non-zero values of the matrix (see code) (Default value = None)
+    :param row: (numpy array) array with the row index of the non-zero values (see code) (Default value = None)
+    :param col: (numpy array) array with the column index of the non-zero values (see code) (Default value = None)
+    :param C_base: (float) solute concentration at the root base in mol/microL (Default value = None)
     :returns: - g (MTG)
         - dx (array)
         - data (array)
@@ -373,20 +375,23 @@ def pressure_calculation(g, Temp = 298, sigma = 1.0,  Ce = 0.0, Cse = 0.0, dP = 
 def pressure_calculation_no_non_permeating_solutes(g, Temp = 298, sigma = 1.0, Ce = 0.0,
                                                    Cse = 0.0, dP = None,
                                                    Pe = 0.4, Pbase = 0.1, data = None, row = None, col = None, C_base = None):
-    """As :func:`~water_solute_transport.py.pressure_calculation` without non-permeating solutes
+    """As :func:`~water_solute_transport.py.pressure_calculation` without non-permeating solutes able to enter the root
+    but it is possible to have non-permeating solute outside the root.
+
+    Remark: it is har   d coded for PEG 8000 as non-permeating solute
 
     :param g: MTG
-    :param Temp: float (Default value = 298)
-    :param sigma: float (Default value = 1.0)
-    :param Cse: float (Default value = 0.0)
-    :param dP: float (Default value = None)
-    :param Pe: float (Default value = 0.4)
-    :param Pbase: float (Default value = 0.1)
-    :param data: numpy array (Default value = None)
-    :param row: numpy array (Default value = None)
-    :param col: numpy array (Default value = None)
-    :param C_base: float (Default value = None)
-    :param Ce:  (Default value = 0.0)
+    :param Temp: (float) - temperature in Kelvin (Default value = 298)
+    :param sigma: (float) - the reflexion coefficient between 0 and 1 (Default value = 1.0)
+    :param Ce: (float) -  external non-permeating solute concentration in mol/microL (Default value = 0.0)
+    :param Cse: (float) - external permeating solute concentration in mol/microL (Default value = 0.0)
+    :param dP: (float) - difference of hydrostatic pressure between root base and external solution in MPa (Default value = None)
+    :param Pe: (float) - external hydrostatic pressure in MPa (Default value = 0.4)
+    :param Pbase: (float) - base hydrostatic pressure in MPa (Default value = 0.1)
+    :param data: (numpy array) array with non-zero values of the matrix (see code) (Default value = None)
+    :param row: (numpy array) array with the row index of the non-zero values (see code) (Default value = None)
+    :param col: (numpy array) array with the column index of the non-zero values (see code) (Default value = None)
+    :param C_base: (float) solute concentration at the root base in mol/microL (Default value = None)
     :returns: - g (MTG)
         - dx (array)
         - data (array)
@@ -612,17 +617,17 @@ def pressure_calculation_drag_permeating(g, Temp = 298, sigma = 1.0, Ce = 0.0, C
     """As :func:`~water_solute_transport.py.pressure_calculation` with a drag term in the solute transport equation.
 
     :param g: MTG
-    :param Temp: float (Default value = 298)
-    :param sigma: float (Default value = 1.0)
-    :param Ce: float (Default value = 0.0)
-    :param Cse: float (Default value = 0.0)
-    :param dP: float (Default value = None)
-    :param Pe: float (Default value = 0.4)
-    :param Pbase: float (Default value = 0.1)
-    :param data: numpy array (Default value = None)
-    :param row: numpy array (Default value = None)
-    :param col: numpy array (Default value = None)
-    :param C_base: float (Default value = None)
+    :param Temp: (float) - temperature in Kelvin (Default value = 298)
+    :param sigma: (float) - the reflexion coefficient between 0 and 1 (Default value = 1.0)
+    :param Ce: (float) -  external non-permeating solute concentration in mol/microL (Default value = 0.0)
+    :param Cse: (float) - external permeating solute concentration in mol/microL (Default value = 0.0)
+    :param dP: (float) - difference of hydrostatic pressure between root base and external solution in MPa (Default value = None)
+    :param Pe: (float) - external hydrostatic pressure in MPa (Default value = 0.4)
+    :param Pbase: (float) - base hydrostatic pressure in MPa (Default value = 0.1)
+    :param data: (numpy array) array with non-zero values of the matrix (see code) (Default value = None)
+    :param row: (numpy array) array with the row index of the non-zero values (see code) (Default value = None)
+    :param col: (numpy array) array with the column index of the non-zero values (see code) (Default value = None)
+    :param C_base: (float) solute concentration at the root base in mol/microL (Default value = None)
     :returns: - g (MTG)
         - dx (array)
         - data (array)
@@ -980,17 +985,17 @@ def pressure_calculation_drag(g, Temp = 298, sigma = 1.0, Ce = 0.0, Cse = 0.0, d
     in the solute transport equation.
 
     :param g: MTG
-    :param Temp: float (Default value = 298)
-    :param sigma: float (Default value = 1.0)
-    :param Cse: float (Default value = 0.0)
-    :param dP: float (Default value = None)
-    :param Pe: float (Default value = 0.4)
-    :param Pbase: float (Default value = 0.1)
-    :param data: numpy array (Default value = None)
-    :param row: numpy array (Default value = None)
-    :param col: numpy array (Default value = None)
-    :param C_base: float (Default value = None)
-    :param Ce:  (Default value = 0.0)
+    :param Temp: (float) - temperature in Kelvin (Default value = 298)
+    :param sigma: (float) - the reflexion coefficient between 0 and 1 (Default value = 1.0)
+    :param Ce: (float) -  external non-permeating solute concentration in mol/microL (Default value = 0.0)
+    :param Cse: (float) - external permeating solute concentration in mol/microL (Default value = 0.0)
+    :param dP: (float) - difference of hydrostatic pressure between root base and external solution in MPa (Default value = None)
+    :param Pe: (float) - external hydrostatic pressure in MPa (Default value = 0.4)
+    :param Pbase: (float) - base hydrostatic pressure in MPa (Default value = 0.1)
+    :param data: (numpy array) array with non-zero values of the matrix (see code) (Default value = None)
+    :param row: (numpy array) array with the row index of the non-zero values (see code) (Default value = None)
+    :param col: (numpy array) array with the column index of the non-zero values (see code) (Default value = None)
+    :param C_base: (float) solute concentration at the root base in mol/microL (Default value = None)
     :returns: - g (MTG)
         - dx (array)
         - data (array)
@@ -1221,11 +1226,13 @@ def init_some_MTG_properties(g, tau = 0., Cini = 0., Cpeg_ini = 0., t = 1, Ps = 
         - 'J_s': the pumping rate
 
     :param g: MTG
-    :param tau: float (Default value = 0.)
-    :param Cini: float (Default value = 0.)
-    :param Cpeg_ini: float (Default value = 0.)
-    :param t: int (Default value = 1)
-    :returns: - g
+    :param tau: (float) active pumping rate in mol/(m2.s) (Default value = 0.)
+    :param Cini: (float) initial permeating solute concentration inside the root in mol/microL (Default value = 0.)
+    :param Cpeg_ini: (float) initial non-permeating solute concentration inside the root in mol/microL (Default value = 0.)
+    :param t: (int) switch factor used in the PDE resolution it is 0 or 1 and it is set during the resolution (Default value = 1)
+    :param Ps: (float) permeability coefficient in m/s (Default value = 0.)
+    :returns:
+        - g
 
     """
     C = g.property('C')
@@ -1268,9 +1275,10 @@ def viscosity_peg(Cpeg = 0.0, unit_factor = 1.0):
     mu in mPa.s
     w in g/g water
 
-    :param Cpeg: Float (Default value = 0.0)
-    :param unit_factor: Float (Default value = 1.0)
-    :returns: - mu: Float, the dynamic viscosity in mPa.s
+    :param Cpeg: (Float) - PEG concentration in mol per volume (Default value = 0.0)
+    :param unit_factor: (Float) - factor to pass the Cpeg unit to g/g, g of PEG per g of water (Default value = 1.0)
+    :returns:
+        - mu: Float, the dynamic viscosity in mPa.s
 
     """
 
@@ -1290,9 +1298,10 @@ def derivative_viscosity_peg(Cpeg = 0.0, unit_factor = 1.0):
     dmu in mPa.s
     w in g/g water
 
-    :param Cpeg: Float (Default value = 0.0)
-    :param unit_factor: Float (Default value = 1.0)
-    :returns: - dmu: Float, the derivative
+    :param Cpeg: (Float) - PEG concentration in mol per volume (Default value = 0.0)
+    :param unit_factor: (Float) - factor to pass the Cpeg unit to g/g, g of PEG per g of water (Default value = 1.0)
+    :returns:
+        - dmu: Float, the derivative
 
     """
 
@@ -1313,10 +1322,11 @@ def osmotic_p_peg(Cpeg = 0.0, unit_factor = 1.0, T = 25.0):
     w: g/g
     T: Celcius
 
-    :param Cpeg: Float (Default value = 0.0)
-    :param unit_factor: Float (Default value = 1.0)
-    :param T: Float (Default value = 25.0)
-    :returns: - osmotic_p: Float, the osmotic pressure (MPa)
+    :param Cpeg: (Float) - PEG concentration in mol per volume (Default value = 0.0)
+    :param unit_factor: (Float) - factor to pass the Cpeg unit to g/g, g of PEG per g of water (Default value = 1.0)
+    :param T: (Float) - temperature in Celcius (Default value = 25.0)
+    :returns:
+        - osmotic_p: Float, the osmotic pressure (MPa)
 
     """
     if Cpeg < 1.0e-20: Cpeg = 1.0e-20
@@ -1334,10 +1344,11 @@ def derivative_osmotic_p_peg(Cpeg = 0.0, unit_factor = 1.0, T = 25.0):
     w: g/g
     T: Celcius
 
-    :param Cpeg: Float (Default value = 0.0)
-    :param unit_factor: Float (Default value = 1.0)
-    :param T: Float (Default value = 25.0)
-    :returns: - osmotic_p: Float, the osmotic pressure (MPa)
+    :param Cpeg: (Float) - PEG concentration in mol per volume (Default value = 0.0)
+    :param unit_factor: (Float) - factor to pass the Cpeg unit to g/g, g of PEG per g of water (Default value = 1.0)
+    :param T: (Float) - temperature in Celcius (Default value = 25.0)
+    :returns:
+        - osmotic_p: Float, the osmotic pressure (MPa)
 
     """
     if Cpeg < 1.0e-20: Cpeg = 1.0e-20

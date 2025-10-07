@@ -9,15 +9,14 @@
 
 import glob
 import argparse
-import tempfile, os
 
+from openalea.plantgl.algo.view import view
 import openalea.plantgl.all as pgl
 from openalea.mtg import turtle as turt
-from IPython.display import Image, display
 
 from openalea.hydroroot.main import hydroroot_flow
 from openalea.hydroroot.init_parameter import Parameters
-from openalea.hydroroot.display import get_root_visitor, plot
+from openalea.hydroroot.display import get_root_visitor, mtg_scene
 from openalea.hydroroot import radius
 from openalea.hydroroot.generator.markov import my_seed,generate_g
 from openalea.hydroroot.generator.measured_root import mtg_from_aqua_data
@@ -102,9 +101,7 @@ def plot_order(g1, has_radius=True, r_base=1.e-4, r_tip=5e-5, prune=None, name=N
                 sh.appearance =pgl.Material(colors[vid])
     scene = pgl.Scene([sh for shid in shapes.values() for sh in shid ])
 
-    pgl.Viewer.display(scene)
-    if name is not None:
-            pgl.Viewer.frameGL.saveImage(name)
+    return scene
 
 if __name__ == '__main__':
 
@@ -161,15 +158,9 @@ if __name__ == '__main__':
                 alpha = 0.2 # radius in millimeter identical for all orders
                 gcopy = g.copy() # copy because we change the radius property in plot below
                 if prop != 'order':
-                    plot(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = prop)
+                    s = mtg_scene(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = prop)
                 else:
-                    plot_order(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
+                    s = plot_order(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4)
 
                 ## for display in the notebook, comment to display in the 3D viewer
-                pgl.Viewer.widgetGeometry.setSize(800, 800) # set the picture size in px
-                fn = tempfile.mktemp(suffix='.png')
-                pgl.Viewer.saveSnapshot(fn)
-                pgl.Viewer.stop()
-                img = Image(fn)
-                os.unlink(fn)
-                display(img)
+                view(s)
