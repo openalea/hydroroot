@@ -18,5 +18,5 @@ HydroRoot's API
    ./user/api_main.rst
    ./user/api_radius.rst
    ./user/api_read_file.rst
+   ./user/api_solver_wrapper.rst
    ./user/api_water_solute_transport.rst
-

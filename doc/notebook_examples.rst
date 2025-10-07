@@ -30,4 +30,5 @@ These are examples showing how to determine transport parameters from experiment
 .. nbgallery::
     example/example_k_adjustment.ipynb
     example/example_solute_water_transport.ipynb
+    example/examples_cut_and_flow.ipynb
     example/Boursiac2022/boursiac2022.ipynb

@@ -17,8 +17,8 @@ def setting_k0_according_to_order(g, k0_pr, k0_lr):
     - to k0_lr otherwise
 
     :param g: (MTG)
-    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for the primary root
-    :param k0_lr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for root of order > 0
+    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\\ m.MPa^{-1}.s^{-1}`) for the primary root
+    :param k0_lr: (float) - radial donductivity (:math:`10^{-9}\\ m.MPa^{-1}.s^{-1}`) for root of order > 0
     :returns: - g: (MTG) - the root architecture with k0_pr and k0_lr set
 
     """
@@ -32,7 +32,7 @@ def set_conductances(g, axial_pr, k0_pr, axial_lr = None, k0_lr = None):
 
      - K_exp: the model input axial conductance in :math:`[L^4.P^{-1}.T^{-1}]`
      - K: the effective axial conductance of each vertex :math:`K=K_{exp}/l\\ [L^3.P^{-1}.T^{-1}]`
-     - k: the radial conductance :math:`k=2 \pi r l k_0 \ [L^3.P^{-1}.T^{-1}]`
+     - k: the radial conductance :math:`k=2 \\pi r l k_0 \\ [L^3.P^{-1}.T^{-1}]`
 
     with r and l the radius and the length of the vertex respectively.
     
@@ -41,10 +41,10 @@ def set_conductances(g, axial_pr, k0_pr, axial_lr = None, k0_lr = None):
     k0_lr is not None.
 
     :param g: (MTG)
-    :param axial_pr: (list) - axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) vs distance to tip, 2 lists of float
-    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`)
-    :param axial_lr: (list) - axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) for root of order > 0, 2 lists of float (Default value = None)
-    :param k0_lr: (float) - radial donductivity  (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for root of order > 0 (Default value = None)
+    :param axial_pr: (list) - axial conductance (:math:`10^{-9}\\ m^4.MPa^{-1}.s^{-1}`) vs distance to tip, 2 lists of float
+    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\\ m.MPa^{-1}.s^{-1}`)
+    :param axial_lr: (list) - axial conductance (:math:`10^{-9}\\ m^4.MPa^{-1}.s^{-1}`) for root of order > 0, 2 lists of float (Default value = None)
+    :param k0_lr: (float) - radial donductivity  (:math:`10^{-9}\\ m.MPa^{-1}.s^{-1}`) for root of order > 0 (Default value = None)
     :returns: - g (MTG)
 
     """
@@ -147,9 +147,9 @@ def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
     :param length: (float)
     :param viscosity: (float) (Default value = 1e-3)
 
-    The Poiseuille formula is, for a cylinder :math:`K = {\pi r^4} / {8 \mu l}`
+    The Poiseuille formula is, for a cylinder :math:`K = {\\pi r^4} / {8 \\mu l}`
 
-    with :math:`r` the radius of a pipe, :math:`\mu` the viscosity of the liquid, :math:`l` the length of the pipe.
+    with :math:`r` the radius of a pipe, :math:`\\mu` the viscosity of the liquid, :math:`l` the length of the pipe.
 
     """
     return pi*(radius**4) / ( 8 * viscosity * length)
@@ -159,7 +159,7 @@ def compute_k(g, k0 = 300.):
     """Compute the radial conductance k (:math:`10^{-9}\ m.s^{-1}.MPa^{-1}`) of each vertex of the MTG.
 
     .. math::
-        k = 2 \pi r l k0
+        k = 2 \\pi r l k0
 
     with l and r the segment length and radius of the vertex
 
