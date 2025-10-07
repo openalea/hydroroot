@@ -1,6 +1,6 @@
 # HydroRoot
 
-[![CI status](https://github.com/openalea/hydroroot/actions/workflows/conda-package-build.yml/badge.svg)](https://github.com/openalea/hydroroot/actions/workflows/conda-package-build.yml)
+[![CI status](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml/badge.svg)](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml)
 [![Documentation Status](https://readthedocs.org/projects/hydroroot/badge/?version=latest)](https://hydroroot.readthedocs.io/en/latest/?badge=latest)
 [![image](https://anaconda.org/openalea3/openalea.hydroroot/badges/version.svg)](https://anaconda.org/openalea3/openalea.hydroroot)
 
