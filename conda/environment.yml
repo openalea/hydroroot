@@ -10,9 +10,9 @@ dependencies:
   - pip
   - openalea.mtg
   - openalea.plantgl
-  - oawidgets
+  - openalea.oawidgets
   - yaml
-  - rsml
+  - openalea.rsml
   - matplotlib-base
   # let pip install the rest using pyproject.toml (if you are okay with conda/pip mix)
   - pip:

@@ -1,5 +1,5 @@
 
-import rsml
+import openalea.rsml as rsml
 from openalea.mtg import MTG, traversal
 
 from openalea.hydroroot.hydro_io import export_mtg_to_rsml, import_rsml_to_discrete_mtg

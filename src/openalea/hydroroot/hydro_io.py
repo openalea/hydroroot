@@ -5,7 +5,7 @@ from openalea.mtg import MTG
 from openalea.mtg.algo import axis
 from openalea.mtg.traversal import *
 
-from rsml import continuous, io
+from openalea.rsml import continuous, io
 
 from openalea.hydroroot import display
 

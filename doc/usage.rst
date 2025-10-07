@@ -125,7 +125,7 @@ arabidopsis-simple example http://rootsystemml.github.io/images/examples/arabido
 
 .. code-block:: python
 
-    import rsml
+    import openalea.rsml as rsml
     from openalea.hydroroot import radius
     from openalea.hydroroot.main import hydroroot_flow
     from openalea.hydroroot.display import plot

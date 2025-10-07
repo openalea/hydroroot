@@ -60,9 +60,9 @@ channels = [
 dependencies = [
     "openalea.mtg",
     "openalea.plantgl",
-    "oawidgets",
+    "openalea.oawidgets",
     "yaml",
-    "rsml",
+    "openalea.rsml",
     "matplotlib-base" # does not exist in pip
 ]
 
