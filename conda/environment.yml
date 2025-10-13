@@ -10,7 +10,7 @@ dependencies:
   - pip
   - openalea.mtg
   - openalea.plantgl
-  - openalea.oawidgets
+  - openalea.widgets
   - yaml
   - openalea.rsml
   - matplotlib-base
