@@ -1,10 +1,27 @@
 # HydroRoot
 
-[![CI status](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml/badge.svg)](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml)
-[![Documentation Status](https://readthedocs.org/projects/hydroroot/badge/?version=latest)](https://hydroroot.readthedocs.io/en/latest/?badge=latest)
-[![image](https://anaconda.org/openalea3/openalea.hydroroot/badges/version.svg)](https://anaconda.org/openalea3/openalea.hydroroot)
+[![Docs](https://readthedocs.org/projects/hydroroot/badge/?version=latest)](https://hydroroot.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml/badge.svg)](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml)
+[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
+[![Anaconda-Server Badge](https://anaconda.org/openalea3/openalea.hydroroot/badges/version.svg)](https://anaconda.org/openalea3/openalea.hydroroot)
+[![License](https://img.shields.io/badge/License--CeCILL-C-blue)](https://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 
-## Software
+OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root
+architecture system generator package.
+
+<figure>
+    <img src="example/data/fig-6E.png" alt="Alt text" />
+    <figcaption>Heat map representation of the incoming local radial flows on an
+arabidopsis root.</figcaption>
+</figure>
+
+### Description
+
+The OpenAlea.HydroRoot package contains a root architecture simulation
+model coupled with a water and solute transport solver. It contains a
+pure hydraulic solver that is solved using resistance network analogy.
+It also contains a water and solute transport solver that is more
+complex and see the root as a continuous medium.
 
 ### Authors
 
@@ -27,35 +44,17 @@ Python package
 
 CecILL-C
 
-**URL** : <https://hydroroot.rtfd.io>
-
-## About
-
-### Description
-
-OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root
-architecture system generator package.
-
-### Content
-
-The OpenAlea.HydroRoot package contains a root architecture simulation
-model coupled with a water and solute transport solver. It contains a
-pure hydraulic solver that is solved using resistance network analogy.
-It also contains a water and solute transport solver that is more
-complex and see the root as a continuous medium.
-
-### Example
-
-Heat map representation of the incoming local radial flows on an
-arabidopsis root.
-
-![Alt Text](example/data/fig-6E.png)
-
 ### Installation
 
-#### Conda Installation
+#### for user
+```bash
+mamba create -n myenv -c openalea3 -c conda-forge openalea.my_pkg openalea.plantgl
+```
 
-    conda create -n hydroroot -c conda-forge -c openalea3 openalea.hydroroot
+#### for developer
+```bash
+mamba env create -f ./conda/environment.yml
+```
 
 #### Requirements
 
