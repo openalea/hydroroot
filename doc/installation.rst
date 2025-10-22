@@ -34,7 +34,9 @@ Just run the following command:
 
     mamba create -f conda/environment.yml
     mamba activate hydroroot
-    pip install -e .
+    pip install -e .[options]
 
-This will first create a conda environment called *hydroroot* with the proper dependencies, then the environment will be activated,
-and finally openalea.hydroroot will be installed in develop mode. As above to have notebook support run `mamba install jupyterlab`.
+This will first create a conda environment called *hydroroot_dev* with the proper dependencies, then the environment will be activated,
+and finally openalea.hydroroot will be installed in development mode. As above to have notebook support run `mamba install jupyterlab`.
+[options] is optional, and allows to install additional dependencies defined in the [project.optional-dependencies] section of your
+pyproject.toml file (usually "dev", or "doc", ...)
