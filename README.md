@@ -61,8 +61,11 @@ arabidopsis root.
 
 > -   openalea.mtg
 > -   openalea.plantgl
-> -   RSML
-> -   pandas \> 0.17
+> -   openalea.rsml
+> -   openalea.widgets (for the notebook examples)
+> -   matplotlib-base
+> -   yaml
+> -   pandas
 > -   numpy
 > -   scipy
 
