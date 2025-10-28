@@ -5,7 +5,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
 [![Anaconda-Server Badge](https://anaconda.org/openalea3/openalea.hydroroot/badges/version.svg)](https://anaconda.org/openalea3/openalea.hydroroot)
 [![License](https://img.shields.io/badge/License--CeCILL-C-blue)](https://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openalea/hydroroot/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openalea/hydroroot/HEAD?urlpath=%2Fdoc%2Ftree%2Fexample%2Fnotebook_list.ipynb)
 
 OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root
 architecture system generator package.
