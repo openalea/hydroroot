@@ -1,18 +1,19 @@
-name: hydroroot
+name: hydroroot_dev
 channels:
-  - conda-forge
   - openalea3/label/dev
   - openalea3/label/rc
   - openalea3
+  - conda-forge
 dependencies:
   # list here manually conda-only deps (listed in [tool.conda.environment] section of pyproject)
   - python
   - pip
   - openalea.mtg
   - openalea.plantgl
-  - oawidgets
+  - openalea.widgets
   - yaml
-  - rsml
+  - openalea.rsml
+  - matplotlib-base
   # let pip install the rest using pyproject.toml (if you are okay with conda/pip mix)
   - pip:
-      - -e ."[doc, test]"
+      - -e .."[doc, test]"
