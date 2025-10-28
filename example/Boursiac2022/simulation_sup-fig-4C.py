@@ -9,14 +9,12 @@
 
 import glob
 import argparse
-import tempfile, os
 
-import openalea.plantgl.all as pgl
-from IPython.display import Image, display
+from openalea.plantgl.algo.view import view
 
 from openalea.hydroroot.main import hydroroot_flow
 from openalea.hydroroot.init_parameter import Parameters
-from openalea.hydroroot.display import plot
+from openalea.hydroroot.display import mtg_scene
 from openalea.hydroroot import radius
 from openalea.hydroroot.conductance import axial, radial_step
 from openalea.hydroroot.read_file import read_archi_data
@@ -80,13 +78,7 @@ if __name__ == '__main__':
             # g has radius, here we set fictive radii just for visual comfort
             alpha = 0.2 # radius in millimeter identical for all orders
             gcopy = g.copy()  # copy because we change the radius property in plot below
-            plot(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j')
+            s = mtg_scene(gcopy, has_radius=False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j')
 
-            # to display in the notebook, comment to display in the 3D viewer
-            pgl.Viewer.widgetGeometry.setSize(450, 600) # set the picture size in px
-            fn = tempfile.mktemp(suffix='.png')
-            pgl.Viewer.saveSnapshot(fn)
-            pgl.Viewer.stop()
-            img = Image(fn)
-            os.unlink(fn)
-            display(img)
+            # to display in the notebook
+            view(s)

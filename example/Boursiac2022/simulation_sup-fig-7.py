@@ -10,17 +10,15 @@
 import argparse
 import sys
 import time
-import tempfile, os
 import pandas as pd
 
 
-import openalea.plantgl.all as pgl
+from openalea.plantgl.algo.view import view
 from openalea.mtg.algo import axis
-from IPython.display import Image, display
 
 from openalea.hydroroot.main import hydroroot_flow, root_builder
 from openalea.hydroroot.init_parameter import Parameters
-from openalea.hydroroot.display import plot
+from openalea.hydroroot.display import mtg_scene
 from openalea.hydroroot.conductance import axial, radial
 
 results = {}
@@ -163,14 +161,8 @@ if __name__ == '__main__':
                 # g has radius, here we set fictive radii just for visual comfort
                 alpha = 0.2  # radius in millimeter identical for all orders
                 g1 = g.copy() # because the radii are changed
-                plot(g1, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat', lognorm = None)
-                pgl.Viewer.widgetGeometry.setSize(450, 600)  # set the picture size in px
-                fn = tempfile.mktemp(suffix = '.png')
-                pgl.Viewer.saveSnapshot(fn)
-                pgl.Viewer.stop()
-                img = Image(fn)
-                os.unlink(fn)
-                display(img)
+                s = mtg_scene(g1, has_radius = False, r_base = alpha * 1.e-3, r_tip = alpha * 9.9e-4, prop_cmap = 'j_relat', lognorm = None)
+                view(s)
 
 
     dj2 = pd.DataFrame(j_relat, columns = _columns)

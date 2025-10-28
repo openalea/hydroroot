@@ -12,7 +12,7 @@ __license__ = 'CeCILL-C'
 __authors__ = ''
 __institutes__ = None
 __description__ = ''
-__url__ = 'http://openalea.github.io'
+__url__ = 'https://hydroroot.rtfd.io'
 __icon__ = ''
 __alias__ = []
 
