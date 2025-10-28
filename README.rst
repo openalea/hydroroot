@@ -1,7 +1,7 @@
 OpenAlea.HydroRoot 
 ==================
 .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/openalea/hydroroot/binder?urlpath=%2Fdoc%2Ftree%2Fexample%2Fexample_cut_and_flow_analysis.ipynb
+ :target: https://mybinder.org/v2/gh/openalea/hydroroot/HEAD
 
 .. image:: https://github.com/openalea/hydroroot/actions/workflows/conda-package-build.yml/badge.svg
     :alt: CI status
