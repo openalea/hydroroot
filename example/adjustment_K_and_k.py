@@ -292,7 +292,7 @@ if __name__ == '__main__':
     for f in parameter.archi['input_file']:
         filename = filename + (glob.glob(parameter.archi['input_dir'] + f))
 
-    fn = 'data/cnf_data.csv'
+    fn = 'data/maize_cnf_data.csv'
     df_exp = pd.read_csv(fn, sep = ',', keep_default_na = True)
 
     # predict the number of simulation run
