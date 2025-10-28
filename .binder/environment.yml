@@ -1,1 +1,19 @@
-/home/bauget/Documents/Dev/hydroroot/conda/environment.yml
+name: hydroroot_dev
+channels:
+  - openalea3/label/dev
+  - openalea3/label/rc
+  - openalea3
+  - conda-forge
+dependencies:
+  # list here manually conda-only deps (listed in [tool.conda.environment] section of pyproject)
+  - python
+  - pip
+  - openalea.mtg
+  - openalea.plantgl
+  - openalea.widgets
+  - yaml
+  - openalea.rsml
+  - matplotlib-base
+  # let pip install the rest using pyproject.toml (if you are okay with conda/pip mix)
+  - pip:
+      - ..
