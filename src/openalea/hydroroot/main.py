@@ -38,11 +38,10 @@ def hydroroot_mtg(
     :param length_data: pandas dataframe (Default value = None)
     :param n: int (Default value = None)
 
-    :returns: - g
-        - surface
-        - volume
-    
-    Example
+    :returns:
+        - g (MTG)
+        - surface (float)
+        - volume (float)
 
     """
     # F. Bauget 2022-08-12: added if-else to be able to use the function without length data, useful for usage demo
@@ -96,14 +95,15 @@ def hydroroot_flow(
     """Flux and equivalent conductance calculation
 
     :param g: MTG
-    :param segment_length: Float (Default value = 1.e-4)
-    :param k0: Float (Default value = 300)
-    :param Jv: Float (Default value = 0.1)
-    :param psi_e: Float (Default value = 0.4)
-    :param psi_base: Float (Default value = 0.1)
-    :param axial_conductivity_data: list of Float (Default value = None)
-    :param radial_conductivity_data: list of Float (Default value = None)
-    :returns: - g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
+    :param segment_length: (float) - not used vertices length in hydroroot in m (Default value = 1.0e-4) #TODO not used delete it
+    :param k0: (float) - not used radial conductivity in :math:`10^{-9}\ m.s^{-1}.MPa^{-1}` (Default value = 300) #TODO not used delete it
+    :param Jv: (Float) not used because invert_model=True in Flux.Flux (Default value = 0.1) #TODO delete it or add invert_model in arguments
+    :param psi_e: (Float) external hydrostatic potential in MPa (Default value = 0.4)
+    :param psi_base: (Float)  root base hydrostatic potential in MPa (Default value = 0.1)
+    :param axial_conductivity_data: (2 list of Float) axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
+    :param radial_conductivity_data: (2 list of Float) radial conductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
+    :returns:
+        - g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
     	        j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
     	        input and output of a MTG node
     	- Keq (float): the equivalent conductance of the whole root
@@ -160,7 +160,7 @@ def hydroroot(
 ):
     """Simulate a root system and compute global conductance and flux.
     see :func:`~main.hydroroot_mtg` and  :func:`~main.hydroroot_flow`
-
+    deprecated
     :param primary_length:  (Default value = 0.15)
     :param delta:  (Default value = 2.e-3)
     :param beta:  (Default value = 0.25)
@@ -242,7 +242,7 @@ def hydroroot_from_data(
     lateral_length_data=None,
     ):
     """Reconstruct a root system and compute global conductance and flux.
-
+    deprecated
     :param primary_length_data: list Float (Default value = None)
     :param lateral_length_data: list Float (Default value = None)
     :param return: 
@@ -332,31 +332,29 @@ def hydroroot_from_data(
 def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
                   ref_radius = 7.0e-5, Flag_radius = False):
-    """wrapper function: build a MTG with properties like radius and vertex length set.
-    The MTG is either generated or built from a data.
-    The radius and vertex length properties are set.
-    The following properties are computed: length, position, mylength, surface, volume, total length, primary root length, nb of intercepts
+    """wrapper function: build a MTG with properties that are set like : radius, vertex length, position (distance to tip) and mylength (distance to base).
+    The MTG is either generated or built from a DataFrame. The unit length in hydroroot should be in m.
 
-    :param primary_length: primary root length for generated mtg (Default value = 0.13)
-    :param seed: seed for generated mtg (Default value = None)
-    :param delta: branching delay for generated mtg (Default value = 2.0e-3)
-    :param nude_length: length from tip without lateral for generated mtg (Default value = 2.0e-2)
-    :param df: pandas DataFrame with the architecture data to be reconstructed (Default value = None)
-    :param segment_length: float (Default value = 1.0e-4)
-    :param length_data: string (Default value = None)
-    :param branching_variability: float (Default value = 0.25)
-    :param order_max: float (Default value = 4.0)
-    :param order_decrease_factor: float (Default value = 0.7)
-    :param ref_radius: float (Default value = 7.0e-5)
-    :param intercepts: list
-    :param Flag_radius: boolean (Default value = False)
-    :returns: - g: MTG with the different properties set or computed (see comments above),
+    :param primary_length: (float) - primary root length for generated mtg (Default value = 0.13)
+    :param seed: (int) - seed for generated mtg (Default value = None)
+    :param delta: (float) - branching delay for generated mtg in hydroroot should be in m (Default value = 2.0e-3)
+    :param nude_length: (float) - length from tip without lateral for generated mtg (Default value = 2.0e-2)
+    :param df: (DataFrame) - DataFrame with the architecture data to be reconstructed if not None (Default value = None)
+    :param segment_length: (float) - vertices length in hydroroot should be in m (Default value = 1.0e-4)
+    :param length_data: (string list) - the file name with the length data laws (Default value = None)
+    :param branching_variability: (float) (Default value = 0.25)
+    :param order_max: (float) (Default value = 4.0)
+    :param order_decrease_factor: (float) (Default value = 0.7)
+    :param ref_radius: (float) - radius in hydroroot should be in m (Default value = 7.0e-5)
+    :param Flag_radius: (boolean) - True if radius exist in df (Default value = False)
+    :returns:
+        - g: MTG with the different properties set or computed (see comments above),
         - primary_length: primary root length (output for generated mtg)
         - total_length: total root length
         - surface: total root surface
-        - intercepts: nb of intercepts at a given distance from base
         - _seed: the seed used in the generator
 
+    see also :func:`generator.measured_root.mtg_from_aqua_data` for details about df
     """
     if df is not None:
         g = measured_root.mtg_from_aqua_data(df, segment_length)

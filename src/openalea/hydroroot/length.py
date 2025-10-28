@@ -11,9 +11,11 @@ def fit_length(csvdata, length='1e-4', k=1, s=0.):
     And evaluate the spline to compute the property 'prop_out'
 
     :param csvdata: 
-    :param length:  (Default value = '1e-4')
-    :param k:  (Default value = 1)
-    :param s:  (Default value = 0.)
+    :param length: number dividing data if > 0 (Default value = '1e-4')
+    :param k: (int) - degree of the smoothing spline (Default value = 1)
+    :param s: (float) - positive smoothing factor used to choose the number of knots (Default value = 0)
+    :return:
+        - spline object
 
     """
     length = float(length)
@@ -27,13 +29,16 @@ def fit_length(csvdata, length='1e-4', k=1, s=0.):
 
 def fit_law(x, y, scale=0., k=1, s=0, **kwds):
     """
+    Return a spline interpolation of y(x)
 
-    :param x: 
-    :param y: 
-    :param scale:  (Default value = 0.)
-    :param k:  (Default value = 1)
-    :param s:  (Default value = 0)
-
+    :param x: (float list)
+    :param y:  (float list)
+    :param scale: (float) - number dividing x and y if > 0 (Default value = 0.)
+    :param k: (int) - degree of the smoothing spline (Default value = 1)
+    :param s: (float) - positive smoothing factor used to choose the number of knots (Default value = 0)
+    :param kwds: additional arguments see scipy doc of UnivariateSpline
+    :return:
+        - spline object
     """
     if scale:
         x = list(np.array(x) / scale)
@@ -45,9 +50,10 @@ def fit_law(x, y, scale=0., k=1, s=0, **kwds):
 
 def diff(law1, ref_law):
     """
-
-    :param law1: 
-    :param ref_law: 
+    deprecated
+    Calculate the difference between the inetgrale of the two laws
+    :param law1: scipy spline object
+    :param ref_law: scipy spline object
 
     """
     knots = law1.get_knots()

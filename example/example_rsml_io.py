@@ -26,7 +26,7 @@ run in python console
 """
 
 import glob
-import rsml
+import openalea.rsml as rsml
 import argparse
 import sys
 

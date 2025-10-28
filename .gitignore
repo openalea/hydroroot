@@ -75,6 +75,6 @@ nosetests.xml
 # Doc build
 doc/_build
 
-# hydroroot
-example/test.rsml
-tmp*.*
+# baugetfa
+tmp*
+

@@ -1,4 +1,4 @@
-# !!! script has to be run from hydroroot\test\ !!!
+# !!! script has to be run from openalea.hydroroot\test\ !!!
 
 pylab qt
 
