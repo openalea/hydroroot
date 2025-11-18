@@ -58,7 +58,7 @@ from scipy import optimize
 
 from openalea.plantgl.all import *
 from openalea.mtg import *
-from oawidgets.plantgl import PlantGL
+from openalea.widgets.plantgl import PlantGL
 
 from openalea.hydroroot import flux, conductance, radius
 from openalea.hydroroot.main import hydroroot_flow, root_builder
