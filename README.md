@@ -71,7 +71,7 @@ mamba env create -f ./conda/environment.yml
 
 #### Usage
 
-See notebook in example directory.
+See notebook in [example directory](https://github.com/openalea/hydroroot/blob/main/example/notebook_list.ipynb).
 
 ## Documentation
 
