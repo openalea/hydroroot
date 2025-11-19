@@ -20,8 +20,6 @@ build:
   noarch: python
   number: 0
   preserve_egg_dir: True
-  script_env:
-    - SSL_NO_VERIFY=1
   script:
     - {{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-build-isolation -vv
 
