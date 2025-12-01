@@ -87,9 +87,6 @@ Changelog = "https://github.com/openalea/hydroroot/releases"
 #[tool.setuptools.dynamic]
 #readme = {file = ["README.rst"]}
 
-[tool.setuptools.package-data]
-"hydroroot_data" = ["*"]
-
 [project.entry-points."wralea"]
 "hydroroot" = "openalea.hydroroot_wralea"
 
