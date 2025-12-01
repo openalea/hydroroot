@@ -1,2 +1,0 @@
-distance_from_base_(mm)	lateral_root_length_(mm)	order																																																																																																																																																																																																																																										
-102.94	0	1																																																																																																																							
