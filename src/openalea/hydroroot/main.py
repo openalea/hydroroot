@@ -92,7 +92,7 @@ def hydroroot_flow(
     axial_conductivity_data=None,
     radial_conductivity_data=None,
 ):
-    """Flux and equivalent conductance calculation
+    r"""Flux and equivalent conductance calculation
 
     :param g: MTG
     :param segment_length: (float) - not used vertices length in hydroroot in m (Default value = 1.0e-4) #TODO not used delete it

@@ -10,15 +10,15 @@ import pylab
 from openalea.hydroroot.length import fit_law
 
 def setting_k0_according_to_order(g, k0_pr, k0_lr):
-    """
+    r"""
     Set uniform radial conductivity to roots according to their order:
 
     - to k0_pr for the primary root (order == 0),
     - to k0_lr otherwise
 
     :param g: (MTG)
-    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\\ m.MPa^{-1}.s^{-1}`) for the primary root
-    :param k0_lr: (float) - radial donductivity (:math:`10^{-9}\\ m.MPa^{-1}.s^{-1}`) for root of order > 0
+    :param k0_pr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for the primary root
+    :param k0_lr: (float) - radial donductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) for root of order > 0
     :returns: - g: (MTG) - the root architecture with k0_pr and k0_lr set
 
     """
@@ -167,7 +167,7 @@ def compute_k(g, k0 = 300.):
     - if k0 is a float: use this value in the calculation
 
     :param g: (MTG)
-    :param k0: (float or string) - "k0" or the radial conductivity in :math:`10^{-9}\ m.s^{-1}.MPa^{-1}` (Default value = 300.)
+    :param k0: (float or string) - "k0" or the radial conductivity in :math:`10^{-9}\\ m.s^{-1}.MPa^{-1}` (Default value = 300.)
 
     """
     #print 'entering radial k fitting'
