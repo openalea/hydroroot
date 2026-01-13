@@ -48,8 +48,13 @@ CecILL-C
 ### Installation
 
 #### for user
+Creating a new conda environment with hydroroot and its dependencies installed
 ```bash
-mamba create -n myenv -c openalea3 -c conda-forge openalea.my_pkg openalea.plantgl
+mamba create -n hydroroot -c openalea3 -c conda-forge openalea.hydroroot
+```
+In an existing conda environment:
+```bash
+mamba install -c openalea3 -c conda-forge openalea.hydroroot
 ```
 
 #### for developer
