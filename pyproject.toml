@@ -76,6 +76,8 @@ doc = [
   "myst-parser",
   "nbsphinx",
   "sphinx-copybutton",
+  "ipykernel",
+  "ipython_genutils",
 ]
 
 [project.urls]

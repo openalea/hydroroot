@@ -11,7 +11,7 @@ OpenAlea.HydroRoot is a hydraulic root architecture modelling and a root
 architecture system generator package.
 
 <figure>
-    <img src="example/data/fig-6E.png" alt="Alt text" />
+    <img src="doc/example/data/fig-6E.png" alt="Alt text" />
     <figcaption>Heat map representation of the incoming local radial flows on an
 arabidopsis root.</figcaption>
 </figure>
@@ -76,7 +76,7 @@ mamba env create -f ./conda/environment.yml
 
 #### Usage
 
-See notebooks in example directory, they are listed [here](example/notebook_list.ipynb) and can be played following [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openalea/hydroroot/HEAD?urlpath=%2Fdoc%2Ftree%2Fexample%2Fnotebook_list.ipynb)
+See notebooks in example directory, they are listed [here](doc/example/notebook_list.ipynb) and can be played following [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openalea/hydroroot/HEAD?urlpath=%2Fdoc%2Ftree%2Fexample%2Fnotebook_list.ipynb)
 
 
 ## Documentation
@@ -99,3 +99,9 @@ If you use Hydroroot for your research, please cite:
     transport parameters, Journal of Experimental Botany, Volume 74,
     Issue 5, 13 March 2023, Pages 1594--1608,
     <https://doi.org/10.1093/jxb/erac471>
+
+## Contributors
+
+<a href="https://github.com/openalea/hydroroot/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=openalea/hydroroot" />
+</a>
