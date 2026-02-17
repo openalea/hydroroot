@@ -526,7 +526,7 @@ def water_solute_model(parameter, df_archi =None, df_law =None,
     #     archi_f = archi_f[0]
     #     df_archi = read_archi_data(archi_f) if parameter.archi['read_architecture'] else None
     #     index = archi_f.replace(glob.glob(parameter.archi['input_dir'])[0], "")
-    
+
     if parameter.archi['read_architecture']:
         # architecture with filename in aqua team format
         # archi_f = glob.glob(parameter.archi['input_dir'] + parameter.archi['input_file'][0])
@@ -534,10 +534,11 @@ def water_solute_model(parameter, df_archi =None, df_law =None,
         fname = str(Path(parameter.archi['input_dir']) / parameter.archi['input_file'][0]) # deals with path in windows
         archi_f = glob.glob(fname) # deals with wildcards ? deprecated ???
         archi_f = archi_f[0]
-        
+
         if df_archi is None: df_archi = read_archi_data(archi_f)
         index = archi_f.replace(glob.glob(parameter.archi['input_dir'])[0], "")
-    index = parameter.archi['input_file'][0]
+    if len(parameter.archi['input_file']) > 0:
+        index = parameter.archi['input_file'][0]
 
     # length law data: override if necessary
     if df_law is not None:
@@ -1254,16 +1255,18 @@ def pure_hydraulic_model(parameter = Parameters(), df_archi = None, df_law =None
 
 
     # architecture with filename in aqua team format
-    if df_archi is None:
-        # archi_f = glob.glob(parameter.archi['input_dir'] + parameter.archi['input_file'][0])
-        # archi_f = archi_f[0]
-        fname = str(Path(parameter.archi['input_dir']) / parameter.archi['input_file'][0]) # deals with path in windows
-        archi_f = glob.glob(fname) # deals with wildcards ? deprecated ???
-        archi_f = archi_f[0]
+    if len(parameter.archi['input_file']) > 0:
+        if df_archi is None:
+            # archi_f = glob.glob(parameter.archi['input_dir'] + parameter.archi['input_file'][0])
+            # archi_f = archi_f[0]
+            fname = str(Path(parameter.archi['input_dir']) / parameter.archi['input_file'][0]) # deals with path in windows
+            archi_f = glob.glob(fname) # deals with wildcards ? deprecated ???
+            archi_f = archi_f[0]
 
-        df_archi = read_archi_data(archi_f) if parameter.archi['read_architecture'] else None
-    index = archi_f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
-
+            df_archi = read_archi_data(archi_f) if parameter.archi['read_architecture'] else None
+        index = archi_f.replace(glob.glob(parameter.archi['input_dir'])[0],"")
+    else:
+        index = ''
     # length law data: override if necessary
     if df_law is not None:
         parameter.archi['length_data'] = df_law

@@ -27,13 +27,13 @@ archi:
     #file format: "LR_length_mm" ; "relative_distance_to_tip"
     #laws used to generate lateral roots of the 1st order (1_order_law), and lateral roots of order above 1 (2_order_law)
     length_file:
-        - data/length*order1*.csv
-        - data/length*order2*.csv
+        - data/length*order1_16*.csv
+        - data/length*order2_16*.csv
 
     #length of the primary root
     #float or list of float
     #unit: m
-    primary_length: 0.16
+    primary_length: 0.13
 
     #branching delay
     #float or list of float
@@ -49,12 +49,12 @@ archi:
 
     #vertices length
     #unit: m
-    segment_length: 1.0e-3
+    segment_length: 1.0e-4
 
     #part of roots without any lateral root, distance from tip
     #float or list of float
     #unit: m
-    nude_length: 0.2
+    nude_length: 0.02
 
     #reference radius of the primary root
     #float
