@@ -5,7 +5,7 @@
 """
 
 import numpy as np
-from scipy.interpolate import UnivariateSpline
+#from scipy.interpolate import UnivariateSpline
 
 def fit_property_from_spline(g, spline, prop_in, prop_out): 
     """ compute a property from another one using a spline transformation.
