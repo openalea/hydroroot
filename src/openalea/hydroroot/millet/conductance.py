@@ -24,3 +24,32 @@ def fit_property_from_spline(g, spline, prop_in, prop_out):
 
     return g
 
+
+def compute_K_from_laws(g, seminal_axial_conductivity_law, crown_axial_conductivity_law, lateral_axial_conductivity_law):
+    """
+
+    compute the axial conductance K versus the vertex position according to some laws and to the root types: crown, seminal,
+    laterals
+
+    :param g: (MTG)
+
+    """
+    K={}
+
+
+    positions= g.property('relative_position')
+    orders = g.property('order')
+
+    for vid in g.vertices_iter(g.max_scale()):
+            if g.label(vid)=='Crown':
+                K[vid] = crown_axial_conductivity_law(positions[vid])
+            elif g.label(vid) == 'Seminal' :
+                K[vid] = seminal_axial_conductivity_law(positions[vid])
+            elif g.label(vid) == 'Lateral' :
+                    K[vid] = lateral_axial_conductivity_law(positions[vid])
+            else: # for the collet and other unknown tpes
+                K[vid] = seminal_axial_conductivity_law(positions[vid])
+
+    g.properties()['K'] = K
+
+    return g
