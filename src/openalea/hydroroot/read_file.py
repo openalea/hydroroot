@@ -1,14 +1,14 @@
 import numpy as np
 import pandas as pd
 
-def readCSVFile(filename, delimiter=";"):
+def readCSVFile(filename):
     """Read and extract data from a csv file, supposed that the data is stored in 2 columns.
 
     :param filename: string
     :returns: - data (array) - record array of (x, y) values, column headers recorded in dtype
 
     """
-    data = np.genfromtxt(filename,delimiter=delimiter,names=True)
+    data = np.genfromtxt(filename,delimiter=';',names=True)
     return data
 
 def read_archi_data(fn):
