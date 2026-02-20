@@ -138,6 +138,71 @@ def hydroroot_flow(
 
     return g, Keq, Jv_global
 
+def hydroroot_solute_flow(
+    g,
+    segment_length=1.e-4,
+    k0=300,
+    Jv=0.1,
+    psi_e=0.4,
+    psi_base=0.1,
+    axial_conductivity_data=None,
+    radial_conductivity_data=None,
+):
+    r"""Water and solute fluxes and equivalent conductance calculation on an MTG
+
+    :param g: MTG
+    :param segment_length: (float) - not used vertices length in hydroroot in m (Default value = 1.0e-4) #TODO not used delete it
+    :param k0: (float) - not used radial conductivity in :math:`10^{-9}\ m.s^{-1}.MPa^{-1}` (Default value = 300) #TODO not used delete it
+    :param Jv: (Float) not used because invert_model=True in Flux.Flux (Default value = 0.1) #TODO delete it or add invert_model in arguments
+    :param psi_e: (Float) external hydrostatic potential in MPa (Default value = 0.4)
+    :param psi_base: (Float)  root base hydrostatic potential in MPa (Default value = 0.1)
+    :param axial_conductivity_data: (2 list of Float) axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
+    :param radial_conductivity_data: (2 list of Float) radial conductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
+    :returns:
+        - g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
+    	        j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
+    	        input and output of a MTG node
+    	- Keq (float): the equivalent conductance of the whole root
+    	- Jv_global (float): the outgoing flux at the root base
+
+    """
+    xa, ya = axial_conductivity_data
+    axial_conductivity_law = fit_law(xa, ya)
+
+    xr, yr = radial_conductivity_data
+    radial_conductivity_law = fit_law(xr, yr)
+
+    # Compute K using axial conductance data
+    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
+    g = conductance.compute_K(g)
+
+    g = conductance.fit_property_from_spline(g, radial_conductivity_law, 'position', 'k0')
+    g = conductance.compute_k(g, k0='k0')
+
+    g = flux.flux(g, psi_e = psi_e, psi_base = psi_base, invert_model=True)
+    g = init_some_MTG_properties(g, tau=J_s, Cini=Cse, Cpeg_ini = Cpeg, t = 1, Ps = Ps)
+
+    if Cpeg <= 0.0:
+        calculation = pressure_calculation_no_non_permeating_solutes()
+    else:
+        calculation = pressure_calculation()
+
+    nb_v = g.nb_vertices()
+    Fdx = 1.0
+    Fdx_old = 1.
+    while Fdx > eps:
+        g, dx, data, row, col = calculation(g, sigma=parameter.solute['Sigma'],
+                                           Ce=Ce,
+                                           Cse=Cse,
+                                           Pe=parameter.exp['psi_e'],
+                                           Pbase=parameter.exp['psi_base'])
+        Fdx = math.sqrt(sum(dx ** 2.0)) / nb_v
+        if abs(Fdx - Fdx_old) < eps: break
+        Fdx_old = Fdx
+
+    Jv_global = g.property('J_out')[1]
+
+    return g, Jv_global
 
 def hydroroot(
     primary_length=0.15,
