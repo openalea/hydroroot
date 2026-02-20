@@ -156,7 +156,7 @@ def poiseuille(radius, length, viscosity=1e-3):  # DEPRECATED
 
 
 def compute_k(g, k0 = 300.):
-    r"""Compute the radial conductance k (:math:`10^{-9}\ m.s^{-1}.MPa^{-1}`) of each vertex of the MTG.
+    r"""Compute the radial conductance k (:math:`10^{-9}\ m^4.s^{-1}.MPa^{-1}`) of each vertex of the MTG.
 
     .. math::
         k = 2 \\pi r l k0
