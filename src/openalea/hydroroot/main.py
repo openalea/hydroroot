@@ -141,9 +141,6 @@ def hydroroot_flow(
 
 def hydroroot_solute_flow(
     g,
-    segment_length=1.e-4,
-    k0=300,
-    Jv=0.1,
     psi_e=0.4,
     psi_base=0.1,
     axial_conductivity_data=None,
@@ -152,9 +149,6 @@ def hydroroot_solute_flow(
     r"""Water and solute fluxes and equivalent conductance calculation on an MTG
 
     :param g: MTG
-    :param segment_length: (float) - not used vertices length in hydroroot in m (Default value = 1.0e-4) #TODO not used delete it
-    :param k0: (float) - not used radial conductivity in :math:`10^{-9}\ m.s^{-1}.MPa^{-1}` (Default value = 300) #TODO not used delete it
-    :param Jv: (Float) not used because invert_model=True in Flux.Flux (Default value = 0.1) #TODO delete it or add invert_model in arguments
     :param psi_e: (Float) external hydrostatic potential in MPa (Default value = 0.4)
     :param psi_base: (Float)  root base hydrostatic potential in MPa (Default value = 0.1)
     :param axial_conductivity_data: (2 list of Float) axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
@@ -170,7 +164,7 @@ def hydroroot_solute_flow(
     :returns:
         - g (MTG): the MTG with the following properties filled: K (axial conductance), k (radial donductivity),
     	        j (radial flux), J_out (axial flux), psi_in and psi_out (hydrostatic pressure into the root at the
-    	        input and output of a MTG node
+    	        input and output of a MTG node)
     	- Jv_global (float): the outgoing flux at the root base
 
     """
