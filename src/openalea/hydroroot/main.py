@@ -185,9 +185,9 @@ def hydroroot_solute_flow(
     g = init_some_MTG_properties(g, tau=J_s, Cini=Cse, Cpeg_ini = Ce, t = 1, Ps = Ps)
 
     if Ce <= 0.0:
-        calculation = pressure_calculation_no_non_permeating_solutes()
+        calculation = pressure_calculation_no_non_permeating_solutes
     else:
-        calculation = pressure_calculation()
+        calculation = pressure_calculation
 
     # Newton-Raphson loop
     nb_v = g.nb_vertices()
