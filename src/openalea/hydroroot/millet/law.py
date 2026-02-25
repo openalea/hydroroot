@@ -397,81 +397,81 @@ def developmental_age(g, nude_tip_length=15):
 
 
 
-    def developmental_age2(g, nude_tip_length=0.0206):
-        """ Compute the developmental age of each vertex.
-    
-        A new property is added to the MTG that represent the age of apparition of the segment.
-        It allows to express a dynamic as a parametrisation.
-        """
-        age = {}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                # convert nude_tip_length to nb of vertices: for a 75cm root, the length of nude tip is 15cm
-        nude_tip_length = (nude_tip_length * 0.15) / 0.75
-    
-        #--------------------------------------
-        # Seminal
-        #--------------------------------------
-        is_primary = lambda v: g.label(v) == 'Seminal' or g.label(v)=='collet'
-    
-        for v in post_order2(g, 1, pre_order_filter=is_primary):
-            if g.is_leaf(v):
-                age[v] = 0  
-            else:
-                age[v] = max(age.get(cid,0) for cid in g.children(v))+1
-    
-        age_max = age[1]
-    
-        k, v = np.array(list(age.keys())), np.array(list(age.values()))
-        v = age_max - v
-    
-        age = dict(zip(list(k), list(v)))
-    
-        delta = nude_tip_length
-    
-        for v in pre_order2_with_filter(g, 1, pre_order_filter=is_primary):
-            pid = g.parent(v)
-            if g.edge_type(v) =='+':
-                age_p, age_v = age[pid], age[v]
-                if age_p +delta < age_v:
-                    age[v] = age_p + delta  # replace by a stat distribution rather than min
-            elif pid is not None:
-                age[v] = age[pid] + 1
-    
-        #---------------------------------------------------------------
-        # Crown: they appear 6 days after germination from the root base
-        #---------------------------------------------------------------
-    
-        delta_crown_age = 6
-    
-        root_crowns = [v for v in g if g.label(v) == 'Crown' and g.label(v) != g.label(g.parent(v))]
-    
-        speed = 1.
-        for v in root_crowns:
-            date = delta_crown_age
-            for cid in axis(g, v):
-                age[cid] = date
-                date += speed
-    
-    
-        #--------------------------------------------------------------------
-        # Lateral: they appear 6 days after germination from the primary root
-        #--------------------------------------------------------------------
-    
-        delta_crown_age = 6
-    
-        root_laterals = [v for v in g if g.label(v) == 'Lateral' and g.label(v) != g.label(g.parent(v))]
-    
-        speed = 1.
-        for v in root_laterals:
-            date = delta_crown_age
-            for cid in axis(g, v):
-                age[cid] = date
-                date += speed
-    
-    
-    
-        # Store  the property in the MTG
-        g.properties()['age'] = age
-        return g
+def developmental_age2(g, nude_tip_length=0.0206):
+    """ Compute the developmental age of each vertex.
+
+    A new property is added to the MTG that represent the age of apparition of the segment.
+    It allows to express a dynamic as a parametrisation.
+    """
+    age = {}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            # convert nude_tip_length to nb of vertices: for a 75cm root, the length of nude tip is 15cm
+    nude_tip_length = (nude_tip_length * 0.15) / 0.75
+
+    #--------------------------------------
+    # Seminal
+    #--------------------------------------
+    is_primary = lambda v: g.label(v) == 'Seminal' or g.label(v)=='collet'
+
+    for v in post_order2(g, 1, pre_order_filter=is_primary):
+        if g.is_leaf(v):
+            age[v] = 0  
+        else:
+            age[v] = max(age.get(cid,0) for cid in g.children(v))+1
+
+    age_max = age[1]
+
+    k, v = np.array(list(age.keys())), np.array(list(age.values()))
+    v = age_max - v
+
+    age = dict(zip(list(k), list(v)))
+
+    delta = nude_tip_length
+
+    for v in pre_order2_with_filter(g, 1, pre_order_filter=is_primary):
+        pid = g.parent(v)
+        if g.edge_type(v) =='+':
+            age_p, age_v = age[pid], age[v]
+            if age_p +delta < age_v:
+                age[v] = age_p + delta  # replace by a stat distribution rather than min
+        elif pid is not None:
+            age[v] = age[pid] + 1
+
+    #---------------------------------------------------------------
+    # Crown: they appear 6 days after germination from the root base
+    #---------------------------------------------------------------
+
+    delta_crown_age = 6
+
+    root_crowns = [v for v in g if g.label(v) == 'Crown' and g.label(v) != g.label(g.parent(v))]
+
+    speed = 1.
+    for v in root_crowns:
+        date = delta_crown_age
+        for cid in axis(g, v):
+            age[cid] = date
+            date += speed
+
+
+    #--------------------------------------------------------------------
+    # Lateral: they appear 6 days after germination from the primary root
+    #--------------------------------------------------------------------
+
+    delta_crown_age = 6
+
+    root_laterals = [v for v in g if g.label(v) == 'Lateral' and g.label(v) != g.label(g.parent(v))]
+
+    speed = 1.
+    for v in root_laterals:
+        date = delta_crown_age
+        for cid in axis(g, v):
+            age[cid] = date
+            date += speed
+
+
+
+    # Store  the property in the MTG
+    g.properties()['age'] = age
+    return g
 ###########################################################################################################
 
 
@@ -494,3 +494,20 @@ def add_soil(g, soil_data, segment_length = 1.e-4):
     return g
 
 
+def add_soil2(g, soil_data, segment_length = 1.e-4):
+
+    """ add a soil a hetergeneous water potential """
+
+    x,y = soil_data
+
+    # Compute absolute z coordinate and normalize
+    vids = g.property('xyz').keys()
+    zs = np.array([np.abs(pt.z) * segment_length for pt in g.property('xyz').values()])
+    zs/=zs.max()
+    zs = zs.tolist()
+    # Fit data on z coordinate to compute psi_e on each vertex
+    g.properties()['height'] = dict(zip(vids,zs))
+    soil_law = length.fit_law(x,y)
+    g = conductance.fit_property_from_spline(g, soil_law, 'height', 'psi_e')
+
+    return g
