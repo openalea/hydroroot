@@ -143,6 +143,7 @@ def hydroroot_solute_flow(
     g,
     psi_e=0.4,
     psi_base=0.1,
+    k0=None,
     axial_conductivity_data=None,
     radial_conductivity_data=None,
     J_s = 1.0e-7, Ps = 1.0e-9, Cse = 13.96e-9, Ce = 0.0, sigma=1.0, Temp=298, C_base = None, eps = 1.0e-9):
@@ -151,8 +152,9 @@ def hydroroot_solute_flow(
     :param g: MTG
     :param psi_e: (Float) external hydrostatic potential in MPa (Default value = 0.4)
     :param psi_base: (Float)  root base hydrostatic potential in MPa (Default value = 0.1)
-    :param axial_conductivity_data: (2 list of Float) axial conductance (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
-    :param radial_conductivity_data: (2 list of Float) radial conductivity (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
+    :param k0: (float) - uniform radial conductivity in :math:`10^{-9}\ m.s^{-1}.MPa^{-1}` (Default value = None)
+    :param axial_conductivity_data: (2 list of Float) axial conductance profile (:math:`10^{-9}\ m^4.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
+    :param radial_conductivity_data: (2 list of Float) radial conductivity profile (:math:`10^{-9}\ m.MPa^{-1}.s^{-1}`) versus distance to tip (m) (Default value = None)
     :param J_s: (float) active pumping rate in mol/(m2.s) (Default value = 1e-7)
     :param Ps: (float) permeability coefficient in m/s (Default value = 1e-9)
     :param Cse: (float) initial permeating solute concentration inside the root in mol/microL (Default value = 13.96e-9)
@@ -171,14 +173,17 @@ def hydroroot_solute_flow(
     xa, ya = axial_conductivity_data
     axial_conductivity_law = fit_law(xa, ya)
 
-    xr, yr = radial_conductivity_data
-    radial_conductivity_law = fit_law(xr, yr)
-
     # Compute K using axial conductance data
     g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
     g = conductance.compute_K(g)
 
-    g = conductance.fit_property_from_spline(g, radial_conductivity_law, 'position', 'k0')
+    if k0:
+        g = conductance.setting_k0_according_to_order(g, k0, k0)
+    else:
+        xr, yr = radial_conductivity_data
+        radial_conductivity_law = fit_law(xr, yr)
+        g = conductance.fit_property_from_spline(g, radial_conductivity_law, 'position', 'k0')
+
     g = conductance.compute_k(g, k0='k0')
 
     g = flux.flux(g, psi_e = psi_e, psi_base = psi_base, invert_model=True)
