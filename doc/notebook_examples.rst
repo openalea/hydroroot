@@ -7,17 +7,17 @@ Gallery
 Architectures
 -------------
 
-These are small examples of direct water flow simulations on root simulated, RSML and measured architectures
+These examples explore the different ways to have RSA, either by generating it or from measurements.
 
 .. nbgallery::
     example/example_generated_archi.ipynb
     example/example_archi_from_rsml.ipynb
     example/example_archi_from_file.ipynb
 
-Parameter class
----------------
+HydroRoot's Parameters class
+----------------------------
 
-This is a simple example showing how to use a yaml file as an input regrouping all HydroRoot's input.
+`Parameters` is a python class that manage model parameters allowing for example to use yaml file as input.
 
 .. nbgallery::
     example/example_parameter_class.ipynb
@@ -31,4 +31,13 @@ These are examples showing how to determine transport parameters from experiment
     example/example_k_adjustment.ipynb
     example/example_solute_water_transport.ipynb
     example/examples_cut_and_flow.ipynb
+
+Paper Boursiac et al. 2022
+--------------------------
+
+This notebook allow to reproduce all figures of the paper:
+
+Yann Boursiac, Christophe Pradal, Fabrice Bauget, Mikaël Lucas, Stathis Delivorias, Christophe Godin, Christophe Maurel, Phenotyping and modeling of root hydraulic architecture reveal critical determinants of axial water transport, Plant Physiology, Volume 190, Issue 2, October 2022, Pages 1289--1306, <https://doi.org/10.1093/plphys/kiac281>
+
+.. nbgallery::
     example/Boursiac2022/boursiac2022.ipynb
