@@ -118,7 +118,7 @@ experimental:
     #water flux at the root base
     #float
     #unit: microL/s
-    Jv: 0.0
+    Jv: 0.01
 
     #hydric potential outside the roots (pressure chamber)
     #float
