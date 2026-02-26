@@ -63,7 +63,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from openalea.hydroroot.init_parameter import Parameters
-from openalea.hydroroot.solver_wrapper import water_solute_model
+from openalea.hydroroot.cut_and_flow import water_solute_model
 
 results = {}
 g_cut = {}
@@ -134,8 +134,8 @@ fig, axs = plt.subplots(2, 2)
 if 'Jexp(P)' in list(dresults.columns):
     d = dresults[['dp', 'Jexp(P)', 'Jv(P)']].dropna()
     d.sort_values(['dp'], inplace=True)
-    d.plot.scatter('dp', 'Jexp(P)', ax = axs[0, 0], label = 'Jexp(P)')
-    d.plot.line('dp', 'Jv(P)', ax = axs[0, 0], label = 'Jv(P)')
+    axs[0,0].scatter(d['dp'], d['Jexp(P)'], label = 'Jexp(P)')
+    axs[0,0].plot(d['dp'], d['Jv(P)'], label = 'Jv(P)')
     j = np.array(d.loc[:, ['Jv(P)', 'Jexp(P)']])
     axs[0, 0].set_ylim(j.min(),j.max())
     axs[0,0].set_xlabel('P (Mpa)')
@@ -144,8 +144,8 @@ if 'Jexp(P)' in list(dresults.columns):
 #Jv CnF data and fit
 if 'Jexp cnf (uL/s)' in list(dresults.columns):
     d = dresults[['max_length', 'Jexp cnf (uL/s)', 'Jv cnf (uL/s)']].dropna()
-    d.plot.scatter('max_length', 'Jexp cnf (uL/s)', ax = axs[0, 1], label = 'Jexp(P) cnf')
-    d.plot.line('max_length', 'Jv cnf (uL/s)', ax = axs[0, 1], label = 'Jv(P)')
+    axs[0,1].scatter(d['max_length'], d['Jexp cnf (uL/s)'], label = 'Jexp(P) cnf')
+    axs[0,1].plot(d['max_length'], d['Jv cnf (uL/s)'], label = 'Jv(P)')
     j = np.array(d.loc[:, ['Jv cnf (uL/s)', 'Jexp cnf (uL/s)']])
     axs[0, 1].set_ylim(j.min(),j.max())
     axs[0,1].set_xlabel('max length (m)')
@@ -153,8 +153,8 @@ if 'Jexp cnf (uL/s)' in list(dresults.columns):
 
 #K 1st guess and optim
 d = dresults[['x pr', 'K1st pr', 'K pr']].dropna()
-d.plot.scatter('x pr', 'K1st pr', ax = axs[1, 0], label = 'K1st')
-d.plot.line('x pr', 'K pr', ax = axs[1, 0], label = 'K adjusted')
+axs[1, 0].scatter(d['x pr'], d['K1st pr'], label = 'K1st')
+axs[1, 0].plot(d['x pr'], d['K pr'], label = 'K adjusted')
 axs[1, 0].set_ylim(min(d['K1st pr'].min(), d['K pr'].min()),
                    max(d['K1st pr'].max(), d['K pr'].max()))
 axs[1,0].set_xlabel('dist. to tip (m)')
@@ -162,10 +162,9 @@ axs[1,0].set_ylabel('K (10-9 m4/(s.Mpa)')
 
 #radial k 1st guess and optim
 d = pd.DataFrame({'lab':['k', 'k adjusted'], 'val':[parameter.hydro['k0'], dresults['kpr'][0]]})
-d.plot.bar(x='lab', y='val', rot=0, ax = axs[1, 1])
+axs[1,1].bar(x=d['lab'], height=d['val'])
 axs[1,1].set_ylabel('k (10-9 m/(s.MPa)')
 axs[1,1].xaxis.label.set_visible(False)
-axs[1,1].get_legend().remove()
 
 fig.patch.set_facecolor('lightgrey')
 fig.tight_layout()
