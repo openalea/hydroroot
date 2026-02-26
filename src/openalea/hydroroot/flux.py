@@ -143,6 +143,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
         # 1. we have with k_i and 1st child (k_i + Keq_{i-1})(Peq_i - Pin_i) = Keq_{i-1}(Peq_i - Pin_i) + k_i(Pe_i - Pin_i)
         #    if we arrange everything Pin_i disappears and we get Peq_i = (Keq_{i-1}*Peq_i + k_i*Pe_i) / (k_i + Keq_{i-1})
         # 2. the 2d child is in parallel with a bove and so on finally we get the loop below
+        # 2/25/26: theoritical calculation verified by @baugetfa
         if self.HAS_SOIL:
             Peq = g.property('Peq')
             for v in traversal.post_order2(g, v_base):
@@ -207,6 +208,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
                 if not self.HAS_SOIL:
                     psi_in[v] = (K[v] * psi_out[v] + psi_e * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                 else:
+                    # 2/25/26: theoritical calculation verified by @baugetfa
                     # psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * (k[v] + Keq_children)) / (k[v] + K[v] + Keq_children)
                     KeqPeq = sum( Peq[cid]*Keq[cid] for cid in children )
                     psi_in[v] = (K[v] * psi_out[v] + psi_e[v] * k[v] + KeqPeq) / (k[v] + K[v] + Keq_children)
