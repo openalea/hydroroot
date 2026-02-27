@@ -20,7 +20,7 @@ def compute_age_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,del
 
     max_scale = g.max_scale()
     _orders = algo.orders(g, scale=max_scale)
-    ramifs = [vid for vid in g.vertices(scale=max_scale) if g.edge_type(vid)=='+']
+    ramifs = [vid for vid in g.vertices_iter(scale=max_scale) if g.edge_type(vid)=='+']
     age = {}
     sr= g.Trunk(g.root, max_scale)
     len_sr = len(sr)
