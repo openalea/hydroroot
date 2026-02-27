@@ -154,11 +154,19 @@ def diameter_law(data_xy, function=None, segment_length = 1e-4, plot= True):
     law = f
     return law
 
-def diameter_law2(data_xy, function=None, plot= True):
+def diameter_fit_law(data_xy, function=None, scale_x=1e-2, scale_y=1e-6, plot= False):
+    """
+    Fit the data_xy using function
 
-    """this function checks the the best paramters of the fonction that fit the data"""
+    :param data_xy: DataFrame in 2 columns x and y
+    :param function: Function to fit the data
+    :param scale_x: (float) factor to scale the x axis, e.i. from cm to m 0.01 (default 0.01)
+    :param scale_y: (float) factor to scale the y axis, e.i. from um to m 1e-6 (default 1e-6)
+    :param plot: (Boolean) True plot data and fit (default False)
+    :return: fit law
+    """
 
-    x,y = read_data(data_xy, scale_x=1e-2, scale_y=1e-6)
+    x,y = read_data(data_xy, scale_x=scale_x, scale_y=scale_y)
     #convert to float
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
@@ -183,7 +191,7 @@ def diameter_law2(data_xy, function=None, plot= True):
     law = f
     return law
 
-
+diameter_law2 = diameter_fit_law
 
 def compute_radius_from_laws(g,
                      seminal_RootDiameter_law=None,
