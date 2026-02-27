@@ -31,7 +31,7 @@ tort = defaultdict(lambda: random.randint(-1,1))
 # Visitor function used for the new implementation of the architecture
 #----------------------------------------------------------------------
 
-def visitor_millet(g, v, turtle):
+def millet_visitor(g, v, turtle):
     n = g.node(v)
 
     # --- Safe geometry default variables (meters)
@@ -73,11 +73,11 @@ def visitor_millet(g, v, turtle):
     # ---------------------------------------------------------
     # Tortuosity / curvature (small turns)
     # ---------------------------------------------------------
-    #rng = random.Random(v)
-    #if label == "Crown":
-        #turtle.down(tort[v])
-    #elif label in ("Seminal", "Lateral"):
-        #turtle.down(rng.random())
+    rng = random.Random(v)
+    if label == "Crown":
+        turtle.down(tort[v])
+    elif label in ("Seminal", "Lateral"):
+        turtle.down(rng.random())
 
     # ---------------------------------------------------------
     # Render
@@ -253,4 +253,4 @@ def test(save_image= False, dir='C:/Users/ndour/Desktop/mon dossier/my_Ph.D/Plan
 
 #-------Display of the MTG
 #test(save_image=False)
-visitor2 = visitor_millet
+
