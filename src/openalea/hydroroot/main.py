@@ -111,24 +111,25 @@ def hydroroot_flow(
     	- Jv_global (float): the outgoing flux at the root base
 
     """
-    xa, ya = axial_conductivity_data
-    # commented line below, BUG correction, the global flux was diverging when decreasing segment_length
-    # ya was not supposed to be multiplied by (segment_length / 1.e-4)
-    # ya = list(np.array(ya) * (segment_length / 1.e-4))
-    axial_conductivity_law = fit_law(xa, ya)
+    if axial_conductivity_data:
+        # Compute K using axial conductance data
+        xa, ya = axial_conductivity_data
+        # commented line below, BUG correction, the global flux was diverging when decreasing segment_length
+        # ya was not supposed to be multiplied by (segment_length / 1.e-4)
+        # ya = list(np.array(ya) * (segment_length / 1.e-4))
+        axial_conductivity_law = fit_law(xa, ya)
 
-    xr, yr = radial_conductivity_data
-    radial_conductivity_law = fit_law(xr, yr)
+        g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
+        g = conductance.compute_K(g) # Fabrice 2020-01-17: calculation of K in dimension [L^3 P^(-1) T^(-1)]
 
-    # Compute K using axial conductance data
-    g = conductance.fit_property_from_spline(g, axial_conductivity_law, 'position', 'K_exp')
-    g = conductance.compute_K(g) # Fabrice 2020-01-17: calculation of K in dimension [L^3 P^(-1) T^(-1)]
+    if radial_conductivity_data:
+        xr, yr = radial_conductivity_data
+        radial_conductivity_law = fit_law(xr, yr)
+
+        g = conductance.fit_property_from_spline(g, radial_conductivity_law, 'position', 'k0')
+        g = conductance.compute_k(g, k0='k0')
+
     # Compute the flux
-
-    g = conductance.fit_property_from_spline(g, radial_conductivity_law, 'position', 'k0')
-    g = conductance.compute_k(g, k0='k0')
-
-    # TODO: return Keq base and Jv
     g = flux.flux(g, Jv, psi_e, psi_base, invert_model=True)
 
     Keqs = g.property('Keq')
