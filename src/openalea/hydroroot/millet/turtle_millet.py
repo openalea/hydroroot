@@ -73,11 +73,11 @@ def visitor2(g, v, turtle):
     # ---------------------------------------------------------
     # Tortuosity / curvature (small turns)
     # ---------------------------------------------------------
-    #rng = random.Random(v)
-    #if label == "Crown":
-        #turtle.down(tort[v])
-    #elif label in ("Seminal", "Lateral"):
-        #turtle.down(rng.random())
+    rng = random.Random(v)
+    if label == "Crown":
+        turtle.down(tort[v])
+    elif label in ("Seminal", "Lateral"):
+        turtle.down(rng.random())
 
     # ---------------------------------------------------------
     # Render
