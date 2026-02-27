@@ -31,7 +31,7 @@ tort = defaultdict(lambda: random.randint(-1,1))
 # Visitor function used for the new implementation of the architecture
 #----------------------------------------------------------------------
 
-def visitor2(g, v, turtle):
+def visitor_millet(g, v, turtle):
     n = g.node(v)
 
     # --- Safe geometry default variables (meters)
@@ -253,4 +253,4 @@ def test(save_image= False, dir='C:/Users/ndour/Desktop/mon dossier/my_Ph.D/Plan
 
 #-------Display of the MTG
 #test(save_image=False)
-
+visitor2 = visitor_millet

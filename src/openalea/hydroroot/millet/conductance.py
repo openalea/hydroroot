@@ -16,7 +16,7 @@ def fit_property_from_spline(g, spline, prop_in, prop_out):
 
     #spline = UnivariateSpline(x, y, s=s)
     keys = g.property(prop_in).keys()
-    x_values = np.array(g.property(prop_in).values())
+    x_values = np.array(list(g.property(prop_in).values()))
 
     y_values = spline(x_values)
 

@@ -31,7 +31,7 @@ tort = defaultdict(lambda: random.randint(-1,1))
 # Visitor function used for the new implementation of the architecture
 #----------------------------------------------------------------------
 
-def visitor2(g, v, turtle):
+def millet_visitor(g, v, turtle):
     n = g.node(v)
 
     # --- Safe geometry default variables (meters)

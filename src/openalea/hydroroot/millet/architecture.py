@@ -258,7 +258,7 @@ from openalea.mtg.algo import orders
 from openalea.mtg.mtg import fat_mtg
 
 
-def millet_mtg2(
+def millet_generator(
     g=None,
     vid=None,
     seed=None,
@@ -279,7 +279,7 @@ def millet_mtg2(
     **kwargs
 ):
     """
-    Millet RSA MTG with an explicit number of laterals (no branching_variability).
+    Millet RSA generator with an explicit number of laterals (no branching_variability).
 
     - Primary axis vertex count = int(primary_length/segment_length)
     - Crown axis vertex count   = int(crown_length/segment_length)
@@ -444,3 +444,5 @@ def millet_mtg2(
     g = fat_mtg(g)
     g.properties()['order'] = orders(g, scale=g.max_scale()) # add order property
     return g
+
+millet_mtg2 = millet_generator
