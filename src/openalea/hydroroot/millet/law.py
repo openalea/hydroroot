@@ -156,7 +156,9 @@ def diameter_law(data_xy, function=None, segment_length = 1e-4, plot= True):
 
 def diameter_fit_law(data_xy, function=None, scale_x=1e-2, scale_y=1e-6, plot= False):
     """
-    Fit the data_xy using function
+    Fit the data_xy using function:
+    - x and y are multiplied by scale_x and scale_y for unit conversion for example
+    - data is normalized according to x
 
     :param data_xy: DataFrame in 2 columns x and y
     :param function: Function to fit the data
