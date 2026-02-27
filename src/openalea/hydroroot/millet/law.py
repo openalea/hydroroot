@@ -229,13 +229,13 @@ def compute_radius_from_laws(g,
 # ************** Here we define evolution diameter laws of different root types************************
 
 
-def compute_diameter_from_laws(g,
+def compute_diam_radius_from_laws(g,
                                 seminal_RootDiameter_law=None,
                                 crown_RootDiameter_law=None,
                                 lr_RootDiameter_law=None
                                ):
     """
-    calculate and add diameter as a propoerty to the MTG
+    calculate and add diameter and radius as a properties to the MTG
 
     :params:
     - g: MTG
@@ -244,10 +244,11 @@ def compute_diameter_from_laws(g,
     - lateral_RootDiameter_law: law of lateral root diameter
 
     :returns:
-    g: MTg with diameter property
+    g: MTg with diam and radius property
     """
 
     diameters = {}
+    radii = {}
     order= g.property('order')
     positions = g.property('relative_position')
     for vid in g.vertices_iter(g.max_scale()):
@@ -258,12 +259,13 @@ def compute_diameter_from_laws(g,
             if g.label(vid)== "Crown":
                 diameters[vid] = crown_RootDiameter_law(positions[vid])
             else: # laterals
-                diameters[vid] = lr_RootDiameter_law(positions[vid])  
+                diameters[vid] = lr_RootDiameter_law(positions[vid])
+        radii[vid] = diameters[vid]
 
     g.properties()['diam'] = diameters
+    g.properties()['radius'] = radii
 
     return g
-
 
 def compute_radius_from_diameter(g):
     """
