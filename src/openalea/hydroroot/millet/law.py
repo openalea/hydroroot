@@ -475,7 +475,7 @@ def developmental_age2(g, nude_tip_length=0.0206):
 ###########################################################################################################
 
 
-def add_soil(g, soil_data, segment_length = 1.e-4):
+def add_soil_old(g, soil_data, segment_length = 1.e-4):
 
     """ add a soil a hetergeneous water potential """
 
@@ -494,7 +494,7 @@ def add_soil(g, soil_data, segment_length = 1.e-4):
     return g
 
 
-def add_soil2(g, soil_data, segment_length = 1.e-4):
+def add_soil(g, soil_data, segment_length = 1.e-4):
 
     """ add a soil a hetergeneous water potential """
 
