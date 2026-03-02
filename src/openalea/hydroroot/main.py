@@ -2,7 +2,7 @@
 import math
 
 from warnings import warn
-# import numpy as np
+import numpy as np
 
 from openalea.mtg import traversal
 
@@ -136,7 +136,11 @@ def hydroroot_flow(
     v_base = next(g.component_roots_at_scale_iter(g.root, scale=1))
 
     Keq = Keqs[v_base]
-    Jv_global = Keq * (psi_e - psi_base)
+    if psi_e is None:
+        Peq = g.property('Peq')
+        Jv_global = Keq * (Peq[v_base] - psi_base)
+    else:
+        Jv_global = Keq * (psi_e - psi_base)
 
     return g, Keq, Jv_global
 
@@ -468,3 +472,26 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
         primary_length = g.property('position')[v_base]
 
     return g, primary_length, total_length, surface, _seed
+
+def soil_1D(g, soil_data = None):
+    """
+    add a soil as heterogeneous water potential along
+
+    :param g: MTG
+    :param soil_data: tuple of 2 lists, (z,psi_e) z=depth (m), psi_e=water potential (MPa)
+    :return: g
+    """
+
+    z,psi_e = soil_data
+
+    # Compute absolute z coordinate and normalize
+    vids = g.property('xyz').keys()
+    zs = np.array([np.abs(pt.z) for pt in g.property('xyz').values()])
+    zs = zs.tolist()
+
+    # Fit data on z coordinate to compute psi_e on each vertex
+    g.properties()['height'] = dict(zip(vids,zs))
+    soil_law = fit_law(z,psi_e)
+    g = conductance.fit_property_from_spline(g, soil_law, 'height', 'psi_e')
+
+    return g

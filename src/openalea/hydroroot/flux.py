@@ -237,7 +237,7 @@ class Flux(object):   # edit this to also allow for flux computation instead jus
             if not self.HAS_SOIL:
                 Jv_global = Keq[v_base] * (psi_e - psi_base)
             else:
-                Jv_global = Keq[v_base] * (psi_e[v_base] - psi_base) # TODO to be corrected: False not psi_e[vbase]
+                Jv_global = Keq[v_base] * (Peq[v_base] - psi_base)
 
             # print "Local Computation Water Flux Jvl = ", J_out[v_base]
             # print "Global Computation Water Flux Jvg = ", Jv_global

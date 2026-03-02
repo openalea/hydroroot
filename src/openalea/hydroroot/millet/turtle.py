@@ -22,7 +22,7 @@ from collections import defaultdict
 LR_root_angle= defaultdict(lambda: random.normalvariate(53.52674,15.14071)) #we store the lateral root angles in a default dictionary
 #average_CR_angle= 20.03194444
 average_CR_angle= 30.03194444
-segment_length = 1e-4
+# segment_length = 1e-3
 
 tort = defaultdict(lambda: random.randint(-1,1))
 ###########################################################
@@ -35,15 +35,16 @@ def visitor_millet(g, v, turtle):
     n = g.node(v)
 
     # --- Safe geometry default variables (meters)
-    length_m = getattr(n, "length", segment_length)   # meters
-    radius = getattr(n, "radius", None)
+    length_m = n.length #getattr(n, "length", segment_length)   # meters
+    radius = n.radius #getattr(n, "radius", None)
 
     if radius is None:
         order = getattr(n, "order", 0)
         radius = max(0.02, 0.12 / (order + 1))
 
-    length = float(length_m) * 1e3   # keep your convention (m -> mm)
-    width  = float(radius)  * 1e3
+    # better to stay in m which is the SI default in HydroRoot
+    length = float(length_m) #* 1e3   # keep your convention (m -> mm)
+    width  = float(radius) #* 1e3
 
     label = getattr(n, "label", "")
     order = getattr(n, "order", 0)
