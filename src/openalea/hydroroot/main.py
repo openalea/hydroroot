@@ -477,6 +477,8 @@ def soil_1D(g, soil_data = None):
     """
     add a soil as heterogeneous water potential along
 
+    This is $\Psi_e$ versus depth with $depth>0$.
+
     :param g: MTG
     :param soil_data: tuple of 2 lists, (z,psi_e) z=depth (m), psi_e=water potential (MPa)
     :return: g
