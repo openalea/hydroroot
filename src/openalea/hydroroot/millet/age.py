@@ -65,6 +65,7 @@ def compute_dag_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,del
                 age_first_vertex_cr += speed
 
     g.properties()['age'] = age
+    g.properties()['dag'] = age
     return g
 
 
@@ -124,6 +125,7 @@ def compute_dag_with_constant_growth_speed_cpl(g,
                 age[vid] = _age
 
     g.properties()['age'] = age
+    g.properties()['dag'] = age
 
     return g
 
