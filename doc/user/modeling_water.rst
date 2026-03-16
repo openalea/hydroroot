@@ -27,7 +27,7 @@ the outflow rate. In brief, let us consider an elementary segment *i*, with :mat
 :math:`r_{i} = 1/\left( k_{i}S_{i} \right)` as axial and radial resistances, respectively. Its equivalent resistance
 :math:`{R_{eq}}_{i}` is calculated as follows, assuming that the apical equivalent resistance :math:`R_{eq_{i - 1}\ }` is known:
 
-.. math:: {R_{eq}}_{i} = \frac{1}{R_{eq_{i - 1}\ } + r_{i}} + R_{i}
+.. math:: {R_{eq}}_{i} = \frac{R_{eq_{i - 1}\ } r_{i}}{R_{eq_{i - 1}\ } + r_{i}} + R_{i}
 
 By implementing this equation, step by step from the tips, and by
 considering a branched root as a parallel network, we end up with an
