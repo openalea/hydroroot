@@ -412,8 +412,8 @@ def developmental_age(g, nude_tip_length=15):
 def developmental_age2(g, nude_tip_length=0.0206):
     """ Compute the developmental age of each vertex.
 
-    A new property is added to the MTG that represent the age of apparition of the segment.
-    It allows to express a dynamic as a parametrisation.
+        A new property is added to the MTG that represent the age of apparition of the segment.
+        It allows to express a dynamic as a parametrisation.
     """
     age = {}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             # convert nude_tip_length to nb of vertices: for a 75cm root, the length of nude tip is 15cm
