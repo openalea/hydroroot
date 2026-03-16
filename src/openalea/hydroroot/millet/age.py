@@ -15,8 +15,8 @@ from openalea.mtg.traversal import pre_order2_with_filter, post_order2
 
 
 
-def compute_age_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,delta_cr_appareance=6):
-    """ compute age of different root types from growth laws"""
+def compute_dag_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,delta_cr_appareance=6):
+    """ compute Days after Germination (DAG) of different root types from growth laws"""
 
     max_scale = g.max_scale()
     _orders = algo.orders(g, scale=max_scale)
@@ -68,11 +68,11 @@ def compute_age_with_constant_growth_speed(g,sr_age=15,delta_lr_appareance=5,del
     return g
 
 
-def compute_age_with_constant_growth_speed_cpl(g,
+def compute_dag_with_constant_growth_speed_cpl(g,
                                                sr_age=15,
                                                delta_lr_appearance=5,
                                                delta_cr_appearance=6):
-    """Compute age of different root types from growth laws.
+    """Compute Days after Germination (DAG) of different root types from growth laws.
 
     Parameters:
     ===========
@@ -126,3 +126,6 @@ def compute_age_with_constant_growth_speed_cpl(g,
     g.properties()['age'] = age
 
     return g
+
+compute_age_with_constant_growth_speed = compute_dag_with_constant_growth_speed
+compute_age_with_constant_growth_speed_cpl = compute_dag_with_constant_growth_speed_cpl
