@@ -19,7 +19,7 @@ from openalea.mtg.plantframe.color import *
 from openalea.plantgl import *
 import openalea.plantgl.all as pgl
 
-from openalea.hydroroot.millet import turtle, law
+from openalea.hydroroot.millet import turtle_millet as turtle, law
 from openalea.hydroroot.display import my_colormap
 ########################################################################################
 

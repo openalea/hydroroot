@@ -52,7 +52,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from openalea.hydroroot.init_parameter import Parameters
-from openalea.hydroroot.solver_wrapper import pure_hydraulic_model
+from openalea.hydroroot.cut_and_flow import pure_hydraulic_model
 
 start_time = time.time()
 
@@ -95,22 +95,21 @@ dresults, g = pure_hydraulic_model(parameter = parameter, df_exp = df_exp, Data_
 fig, axs = plt.subplots(2,2)
 axs[0,0].axis('off')
 ### Display the plot J vs Lcut
-dresults.plot.scatter('max_length', 'Jexp (uL/s)', c = 'black', ax = axs[0,1], label = 'Jexp(P) cnf')
-dresults.plot.line('max_length', 'Jv (uL/s)', c = 'purple', ax = axs[0,1], label = 'Jv(P)')
+axs[0,1].scatter(dresults['max_length'], dresults['Jexp (uL/s)'], c = 'black', label = 'Jexp(P) cnf')
+axs[0,1].plot(dresults['max_length'], dresults['Jv (uL/s)'], c = 'purple', label = 'Jv(P)')
 axs[0,1].set_xlabel('max length (m)')
 axs[0,1].set_ylabel('Jv (uL/s)')
 
 ### Plot K vs x and comparing radial k between 1st guess and optim value
-dresults.plot.scatter('x', 'K 1st', c = 'black', ax = axs[1,0], label = 'K1st')
-dresults.plot.line('x', 'K optimized', c = 'purple', ax = axs[1,0], label = 'K adjusted')
+axs[1,0].scatter(dresults['x'], dresults['K 1st'], c = 'black', label = 'K1st')
+axs[1,0].plot(dresults['x'], dresults['K optimized'], c = 'purple', label = 'K adjusted')
 axs[1,0].set_xlabel('dist. to tip (m)')
 axs[1,0].set_ylabel('K (10-9 m4/(s.Mpa))')
 
 d = pd.DataFrame({'radial':['k', 'k adjusted'], 'val':[parameter.hydro['k0'], dresults['k (10-9 m/s/MPa)'][0]]})
-d.plot.bar(x='radial', y='val', rot=0, ax = axs[1,1])
+axs[1,1].bar(x=d['radial'], height=d['val'])
 axs[1,1].set_ylabel('k (10-9 m/(s.MPa))')
 axs[1,1].xaxis.label.set_visible(False)
-axs[1,1].get_legend().remove()
 
 fig.patch.set_facecolor('lightgrey')
 fig.tight_layout()

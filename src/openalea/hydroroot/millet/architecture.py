@@ -247,3 +247,202 @@ def millet_mtg(
     return g
 
 
+#####################################
+# New implementation
+####################################
+import random
+import numpy as np
+
+from openalea.mtg import MTG
+from openalea.mtg.algo import orders
+from openalea.mtg.mtg import fat_mtg
+
+
+def millet_generator(
+    g=None,
+    vid=None,
+    seed=None,
+    # seminal
+    primary_length=0.2,          # [m]
+    nude_tip_length=0.03,        # [m]
+    order_max=2,
+    branching_stability=0.8,     # 1=regular spacing, 0=random spacing
+    # NEW: explicit number of laterals on primary
+    n_laterals_primary=5,       # [count]
+    # fixed lateral length
+    lateral_length=0.89,         # [m]
+    # crown
+    nb_crown=2,
+    crown_length=0.06,           # [m]
+    # discretization
+    segment_length=1e-4,         # [m]
+    **kwargs
+):
+    """
+    Millet RSA generator with an explicit number of laterals (no branching_variability).
+
+    - Primary axis vertex count = int(primary_length/segment_length)
+    - Crown axis vertex count   = int(crown_length/segment_length)
+    - Each lateral axis length  = lateral_length (fixed)
+    - Exactly n_laterals_primary laterals are initiated on the primary axis
+      (unless branchable zone is too short, then it is clipped).
+    """
+
+    # -------------------------
+    # Helper functions that will be used later to build the MTG
+    # -------------------------
+    def steps_from_length(length_m: float):
+        return max(1, int(length_m / segment_length))
+
+    def pick_lateral_indices(n_axis_steps: int, nude_steps: int, n_laterals: int):
+        """
+        Choose exactly n_laterals indices i in [0 .. max_i] where laterals initiate,
+        where max_i excludes the nude tip region near the apex.
+        """
+        max_i = n_axis_steps - 1 - nude_steps
+        if max_i <= 0 or n_laterals <= 0:
+            return []
+
+        # cannot place more laterals than available slots
+        n_laterals = min(int(n_laterals), max_i + 1)
+
+        if branching_stability >= 0.5:
+            # quasi-regular spacing with limited jitter
+            grid = np.linspace(0, max_i, num=n_laterals, endpoint=True)
+            # jitter amplitude in steps (smaller if stability high)
+            jitter_amp = max(1, int((1.0 - branching_stability) * (max_i / max(n_laterals, 1))))
+            idx = []
+            occupied = set()
+            for x in grid:
+                j = int(round(x + np.random.randint(-jitter_amp, jitter_amp + 1)))
+                j = max(0, min(max_i, j))
+                # resolve collisions locally
+                if j in occupied:
+                    for dj in range(1, 50):
+                        for cand in (j - dj, j + dj):
+                            if 0 <= cand <= max_i and cand not in occupied:
+                                j = cand
+                                break
+                        if j not in occupied:
+                            break
+                occupied.add(j)
+                idx.append(j)
+            return sorted(idx)
+        else:
+            # fully random positions without replacement
+            return sorted(random.sample(range(0, max_i + 1), k=n_laterals))
+
+    def create_linear_axis(root_node, axis_length_m: float, label: str, order: int, lateral_idx=None, anchors=None):
+        """
+        Create a successor axis (<). Optionally mark certain indices as anchors.
+        Store position_index = distance-to-tip in meters.
+        """
+        n_steps = steps_from_length(axis_length_m)
+        lateral_idx = set(lateral_idx or [])
+        anchors = anchors if anchors is not None else []
+
+        nid = root_node
+        for i in range(n_steps):
+            nid = nid.add_child(edge_type='<', label=label, order=order, **kwargs)
+            dist_to_tip_steps = (n_steps - 1 - i)
+            nid.position_index = dist_to_tip_steps * segment_length
+            if i in lateral_idx:
+                anchors.append(nid)
+        return nid
+
+    def add_fixed_length_lateral(parent_node, lateral_length_m: float, order: int):
+        """Create a lateral root: '+' then '<' chain of fixed length."""
+        n_steps = steps_from_length(lateral_length_m)
+        cid = parent_node.add_child(edge_type='+', label='Lateral', order=order, **kwargs)
+        nid = cid
+        for i in range(n_steps):
+            nid = nid.add_child(edge_type='<', label='Lateral', order=order, **kwargs)
+            dist_to_tip_steps = (n_steps - 1 - i)
+            nid.position_index = dist_to_tip_steps * segment_length
+        return cid
+
+    def add_crown_axes(collet_ids):
+        for i in range(min(nb_crown, len(collet_ids))):
+            parent = g.node(collet_ids[i])
+            n_steps = steps_from_length(crown_length)
+
+            cid = parent.add_child(edge_type='+', label='Crown', order=0, **kwargs)
+            cid.position_index = (n_steps - 1) * segment_length
+
+            nid = cid
+            for k in range(1, n_steps):
+                nid = nid.add_child(edge_type='<', label='Crown', order=0, **kwargs)
+                nid.position_index = (n_steps - 1 - k) * segment_length
+
+    # -------------------------
+    # Seeding
+    # -------------------------
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+
+    # -------------------------
+    # MTG init + collets: Crown and and primary roots are built from the collet
+    # -------------------------
+    if g is None:
+        g = MTG()
+
+    if vid is None:
+        vid = g.add_component(g.root, label='collet', order=0, **kwargs)
+
+    collet_ids = [vid]
+    for _ in range(nb_crown):
+        vid = g.add_child(vid, label='collet', edge_type='<', order=0, **kwargs)
+        collet_ids.append(vid)
+
+    # -------------------------
+    # Primary axis with explicit laterals: rather than using lateral root density, we reported the number of laterals observed experimentally for the different millet lines
+    # -------------------------
+    n_primary_steps = steps_from_length(primary_length)
+    nude_steps = max(0, steps_from_length(nude_tip_length))
+
+    lateral_indices = pick_lateral_indices(
+        n_axis_steps=n_primary_steps,
+        nude_steps=nude_steps,
+        n_laterals=n_laterals_primary
+    )
+
+    anchors = []
+    seminal_root = g.node(collet_ids[-1])
+    create_linear_axis(
+        root_node=seminal_root,
+        axis_length_m=primary_length,
+        label='Seminal',
+        order=0,
+        lateral_idx=lateral_indices,
+        anchors=anchors
+    )
+
+    # -------------------------
+    # Create laterals (fixed length)
+    # -------------------------
+    hard_vertex_cap = max(5000, n_primary_steps * 50)
+    while anchors and len(g) < hard_vertex_cap:
+        nid = anchors.pop(0)
+        current_order = getattr(nid, "order", 0)
+        if current_order >= order_max:
+            continue
+        add_fixed_length_lateral(
+            parent_node=nid,
+            lateral_length_m=float(lateral_length),
+            order=current_order + 1
+        )
+
+    # -------------------------
+    # Crown roots
+    # -------------------------
+    add_crown_axes(collet_ids)
+
+    # -------------------------
+    # Finalize
+    # -------------------------
+    g = fat_mtg(g)
+    g.properties()['order'] = orders(g, scale=g.max_scale()) # add order property
+    return g
+
+millet_mtg2 = millet_generator

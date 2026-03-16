@@ -5,7 +5,7 @@ from openalea.mtg import MTG
 from openalea.mtg.algo import axis
 from openalea.mtg.traversal import *
 
-from openalea.rsml import continuous, io
+from openalea.rsml import continuous, io, rsml2mtg
 
 from openalea.hydroroot import display
 
@@ -255,5 +255,29 @@ def import_rsml_to_discrete_mtg(g_c, segment_length = 1.0e-4, resolution = 1.0e-
                 seg = g.add_child(seg, edge_type = '<', label = 'S', length = segment_length, order = _order)
             axe_segments[(axe, i + 2)] = seg
 
+
+    return g
+
+def read_rsml(filename, segment_length=1.0e-4):
+    """
+    Read an RSML file to discretuous MTG. The RSML file must have resolution and unit properties.
+    The MTG will have root segments of length segment_length in meter.
+
+    :param filename: (string) relative path  to name of the rsml file
+    :param segment_length: (Float) - the segment length in meter (m)
+    :return: g (MTG)
+    """
+
+    g_c = rsml2mtg(filename)
+
+    resolution = g_c.graph_properties()['metadata']['resolution']  # pixel to unit
+    unit = g_c.graph_properties()['metadata']['unit']
+
+    SI = {'nm': 1.0e-9, 'um': 1.0e-6, 'mm': 0.001, 'cm': 0.01, 'm': 1.0, 'km': 1000.0, 'pixel': 1.0,
+          'nanommetre': 1.0e-9, 'micrometre': 1.0e-6, 'millimetre': 0.001, 'centimetre': 0.01, 'metre': 1.0,
+          'kilometre': 1000.0}
+    resolution_m = resolution*SI[unit]
+
+    g = import_rsml_to_discrete_mtg(g_c, segment_length=1.0e-4, resolution=resolution_m)
 
     return g
