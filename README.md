@@ -32,10 +32,12 @@ complex and see the root as a continuous medium.
 > -   Fabrice Bauget
 > -   Christophe Godin
 > -   Christophe Maurel
+> -   Adama Ndour
+> -   Laurent Laplaze
 
 ### Institutes
 
-CIRAD / INRAE / inria / CNRS
+CIRAD / INRAE / inria / CNRS / IRD
 
 ### Status
 
@@ -100,8 +102,3 @@ If you use Hydroroot for your research, please cite:
     Issue 5, 13 March 2023, Pages 1594--1608,
     <https://doi.org/10.1093/jxb/erac471>
 
-## Contributors
-
-<a href="https://github.com/openalea/hydroroot/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=openalea/hydroroot" />
-</a>
