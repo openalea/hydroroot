@@ -525,3 +525,5 @@ def add_soil_1D(g, soil_data, segment_length = 1.e-4):
     return g
 
 add_soil2 = add_soil_1D
+
+compute_diameter_from_laws = compute_diam_radius_from_laws
