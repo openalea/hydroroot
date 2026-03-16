@@ -25,13 +25,21 @@ authors:
     name-particle: Dr.
     orcid: 'https://orcid.org/0000-0002-3293-4049'
   - name-particle: Dr.
+    family-names: Ndour
+    given-names: Adama
+    orcid: 'https://orcid.org/0000-0001-5188-3921'
+  - name-particle: Dr.
     family-names: Godin
-    orcid: 'https://orcid.org/0000-0002-1202-8460'
     given-names: Christophe
+    orcid: 'https://orcid.org/0000-0002-1202-8460'
   - name-particle: Dr.
     family-names: Maurel
     given-names: Christophe
     orcid: 'https://orcid.org/0000-0002-4255-6440'
+  - name-particle: Dr.
+    family-names: Laplaze
+    given-names: Laurent
+    orcid: 'https://orcid.org/0000-0002-6568-6504'
 abstract: >-
   OpenAlea.HydroRoot is a hydraulic root architecture
   modelling and a root architecture system generator
