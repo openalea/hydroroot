@@ -260,7 +260,7 @@ def compute_diam_radius_from_laws(g,
                 diameters[vid] = crown_RootDiameter_law(positions[vid])
             else: # laterals
                 diameters[vid] = lr_RootDiameter_law(positions[vid])
-        radii[vid] = diameters[vid]
+        radii[vid] = diameters[vid]/2.
 
     g.properties()['diam'] = diameters
     g.properties()['radius'] = radii
