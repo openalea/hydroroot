@@ -11,7 +11,7 @@ dependencies:
   - openalea.widgets
   - yaml
   - openalea.rsml
-  - matplotlib
+  - matplotlib-base
   # let pip install the rest using pyproject.toml (if you are okay with conda/pip mix)
   - pip:
       - -e .."[doc, test]"
