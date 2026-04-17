@@ -2,7 +2,7 @@
 
 [![Docs](https://readthedocs.org/projects/hydroroot/badge/?version=latest)](https://hydroroot.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml/badge.svg)](https://github.com/openalea/hydroroot/actions/workflows/openalea_ci.yml)
-[![Python Version](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/downloads/)
 [![Anaconda-Server Badge](https://anaconda.org/openalea3/openalea.hydroroot/badges/version.svg)](https://anaconda.org/openalea3/openalea.hydroroot)
 [![License](https://img.shields.io/badge/License--CeCILL-C-blue)](https://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html)
 [[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/openalea/hydroroot/main?urlpath=%2Fdoc%2Ftree%2Ftutorial%2Findex.ipynb)
@@ -48,6 +48,8 @@ Python package
 CecILL-C
 
 ### Installation
+
+Conda must be installed, please follow the instructions and recommendations [here](https://openalea.readthedocs.io/en/latest/install.html).
 
 #### for user
 Creating a new conda environment with hydroroot and its dependencies installed
