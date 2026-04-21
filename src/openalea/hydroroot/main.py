@@ -486,7 +486,7 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     # total_length is the total length of the RSA (sum of the length of all the segments)
     total_length = g.nb_vertices(scale = 1) * segment_length
     g, surface = radius.compute_surface(g)
-    g, volume = radius.compute_volume(g)
+    # g, volume = radius.compute_volume(g)
 
     if df is not None:
         v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))
