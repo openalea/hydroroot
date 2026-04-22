@@ -13,11 +13,11 @@ run %run example_rsml_io parameters_test_rsml_io.yml
   into continuous mtg representation
 - set the resolution according to the unit precised in the rsml, in Hydroroot lengths are in meter
 - transform the continuous mtg to discrete mtg usable in Hydroroot according to resolution
-- calculation of g properties (radius, mylength) and  flux
+- calculation of g properties (radius, dist_to_base) and  flux
 
 - export discrete mtg to rsml
 - re-import rsml to continuous mtg, transform the latter to discrete mtg
-- re-do calculation of g properties (radius, mylength) and  flux
+- re-do calculation of g properties (radius, dist_to_base) and  flux
 
 - compare both calculations should be zero
 
@@ -53,7 +53,7 @@ def set_mtg_properties(g):
     Set MTG properties and perform some gemetrical calculation
 
     The vertex radius properties is set.
-    The following properties are computed: length, position, mylength, surface, volume, total length,
+    The following properties are computed: length, position, dist_to_base, surface, volume, total length,
         primary root length
 
     :param:
@@ -79,7 +79,7 @@ def set_mtg_properties(g):
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
         _mylength[v] = _mylength[pid] + parameter.archi['segment_length'] if pid else parameter.archi['segment_length']
-    g.properties()['mylength'] = _mylength
+    g.properties()['dist_to_base'] = _mylength
 
     # _length is the total length of the RSA (sum of the length of all the segments)
     _length = g.nb_vertices(scale = 1) * parameter.archi['segment_length']
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     # continuous mtg to discrete mtg
     g = import_rsml_to_discrete_mtg(g_c, segment_length = parameter.archi['segment_length'], resolution = resolution)
 
-    # calculation of g properties: radius, mylength, etc.
+    # calculation of g properties: radius, dist_to_base, etc.
     g, primary_length, _length, surface = set_mtg_properties(g)
 
     # flux calculation

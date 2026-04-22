@@ -37,9 +37,9 @@ def get_root_visitor(prune=None, factor = 1.0e4):
         :param prune: (float) - distance from base after witch the MTG is no longer read (Default value = None)
 
         """
-        mylength = {}
-        if prune and ('mylength' in g.properties()):
-            mylength = g.property('mylength')
+        dist_to_base = {}
+        if prune and ('dist_to_base' in g.properties()):
+            dist_to_base = g.property('dist_to_base')
         angles = [90,45]+[30]*5
         n = g.node(v)
         # radius = n.radius*1.e4
@@ -49,7 +49,7 @@ def get_root_visitor(prune=None, factor = 1.0e4):
         length = n.length * factor
 
         if prune:
-            if mylength.get(v,0.)>prune:
+            if dist_to_base.get(v,0.)>prune:
                 return
 
         if g.edge_type(v) == '+':

@@ -23,13 +23,13 @@ def nb_roots(g, l, root=1, dl=1e-4, max_order=None):
     """
     length = {}
 
-    if 'mylength' in g.property_names():
-        length = g.property('mylength')
+    if 'dist_to_base' in g.property_names():
+        length = g.property('dist_to_base')
     else:
         for v in pre_order2(g, root):
             pid = g.parent(v)
             length[v] = length[pid] + dl if pid else dl
-        g.properties()['mylength'] = length
+        g.properties()['dist_to_base'] = length
 
     order = None
     if max_order is not None:

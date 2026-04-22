@@ -407,7 +407,7 @@ def hydroroot_from_data(
 def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
                   ref_radius = 7.0e-5, Flag_radius = False):
-    """wrapper function: build a MTG with properties that are set like : radius, vertex length, position (distance to tip) and mylength (distance to base).
+    """wrapper function: build a MTG with properties that are set like : radius, vertex length, position (distance to tip) and dist_to_base (distance to base).
     The MTG is either generated or built from a DataFrame. The unit length in hydroroot should be in m.
 
     :param primary_length: (float) - primary root length for generated mtg (Default value = 0.13)
@@ -460,7 +460,7 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
         _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
-    g.properties()['mylength'] = _mylength
+    g.properties()['dist_to_base'] = _mylength
 
     # total_length is the total length of the RSA (sum of the length of all the segments)
     total_length = g.nb_vertices(scale = 1) * segment_length
