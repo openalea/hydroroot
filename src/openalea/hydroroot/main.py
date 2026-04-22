@@ -11,27 +11,6 @@ from openalea.hydroroot import radius, flux, conductance
 from openalea.hydroroot.generator import markov, measured_root # 21-12-14: FB __init__.py in src not doing job
 from openalea.hydroroot.water_solute_transport import pressure_calculation_no_non_permeating_solutes, init_some_MTG_properties, pressure_calculation
 
-from dataclasses import dataclass, field, fields
-
-from openalea.metafspm.component import Model, declare
-from openalea.metafspm.component_factory import *
-
-@dataclass
-class hydroroot_model(Model):
-
-    def __init__(self, g, time_step, **scenario):
-        # 4/21/26 FB: copied from root_cynaps RootWaterModel
-        self.g = g
-        self.props = self.g.properties()
-        self.time_step = time_step
-        self.choregrapher.add_time_and_data(instance=self, sub_time_step=self.time_step, data=self.props)
-        self.vertices = self.g.vertices(scale=self.g.max_scale())
-
-        # Before any other operation, we apply the provided scenario by changing default parameters and initialization
-        self.apply_scenario(**scenario)
-        self.link_self_to_mtg()
-
-
 def hydroroot_mtg(
     primary_length=0.15,
     delta=2.e-3,
