@@ -252,8 +252,8 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'ex
     * 2nd col: "relative_distance_to_tip" relative distance to tip in % so between 0 and 100.
 
     """
-    x = pd.relative_distance_to_tip.tolist()
-    y = pd.LR_length_mm.tolist()
+    x = pd.iloc[:,1].tolist()
+    y = pd.iloc[:,0].tolist()
 
     # size of the windows: in %
     size *= scale_x
