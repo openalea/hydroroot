@@ -437,7 +437,7 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     :param nude_length: (float) - length from tip without lateral for generated mtg (Default value = 2.0e-2)
     :param df: (DataFrame) - DataFrame with the architecture data to be reconstructed if not None (Default value = None)
     :param segment_length: (float) - vertices length in hydroroot should be in m (Default value = 1.0e-4)
-    :param length_data: (string list) - the file name with the length data laws (Default value = None)
+    :param length_data: (list of DataFrame) - DataFrame with the length data laws (Default value = None)
     :param branching_variability: (float) (Default value = 0.25)
     :param order_max: (float) (Default value = 4.0)
     :param order_decrease_factor: (float) (Default value = 0.7)
