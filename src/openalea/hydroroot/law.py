@@ -257,7 +257,7 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1.e-3, scale = 1e-4, uniform = 
 
     # size of the windows: in %
     size *= scale_x
-    
+
     _length_law = histo_relative_law(x, y,
                                      size = size,
                                      scale_x = scale_x,

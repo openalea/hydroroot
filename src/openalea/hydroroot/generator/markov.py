@@ -309,6 +309,7 @@ def generate_g(seed = None, length_data = None, branching_variability = 0.25,
 
     # F. Bauget 2022-08-12: added if-else to be able to use the function without length data, useful for usage demo
     if length_data:
+        #TODO avoid unit management here mm to m '* 1e-3'
         length_max_secondary = length_data[0].iloc[:,0].max() * 1e-3  # in m
 
         law_order1 = length_law(length_data[0], scale_x = primary_length / 100., scale = segment_length)
