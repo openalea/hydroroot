@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 from openalea.metafspm.component import Model, declare
 
+from openalea.hydroroot.generator import markov
+from openalea.hydroroot import radius
 from openalea.hydroroot.law import length_law
 
 @dataclass
