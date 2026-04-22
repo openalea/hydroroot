@@ -75,11 +75,11 @@ def set_mtg_properties(g):
     # Calculation of the distance from base of each vertex, used for cut and flow
     # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
     # parameter dl which should be equal to vertex length but which is not pass
-    _mylength = {}
+    _dist_to_base = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + parameter.archi['segment_length'] if pid else parameter.archi['segment_length']
-    g.properties()['dist_to_base'] = _mylength
+        _dist_to_base[v] = _dist_to_base[pid] + parameter.archi['segment_length'] if pid else parameter.archi['segment_length']
+    g.properties()['dist_to_base'] = _dist_to_base
 
     # _length is the total length of the RSA (sum of the length of all the segments)
     _length = g.nb_vertices(scale = 1) * parameter.archi['segment_length']

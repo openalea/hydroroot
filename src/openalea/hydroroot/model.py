@@ -100,15 +100,58 @@ class RsaModel(Model):
                                            nude_tip_length=nb_nude_vertices,
                                            order_max=self.order_max,
                                            seed=self.seed)
+
+        self.compute_surface_volume()
+        self.compute_radius()
+
+    def compute_length(self):
+        """
+        compute vertices length according to self.segment_length
+        :return:
+        """
+        self.g = radius.compute_length(self.g, self.segment_length)
+
+    def compute_dist_to_base(self):
+        """
+
+        :return:
+        """
+
+    def compute_dist_to_tip(self):
+        """
+        For each vertex compute the distance from the tip of the axis bearing it in absolute
+        and relative to the length of the axis bearing it
+        :return:
+        """
+        self.g = radius.compute_relative_position(self.g)
+
+    def compute_radius(self):
+        """
+        compute the radius of each vertex from self.ref_radius with fixed decrease between each order.
+        :return:
+        """
+        self.g = radius.ordered_radius(self.g, self.ref_radius, self.order_decrease_factor)
+
+    def compute_surface_volume(self):
+        """
+        set self.g and compute surface, volume, etc.
+        """
+
         _g, self.surface = radius.compute_surface(self.g)
         _g, self.volume = radius.compute_volume(self.g)
 
-    def set_mtg(self, _g):
-        """
-        set self.g and compute surface, volume, etc.
-        :param _g: (MTG) existing mtg, for instance, comming from file reading
-        """
-        self.g = _g
-        _g, self.surface = radius.compute_surface(self.g)
-        _g, self.volume = radius.compute_volume(self.g)
+@dataclass
+class HydrostaticModel(Model):
+
+    def __init__(self, g, time_step, **scenario):
+        # 4/21/26 FB: copied from root_cynaps RootWaterModel
+        self.g = g
+        self.props = self.g.properties()
+        self.time_step = time_step
+        self.choregrapher.add_time_and_data(instance=self, sub_time_step=self.time_step, data=self.props)
+        self.vertices = self.g.vertices(scale=self.g.max_scale())
+
+        # Before any other operation, we apply the provided scenario by changing default parameters and initialization
+        self.apply_scenario(**scenario)
+        self.link_self_to_mtg()
 

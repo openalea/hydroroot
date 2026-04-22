@@ -223,6 +223,9 @@ def compute_relative_position(g):
     return:
         - g
 
+    .. note::
+        For instance, needed to compute axial and radial conductances that are properties depending
+        on the distance to tip
     """
     #print 'entering MTG node positionning computation'
     scale = g.max_scale()

@@ -456,11 +456,11 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     g = radius.compute_relative_position(g)
 
     # Calculation of the distance from base of each vertex, used for cut and flow
-    _mylength = {}
+    _dist_to_base = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
-    g.properties()['dist_to_base'] = _mylength
+        _dist_to_base[v] = _dist_to_base[pid] + segment_length if pid else segment_length
+    g.properties()['dist_to_base'] = _dist_to_base
 
     # total_length is the total length of the RSA (sum of the length of all the segments)
     total_length = g.nb_vertices(scale = 1) * segment_length
