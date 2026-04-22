@@ -232,7 +232,7 @@ def reference_relative_law(x, y, size=5e-2, scale_x=1., scale_y=1e-3):
     return length.fit_law(X, means, ext=2)
 
 
-def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'expo', size = 5):
+def length_law(pd, scale_x = 1 / 100., scale_y = 1.e-3, scale = 1e-4, uniform = 'expo', size = 5):
     """Build the function giving the lateral length according to its position on the parent branch
 
     :param pd: DataFrame
@@ -257,11 +257,11 @@ def length_law(pd, scale_x = 1 / 100., scale_y = 1., scale = 1e-4, uniform = 'ex
 
     # size of the windows: in %
     size *= scale_x
-    # TODO : change '1.e-3 * scale_y' to scale_y
+    
     _length_law = histo_relative_law(x, y,
                                      size = size,
                                      scale_x = scale_x,
-                                     scale_y = 1.e-3 * scale_y,
+                                     scale_y = scale_y,
                                      scale = scale,
                                      plot = False,
                                      uniform = uniform)
