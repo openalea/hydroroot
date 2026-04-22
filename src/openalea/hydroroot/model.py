@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 
+from openalea.mtg import traversal
+
 from openalea.metafspm.component import Model, declare
 
+from openalea.hydroroot import radius, conductance, main, flux
 from openalea.hydroroot.generator import markov
-from openalea.hydroroot import radius
 from openalea.hydroroot.law import length_law
+from openalea.hydroroot.length import fit_law
 
 @dataclass
 class RsaModel(Model):
@@ -57,6 +60,19 @@ class RsaModel(Model):
                                            variable_type="parameter", by="RsaModel", state_variable_type="",
                                            edit_by="user")
 
+    # hydraulic parameters
+    axial_conductivity_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
+                                description="(2 list of Float) axial conductivity versus dist. to tip",
+                                min_value="0", max_value="", value_comment="", references="", DOI="",
+                                variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+
+    radial_conductivity_data: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]",
+                                            unit_comment="distance to the tip, k",
+                                            description="(2 list of Float) radial conductivity versus dist. to tip",
+                                            min_value="0", max_value="", value_comment="", references="", DOI="",
+                                            variable_type="parameter", by="RsaModel", state_variable_type="",
+                                            edit_by="user")
+
     # Plant scale variable
     surface: float = declare(default=None, unit="m2", unit_comment="", description="total surface of the RSA",
                              min_value="0", max_value="", value_comment="", references="", DOI="",
@@ -101,6 +117,9 @@ class RsaModel(Model):
                                            order_max=self.order_max,
                                            seed=self.seed)
 
+        self.compute_radius()
+        self.compute_length()
+        self.compute_dist_to_tip()
         self.compute_surface_volume()
         self.compute_radius()
 
@@ -113,9 +132,16 @@ class RsaModel(Model):
 
     def compute_dist_to_base(self):
         """
-
+        Calculation of the distance from base of each vertex, used for cut and flow
         :return:
         """
+        g = self.g
+        _dist_to_base = {}
+        for v in traversal.pre_order2(g, 1):
+            pid = g.parent(v)
+            segment_length = g.length(pid)
+            _dist_to_base[v] = _dist_to_base[pid] + segment_length if pid else segment_length
+        g.properties()['dist_to_base'] = _dist_to_base
 
     def compute_dist_to_tip(self):
         """
@@ -136,12 +162,77 @@ class RsaModel(Model):
         """
         set self.g and compute surface, volume, etc.
         """
+        self.g, self.surface = radius.compute_surface(self.g)
+        self.g, self.volume = radius.compute_volume(self.g)
 
-        _g, self.surface = radius.compute_surface(self.g)
-        _g, self.volume = radius.compute_volume(self.g)
+    def compute_axial_conductance(self):
+        """
+        compute axial conductance of each vertex from self.ref_axial_conductivity
+        :return:
+        """
+        if self.axial_conductivity_data:
+            # Compute K using axial conductance data
+            xa, ya = self.axial_conductivity_data
+            axial_conductivity_law = fit_law(xa, ya)
+
+            self.g = conductance.fit_property_from_spline(self.g, axial_conductivity_law, 'position', 'K_exp')
+            self.g = conductance.compute_K(self.g)
+
+    def compute_radial_conductance(self):
+        """
+        compute radial conductance of each vertex from self.ref_radial_conductivity
+        :return:
+        """
+        if self.radial_conductivity_data:
+            xr, yr = self.radial_conductivity_data
+            radial_conductivity_law = fit_law(xr, yr)
+
+            self.g = conductance.fit_property_from_spline(self.g, radial_conductivity_law, 'position', 'k0')
+            self.g = conductance.compute_k(self.g, k0='k0')
 
 @dataclass
 class HydrostaticModel(Model):
+    # Hydraulic input from RsaModel
+    axial_conductivity_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
+                                description="(2 list of Float) axial conductivity versus dist. to tip",
+                                min_value="0", max_value="", value_comment="", references="", DOI="",
+                                variable_type="input", by="RsaModel", state_variable_type="", edit_by="user")
+
+    radial_conductivity_data: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
+                                            description="(2 list of Float) radial conductivity versus dist. to tip",
+                                            min_value="0", max_value="", value_comment="", references="", DOI="",
+                                            variable_type="input", by="RsaModel", state_variable_type="",
+                                            edit_by="user")
+
+    # Soil1DModel input
+    psi_e: float = declare(default=0.401325, unit="MPa", unit_comment="",
+                                description="Homogeneous hydrostatic potential at the vertex boundary",
+                                min_value="0", max_value="", value_comment="", references="", DOI="",
+                                variable_type="input", by="Soil1DModel", state_variable_type="", edit_by="user")
+
+    # HydrostaticModel parameter
+    psi_base: float = declare(default=0.101325, unit="MPa", unit_comment="",
+                                description="Hydrostatic potential at the root base",
+                                min_value="0", max_value="", value_comment="", references="", DOI="",
+                                variable_type="parameter", by="HydrostaticModel", state_variable_type="", edit_by="user")
+
+    Jv: float = declare(default=None, unit="microL.s-1", unit_comment="",
+                                description="water flux at the root base, input if invert_model=False ",
+                                min_value="0", max_value="", value_comment="", references="", DOI="",
+                                variable_type="parameter", by="HydrostaticModel", state_variable_type="", edit_by="user")
+
+    invert_model: bool = declare(default=True, unit="", unit_comment="",
+                                description="when false, distribute output flux within the root ; "
+                                            "when true, compute the output flux for the given root and conditions.",
+                                min_value="", max_value="", value_comment="", references="", DOI="",
+                                variable_type="parameter", by="HydrostaticModel", state_variable_type="", edit_by="user")
+
+    cut_and_flow: bool = declare(default=False, unit="", unit_comment="",
+                                description="Use specific model to compute conductance at tips with cut & flow.",
+                                min_value="", max_value="", value_comment="", references="", DOI="",
+                                variable_type="parameter", by="HydrostaticModel", state_variable_type="", edit_by="user")
+
+
 
     def __init__(self, g, time_step, **scenario):
         # 4/21/26 FB: copied from root_cynaps RootWaterModel
@@ -155,3 +246,55 @@ class HydrostaticModel(Model):
         self.apply_scenario(**scenario)
         self.link_self_to_mtg()
 
+    def flux(self):
+        """
+        Compute flux according to psi_e and psi_base
+        If self.psi_e is None use self.g.property('psi_e')
+        :return:
+        """
+        _psi_e = self.psi_e
+        f = flux.Flux(self.g, self.Jv, _psi_e, self.psi_base, self.invert_model, cut_and_flow=self.cut_and_flow)
+        f.run()
+        self.g = f.g
+
+        Keqs = self.g.property('Keq')
+        v_base = next(self.g.component_roots_at_scale_iter(self.g.root, scale=1))
+        if _psi_e is None:
+            peq = self.g.property('Peq')
+            _psi_e = peq[v_base]
+
+        self.Jv = Keqs[v_base] * (_psi_e - self.psi_base)
+
+
+@dataclass
+class Soil1DModel(Model):
+    # Soil1DModel parameters
+    soil_data: tuple = declare(default=None, unit="[m, MPa]", unit_comment="",
+                                description="tuple of 2 lists, (z,psi_e) z=depth, psi_e=water potential",
+                                min_value="", max_value="", value_comment="", references="", DOI="",
+                                variable_type="parameter", by="Soil1DModel", state_variable_type="", edit_by="user")
+
+    # state variable
+    psi_e: float = declare(default=0.401325, unit="MPa", unit_comment="",
+                                description="Soil hydrostatic potential at the vertex boundary",
+                                min_value="0", max_value="", value_comment="", references="", DOI="",
+                                variable_type="state_variable", by="HydrostaticModel", state_variable_type="", edit_by="user")
+
+    def __init__(self, g, time_step, **scenario):
+        # 4/21/26 FB: copied from root_cynaps RootWaterModel
+        self.g = g
+        self.props = self.g.properties()
+        self.time_step = time_step
+        self.choregrapher.add_time_and_data(instance=self, sub_time_step=self.time_step, data=self.props)
+        self.vertices = self.g.vertices(scale=self.g.max_scale())
+
+        # Before any other operation, we apply the provided scenario by changing default parameters and initialization
+        self.apply_scenario(**scenario)
+        self.link_self_to_mtg()
+
+    def compute_doil_psi_e(self):
+        """
+        add a soil as heterogeneous water potential along z
+        :return:
+        """
+        self.g = main.soil_1D(self.g, self.soil_data)
