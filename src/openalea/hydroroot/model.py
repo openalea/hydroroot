@@ -68,12 +68,12 @@ class HydroRootModel(Model):
                                            edit_by="user")
 
     # hydraulic parameters
-    axial_conductivity_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
+    axial_conductance_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
                                 description="(2 list of Float) axial conductivity versus dist. to tip",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
                                 variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
 
-    radial_conductivity_data: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]",
+    k0: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]",
                                             unit_comment="distance to the tip, k",
                                             description="(2 list of Float) radial conductivity versus dist. to tip",
                                             min_value="0", max_value="", value_comment="", references="", DOI="",
@@ -274,11 +274,11 @@ class HydroRootModel(Model):
         :return:
         """
         if data:
-            self.axial_conductivity_data = data
+            self.axial_conductance_data = data
 
-        if self.axial_conductivity_data:
+        if self.axial_conductance_data:
             # Compute K using axial conductance data
-            xa, ya = self.axial_conductivity_data
+            xa, ya = self.axial_conductance_data
             axial_conductivity_law = fit_law(xa, ya)
 
             self.g = conductance.fit_property_from_spline(self.g, axial_conductivity_law, 'position', 'K_exp')
@@ -292,10 +292,10 @@ class HydroRootModel(Model):
         :return:
         """
         if data:
-            self.radial_conductivity_data = data
+            self.k0 = data
 
-        if self.radial_conductivity_data:
-            xr, yr = self.radial_conductivity_data
+        if self.k0:
+            xr, yr = self.k0
             radial_conductivity_law = fit_law(xr, yr)
 
             self.g = conductance.fit_property_from_spline(self.g, radial_conductivity_law, 'position', 'k0')
@@ -364,12 +364,12 @@ class HydrostaticModel(Model):
                                     min_value="0", max_value="", value_comment="", references="", DOI="",
                                     variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
 
-    axial_conductivity_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
+    axial_conductance_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
                                 description="(2 list of Float) axial conductivity versus dist. to tip",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
                                 variable_type="input", by="RsaModel", state_variable_type="", edit_by="user")
 
-    radial_conductivity_data: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
+    k0: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
                                             description="(2 list of Float) radial conductivity versus dist. to tip",
                                             min_value="0", max_value="", value_comment="", references="", DOI="",
                                             variable_type="input", by="RsaModel", state_variable_type="",
@@ -424,12 +424,12 @@ class HydrostaticModel(Model):
 @dataclass
 class SoluteModel(Model):
     # Hydraulic input from RsaModel
-    axial_conductivity_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
+    axial_conductance_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
                                 description="(2 list of Float) axial conductivity versus dist. to tip",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
                                 variable_type="input", by="RsaModel", state_variable_type="", edit_by="user")
 
-    radial_conductivity_data: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
+    k0: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
                                             description="(2 list of Float) radial conductivity versus dist. to tip",
                                             min_value="0", max_value="", value_comment="", references="", DOI="",
                                             variable_type="input", by="RsaModel", state_variable_type="",
