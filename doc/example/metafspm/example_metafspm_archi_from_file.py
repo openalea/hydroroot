@@ -160,9 +160,7 @@ view(s) # to reduce notebook size we use here a 2D view but use PlantGL(s) to 3D
 from openalea.hydroroot.init_parameter import Parameters
 parameter = Parameters()
 parameter.read_file('parameters_plant_01.yml')
-scenario = {}
-for key, value in parameter.__dict__.items():
-    scenario.update(value)
+scenario = parameter.metafspm_scenario()
 hydromodel = model.HydroRootModel(g, time_step, **scenario)
 hydromodel.hydrostatic_solver_flux()
 print('sap flux (microL/s): ', hydromodel.Jv)
