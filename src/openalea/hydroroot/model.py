@@ -22,62 +22,62 @@ class HydroRootModel(Model):
     length_data: list = declare(default=None, unit="[adim,m]", unit_comment="relative distance to the tip, meter",
                                 description="list of float or list of 2 list of float, lateral length vs relat. dist. to tip",
                                 min_value="", max_value="", value_comment="", references="", DOI="",
-                                variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     primary_length: float = declare(default=0.16, unit="m", unit_comment="", description="length of the primary root",
                                     min_value="0", max_value="", value_comment="", references="", DOI="",
-                                    variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                    variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     seed: int = declare(default=None, unit="", unit_comment="", description="seed used to generate the architecture",
                         min_value="0", max_value="", value_comment="", references="", DOI="",
-                        variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                        variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     branching_delay: float = declare(default=2.0e-3, unit="m", unit_comment="",
                                      description="distance between branching laterals",
                                      min_value="0", max_value="", value_comment="", references="", DOI="",
-                                     variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                     variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     branching_variability: float = declare(default=0.25, unit="", unit_comment="",
                                            description="variability of the branching laterals distance",
                                            min_value="0", max_value="1", value_comment="", references="", DOI="",
-                                           variable_type="parameter", by="RsaModel", state_variable_type="",
+                                           variable_type="parameter", by="HydroRootModel", state_variable_type="",
                                            edit_by="user")
 
     order_max: int = declare(default=4, unit="", unit_comment="", description="maximum order of laterals",
                              min_value="0", max_value="1", value_comment="", references="", DOI="",
-                             variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                             variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     length: float = declare(default=1.0e-4, unit="m", unit_comment="", description="vertices lentgh",
                                     min_value="0", max_value="", value_comment="", references="", DOI="",
-                                    variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                    variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     nude_length: float = declare(default=0.02, unit="m", unit_comment="",
                                  description="part of roots without any lateral root, distance from tip",
                                  min_value="0", max_value="", value_comment="", references="", DOI="",
-                                 variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                 variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     ref_radius: float = declare(default=7.0e-5, unit="m", unit_comment="",
                                 description="reference radius or radius of the primary root",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
-                                variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     order_decrease_factor: float = declare(default=0.7, unit="", unit_comment="",
                                            description="radius decrease factor applied when increasing order",
                                            min_value="0", max_value="1", value_comment="", references="", DOI="",
-                                           variable_type="parameter", by="RsaModel", state_variable_type="",
+                                           variable_type="parameter", by="HydroRootModel", state_variable_type="",
                                            edit_by="user")
 
     # hydraulic parameters
     axial_conductance_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
                                 description="(2 list of Float) axial conductivity versus dist. to tip",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
-                                variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     k0: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]",
                                             unit_comment="distance to the tip, k",
                                             description="(2 list of Float) radial conductivity versus dist. to tip",
                                             min_value="0", max_value="", value_comment="", references="", DOI="",
-                                            variable_type="parameter", by="RsaModel", state_variable_type="",
+                                            variable_type="parameter", by="HydroRootModel", state_variable_type="",
                                             edit_by="user")
 
     # Soil1DModel input
@@ -151,11 +151,11 @@ class HydroRootModel(Model):
 
     surface: float = declare(default=None, unit="m2", unit_comment="", description="total surface of the RSA",
                              min_value="0", max_value="", value_comment="", references="", DOI="",
-                             variable_type="plant_scale_state", by="RsaModel", state_variable_type="", edit_by="user")
+                             variable_type="plant_scale_state", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     volume: float = declare(default=None, unit="m3", unit_comment="", description="total surface of the RSA",
                             min_value="0", max_value="", value_comment="", references="", DOI="",
-                            variable_type="plant_scale_state", by="RsaModel", state_variable_type="", edit_by="user")
+                            variable_type="plant_scale_state", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     def __init__(self, g, time_step, **scenario):
         # 4/21/26 FB: copied from root_cynaps RootWaterModel
@@ -359,20 +359,20 @@ class HydroRootModel(Model):
 
 @dataclass
 class HydrostaticModel(Model):
-    # Hydraulic input from RsaModel
+    # Hydraulic input from HydroRootModel
     length: float = declare(default=1.0e-4, unit="m", unit_comment="", description="vertices lentgh",
                                     min_value="0", max_value="", value_comment="", references="", DOI="",
-                                    variable_type="parameter", by="RsaModel", state_variable_type="", edit_by="user")
+                                    variable_type="parameter", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     axial_conductance_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
                                 description="(2 list of Float) axial conductivity versus dist. to tip",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
-                                variable_type="input", by="RsaModel", state_variable_type="", edit_by="user")
+                                variable_type="input", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     k0: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
                                             description="(2 list of Float) radial conductivity versus dist. to tip",
                                             min_value="0", max_value="", value_comment="", references="", DOI="",
-                                            variable_type="input", by="RsaModel", state_variable_type="",
+                                            variable_type="input", by="HydroRootModel", state_variable_type="",
                                             edit_by="user")
 
     # Soil1DModel input
@@ -423,16 +423,16 @@ class HydrostaticModel(Model):
 
 @dataclass
 class SoluteModel(Model):
-    # Hydraulic input from RsaModel
+    # Hydraulic input from HydroRootModel
     axial_conductance_data: list = declare(default=None, unit="[m,10-9 m4.MPa-1.s-1]", unit_comment="distance to the tip, K",
                                 description="(2 list of Float) axial conductivity versus dist. to tip",
                                 min_value="0", max_value="", value_comment="", references="", DOI="",
-                                variable_type="input", by="RsaModel", state_variable_type="", edit_by="user")
+                                variable_type="input", by="HydroRootModel", state_variable_type="", edit_by="user")
 
     k0: list = declare(default=None, unit="[m,10-9 m.MPa-1.s-1]", unit_comment="distance to the tip, k",
                                             description="(2 list of Float) radial conductivity versus dist. to tip",
                                             min_value="0", max_value="", value_comment="", references="", DOI="",
-                                            variable_type="input", by="RsaModel", state_variable_type="",
+                                            variable_type="input", by="HydroRootModel", state_variable_type="",
                                             edit_by="user")
 
     # Soil1DModel input
