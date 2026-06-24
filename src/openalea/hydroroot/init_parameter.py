@@ -20,6 +20,8 @@ import numpy
 import yaml
 import pandas
 import glob
+from openalea.core.config import Config, ModelUnit, Parameter
+
 
 
 class Parameters():
@@ -101,6 +103,8 @@ class Parameters():
             'axfold': [1.0],
             'intercepts': [0.01, 0.02, 0.03, 0.045, 0.06, 0.08],
             'run_nb': 1}
+
+    
 
     def read_file(self, filename = None):
         """Read the input yaml file, set the class variables and perform some initialization
@@ -200,3 +204,29 @@ class Parameters():
                 parameter = [parameter]
 
         return parameter
+
+
+def hydroroot_parameters_to_config(params: Parameters):
+        units = []
+
+        units.append(ModelUnit("archi", [
+            Parameter(name, value) for name, value in params.archi.items()
+        ]))
+
+        units.append(ModelUnit("hydro", [
+            Parameter(name, value) for name, value in params.hydro.items()
+        ]))
+
+        units.append(ModelUnit("solute", [
+            Parameter(name, value) for name, value in params.solute.items()
+        ]))
+
+        units.append(ModelUnit("exp", [
+            Parameter(name, value) for name, value in params.exp.items()
+        ]))
+
+        units.append(ModelUnit("output", [
+            Parameter(name, value) for name, value in params.output.items()
+        ]))
+
+        return Config(units)
