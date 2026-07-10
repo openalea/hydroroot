@@ -407,7 +407,7 @@ def hydroroot_from_data(
 def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length = 2.0e-2, df = None, segment_length = 1.0e-4,
                   length_data = None, branching_variability = 0.25, order_max = 4.0, order_decrease_factor = 0.7,
                   ref_radius = 7.0e-5, Flag_radius = False):
-    """wrapper function: build a MTG with properties that are set like : radius, vertex length, position (distance to tip) and mylength (distance to base).
+    """wrapper function: build a MTG with properties that are set like : radius, vertex length, position (distance to tip) and dist_to_base (distance to base).
     The MTG is either generated or built from a DataFrame. The unit length in hydroroot should be in m.
 
     :param primary_length: (float) - primary root length for generated mtg (Default value = 0.13)
@@ -416,7 +416,7 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     :param nude_length: (float) - length from tip without lateral for generated mtg (Default value = 2.0e-2)
     :param df: (DataFrame) - DataFrame with the architecture data to be reconstructed if not None (Default value = None)
     :param segment_length: (float) - vertices length in hydroroot should be in m (Default value = 1.0e-4)
-    :param length_data: (string list) - the file name with the length data laws (Default value = None)
+    :param length_data: (list of DataFrame) - DataFrame with the length data laws (Default value = None)
     :param branching_variability: (float) (Default value = 0.25)
     :param order_max: (float) (Default value = 4.0)
     :param order_decrease_factor: (float) (Default value = 0.7)
@@ -456,16 +456,16 @@ def root_builder(primary_length = 0.13, seed = None, delta = 2.0e-3, nude_length
     g = radius.compute_relative_position(g)
 
     # Calculation of the distance from base of each vertex, used for cut and flow
-    _mylength = {}
+    _dist_to_base = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
-    g.properties()['mylength'] = _mylength
+        _dist_to_base[v] = _dist_to_base[pid] + segment_length if pid else segment_length
+    g.properties()['dist_to_base'] = _dist_to_base
 
     # total_length is the total length of the RSA (sum of the length of all the segments)
     total_length = g.nb_vertices(scale = 1) * segment_length
     g, surface = radius.compute_surface(g)
-    g, volume = radius.compute_volume(g)
+    # g, volume = radius.compute_volume(g)
 
     if df is not None:
         v_base = next(g.component_roots_at_scale_iter(g.root, scale = g.max_scale()))

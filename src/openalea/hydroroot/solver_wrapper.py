@@ -731,8 +731,8 @@ def water_solute_model(parameter, df_archi =None, df_law =None,
 
         # case where the primary is shorter than laterals
         max_length = primary_length
-        mylength = g_cut[0, ig].property('mylength')
-        if max(mylength.values()) > max_length: max_length = max(mylength.values())
+        dist_to_base = g_cut[0, ig].property('dist_to_base')
+        if max(dist_to_base.values()) > max_length: max_length = max(dist_to_base.values())
 
         # set conductance
         g_cut[0, ig] = set_conductances(g_cut[0, ig], axial_pr = axial_data, k0_pr = k[0], axial_lr = axial_lr,

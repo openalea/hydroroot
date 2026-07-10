@@ -18,7 +18,7 @@ def root_creation(g, segment_length, ref_radius, order_decrease_factor):
     Set MTG properties and perform some gemetrical calculation
 
     The vertex radius properties is set.
-    The following properties are computed: length, position, mylength, surface, volume, total length,
+    The following properties are computed: length, position, dist_to_base, surface, volume, total length,
         primary root length
 
     :param:
@@ -40,11 +40,11 @@ def root_creation(g, segment_length, ref_radius, order_decrease_factor):
     # Calculation of the distance from base of each vertex, used for cut and flow
     # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
     # parameter dl which should be equal to vertex length but which is not pass
-    _mylength = {}
+    _dist_to_base = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
-    g.properties()['mylength'] = _mylength
+        _dist_to_base[v] = _dist_to_base[pid] + segment_length if pid else segment_length
+    g.properties()['dist_to_base'] = _dist_to_base
 
     # _length is the total length of the RSA (sum of the length of all the segments)
     _length = g.nb_vertices(scale = 1) * segment_length
@@ -82,7 +82,7 @@ def test_rsml():
     resolution *= rsml_units_to_metre[unit]  # rsml file unit to meter
     g = import_rsml_to_discrete_mtg(g_c, segment_length = segment_length, resolution = resolution)
     
-    # calculation of g properties: radius, mylength, etc.
+    # calculation of g properties: radius, dist_to_base, etc.
     g, primary_length, _length, surface = set_mtg_properties(g, segment_length, ref_radius, order_decrease_factor)
 
     export_mtg_to_rsml(g, "data/test_rsml_io.rsml", segment_length = segment_length)
@@ -135,7 +135,7 @@ def set_mtg_properties(g, segment_length, ref_radius, order_decrease_factor):
     Set MTG properties and perform some gemetrical calculation
 
     The vertex radius properties is set.
-    The following properties are computed: length, position, mylength, surface, volume, total length,
+    The following properties are computed: length, position, dist_to_base, surface, volume, total length,
         primary root length
 
     :param:
@@ -157,11 +157,11 @@ def set_mtg_properties(g, segment_length, ref_radius, order_decrease_factor):
     # Calculation of the distance from base of each vertex, used for cut and flow
     # Remark: this calculation is done in flux.segments_at_length; analysis.nb_roots but there is a concern with the
     # parameter dl which should be equal to vertex length but which is not pass
-    _mylength = {}
+    _dist_to_base = {}
     for v in traversal.pre_order2(g, 1):
         pid = g.parent(v)
-        _mylength[v] = _mylength[pid] + segment_length if pid else segment_length
-    g.properties()['mylength'] = _mylength
+        _dist_to_base[v] = _dist_to_base[pid] + segment_length if pid else segment_length
+    g.properties()['dist_to_base'] = _dist_to_base
 
     # _length is the total length of the RSA (sum of the length of all the segments)
     _length = g.nb_vertices(scale = 1) * segment_length

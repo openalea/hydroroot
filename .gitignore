@@ -77,4 +77,6 @@ doc/_build
 
 # baugetfa
 tmp*
+test/data/test_rsml_io.rsml
+out.csv
 

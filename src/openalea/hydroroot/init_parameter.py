@@ -200,3 +200,14 @@ class Parameters():
                 parameter = [parameter]
 
         return parameter
+
+    def metafspm_scenario(self):
+        """
+        In metafspm scenario is just a dict
+        This function simply aggregates all variables in a single dictionary
+        :return: scenario (dict)
+        """
+        scenario = {}
+        for key, value in self.__dict__.items():
+            scenario.update(value)
+        return scenario
