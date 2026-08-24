@@ -1,0 +1,2 @@
+image, root_name, root, length, vector_length, surface, volume, direction, diameter, root_order, root_ontology, parent_name, parent, insertion_position, insertion_angle, n_child, child_density, first_child, insertion_first_child, last_child, insertion_last_child
+p15r1-cut1, PR, a4900114-fcf1-4405-8d84-15ca40f91a51,4.4,4.310782,0.42669863,0.0033118865,75.1935525726704,0.030357612,0, Primary root,-1,-1,-0.0021166701,-57.2957795130823,37,25.912617, 3b445e13-edad-4d01-be9e-d22b77127c54,0, 208dfc51-0e2e-4870-9ef6-19a41dd9f82a,1.4278759
