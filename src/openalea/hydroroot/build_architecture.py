@@ -36,10 +36,6 @@ from typing import Dict, Iterable, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from openalea.hydroroot.main import root_builder
-from openalea.hydroroot.read_file import read_archi_data
-
-
 CM_TO_MM = 10.0
 MM_TO_M = 1.0e-3
 CSV_SEPARATORS = (";", ",", "\t")
@@ -49,7 +45,7 @@ CSV_SEPARATORS = (";", ",", "\t")
 class Config:
     """User-editable settings for one reconstruction run."""
 
-    path: str = "/home/bauget/Documents/Rice/Experiments/2026-06-22-Exp04/2026-06-22-CnfArchi-Exp04/"
+    path: str = "directory"
     list_fn: List[str] = field(default_factory=lambda: ["p15r1"])
     extension: str = "csv"
     primary_prefix: str = "PR"
@@ -59,13 +55,22 @@ class Config:
     sort_by_diameter: bool = False
     reverse_cut_filename_order: bool = True
 
+    flag_verbose: bool = False # some prints
+
     # Tolerances around the cut position. tol1 selects laterals close enough to
     # a cut, tol2 rejects laterals that extend too far past the cut.
     tol1: float = 0.1
     tol2: float = 0.1
 
+@dataclass
+class Results:
+    """output from reconstruction run."""
+    d_archi: dict[str, pd.DataFrame] = field(default_factory=dict) # dict with DataFrame of the archi in Aqua format
+    l_cut: dict[str, list[float]] = field(default_factory=dict) # list of the distance from the tip to the base at each cut
+    plant_length: dict[str, float] = field(default_factory=dict) # total length of the plant root
+    output_name: dict[str, str] = field(default_factory=dict) # name of the output archi
 
-def drop_mislabeled_primary_records(df: pd.DataFrame, cut_index: int) -> pd.DataFrame:
+def drop_mislabeled_primary_records(df: pd.DataFrame, cut_index: int, flag_verbose: bool = False) -> pd.DataFrame:
     """
     Drop rows exported as parentless primary roots whose name identifies a lateral.
 
@@ -75,11 +80,11 @@ def drop_mislabeled_primary_records(df: pd.DataFrame, cut_index: int) -> pd.Data
     rows_to_drop = []
     for index, row in df.iterrows():
         root_name = str(row[" root_name"])
-        if str(row[" parent_name"]) == "-1" and ("lat" in root_name or "LRII" in root_name):
+        if str(row[" parent_name"]) == "-1" and ("lat" in root_name or "lR" in root_name or "LRII" in root_name):
             rows_to_drop.append(index)
 
     if rows_to_drop:
-        print(
+        if flag_verbose: print(
             "cut nb ",
             cut_index,
             " ",
@@ -87,35 +92,10 @@ def drop_mislabeled_primary_records(df: pd.DataFrame, cut_index: int) -> pd.Data
             "root with 'lat' in its name: ",
         )
         for row_index in rows_to_drop:
-            print(df[" root_name"][row_index])
+            if flag_verbose: print(df[" root_name"][row_index])
         df = df.drop(rows_to_drop)
 
     return df.reset_index(drop=True)
-
-
-def plot_txt(fname: str, image_name: Optional[str] = None) -> None:
-    """
-    Plot the architecture in a PlantGL 3D viewer.
-
-    Parameters
-    ----------
-    fname
-        AQUA-format architecture text file.
-    image_name
-        Optional image path. Keeping it as None avoids black 2D/3D snapshots in
-        the current PlantGL viewer.
-    """
-    from openalea.hydroroot.display import plot
-
-    df = read_archi_data(fname)
-    g, primary_length, total_length, surface, seed = root_builder(
-        df=df,
-        segment_length=1.0e-4,
-        Flag_radius=True,
-    )
-    print("primary_length: ", primary_length, "total_length: ", total_length, "surface: ", surface)
-    plot(g, name=image_name, prop_cmap="order")
-
 
 def move_primary_row_to_end(df: pd.DataFrame, primary_prefix: str) -> pd.DataFrame:
     """Ensure the primary-root tip marker is the last row."""
@@ -644,7 +624,7 @@ def build_plant_architecture(
         d_lriii = append_laterals(d_lriii, d_lriii_current)
         d_lrii = append_laterals(d_lrii, d_lrii_current)
 
-        if used_segment_count < free_segment_count:
+        if used_segment_count < free_segment_count and config.flag_verbose:
             print("somme segments not used", "cut", cut_index, free_segment_count - used_segment_count)
 
         cut_seg[cut_index] = cut_seg[cut_index].sort_values("l", ascending=False, ignore_index=True)
@@ -660,7 +640,7 @@ def build_plant_architecture(
         d_pr = merge_cut_into_primary(d_pr, cut_pr[cut_index])
 
         totals[f"build-cut-{cut_index}"] = built_length(d_pr, d_lrii, d_lriii)
-        print("cut ", cut_index, totals[f"cut-{cut_index}"] - totals[f"build-cut-{cut_index}"])
+        if config.flag_verbose: print("cut ", cut_index, totals[f"cut-{cut_index}"] - totals[f"build-cut-{cut_index}"])
 
     d_pr["order"] = "1"
     totals["build"] = built_length(d_pr, d_lrii, d_lriii)
@@ -668,17 +648,11 @@ def build_plant_architecture(
     lcut_m = sorted((cut_length * MM_TO_M for cut_length in lcut), reverse=True)
     d_r = to_aqua_format(d_pr.copy(), d_lrii, d_lriii)
 
-    print(
-        "plant: ",
-        plant_name,
-        "primary length: ",
-        d_pr.x.max(),
-        "total length:",
-        totals["exp"],
-        "lengths <> :",
-        totals["exp"] - totals["build"],
-    )
-    print("plant: ", plant_name, "cut lengths:", [float(cut_length) for cut_length in lcut_m])
+    if config.flag_verbose:
+        print(
+        "plant: ", plant_name, "primary length: ", d_pr.x.max(), "total length:", totals["exp"], "lengths <> :", totals["exp"] - totals["build"],
+        )
+        print("cut lengths:", [float(cut_length) for cut_length in lcut_m])
 
     return d_r, totals, lcut_m
 
@@ -688,6 +662,7 @@ def write_architecture_file(
     directory: str,
     prefix_fn: str,
     should_write: bool,
+    flag_verbose: bool = False,
 ) -> Optional[str]:
     """Write, plot, and re-read the AQUA architecture file when requested."""
     if not should_write:
@@ -695,44 +670,32 @@ def write_architecture_file(
 
     output_name = os.path.join(directory, f"{prefix_fn}.txt")
     d_r.to_csv(output_name, sep="\t", index=False)
-    plot_txt(output_name, image_name=None)
 
-    df = read_archi_data(output_name)
-    g, primary_length, root_total_length, surface, seed = root_builder(
-        df=df,
-        segment_length=1.0e-4,
-        Flag_radius=True,
-    )
-    print("PR length: ", primary_length, "total length: ", root_total_length, "surface: ", surface)
     return output_name
 
 
-def process_plant(directory: str, prefix_fn: str, config: Config) -> Optional[pd.DataFrame]:
+def process_plant(config: Optional[Config] = None, results: Optional[Results] = None):
     """Load, reconstruct, and optionally write one plant architecture."""
-    filenames = find_plant_files(
-        directory,
-        prefix_fn,
-        config.extension,
-        config.reverse_cut_filename_order,
-    )
-    if not filenames:
-        return None
-
-    dfs = load_plant_files(filenames)
-    print("tot_length_file :", sum(total_length(df) for df in dfs.values()))
-    d_r, totals, lcut = build_plant_architecture(dfs, config, plant_name=prefix_fn)
-    write_architecture_file(d_r, directory, prefix_fn, config.write_architecture)
-    return d_r
-
-
-def cuts_to_archi(config: Optional[Config] = None) -> None:
-    """Run reconstruction for every configured plant and directory."""
     config = config or Config()
-    directories = glob.glob(config.path)
-    for prefix_fn in config.list_fn:
-        for directory in directories:
-            process_plant(directory, prefix_fn, config)
+    results = results or Results()
+    directory = config.path
 
+    for prefix_fn in config.list_fn:
+        filenames = find_plant_files(
+            directory,
+            prefix_fn,
+            config.extension,
+            config.reverse_cut_filename_order,
+        )
+        if not filenames:
+            print('no files to process for: ', prefix_fn)
+            return None
+
+        dfs = load_plant_files(filenames)
+        results.d_archi[prefix_fn], results.plant_length[prefix_fn], results.l_cut[prefix_fn] = (
+            build_plant_architecture(dfs, config, plant_name=prefix_fn))
+        results.output_name[prefix_fn] = write_architecture_file(results.d_archi[prefix_fn], directory, prefix_fn,
+                                                      config.write_architecture, flag_verbose = config.flag_verbose)
 
 if __name__ == "__main__":
-    cuts_to_archi()
+    process_plant()
