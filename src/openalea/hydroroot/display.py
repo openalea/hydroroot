@@ -9,7 +9,9 @@ from openalea.mtg.plantframe import color
 
 import openalea.plantgl.all as pgl
 
-from .radius import discont_radius
+from openalea.hydroroot.radius import discont_radius
+from openalea.hydroroot.read_file import read_archi_data
+from openalea.hydroroot.main import root_builder
 
 def get_root_visitor(prune=None, factor = 1.0e4):
     """
@@ -132,6 +134,17 @@ def plot(g = None, min=None, max=None, name=None, cmap = 'jet', **kwds):
     pgl.Viewer.display(mtg_scene(g, min = min, max = max, cmap = cmap, **kwds))
     if name is not None:
         pgl.Viewer.frameGL.saveImage(name)
+
+def plot_txt(fname, image_name = None):
+    """
+    plot the architecture in fname in AQUA format in the plantgl 3D viewer
+    :param fname: name of the architecture text file
+    :param image_name: optional name of the image in which to save the architetcure image
+    :return: the plot
+    """
+    df = read_archi_data(fname)
+    g, primary_length, total_length, surface, seed = root_builder(df = df, segment_length = 1.0e-4, Flag_radius=True)
+    plot(g, name = image_name, prop_cmap = 'order')
 
 def mtg_scene(g, has_radius=False, r_base=1.e-4, r_tip=5e-5,
          visitor=None, prop_cmap='radius', cmap='jet',lognorm=False,
