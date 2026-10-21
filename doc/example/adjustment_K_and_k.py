@@ -56,9 +56,9 @@ import matplotlib.pyplot as plt
 # import k3d
 from scipy import optimize
 
-from openalea.plantgl.all import *
+# from openalea.plantgl.all import *
 from openalea.mtg import *
-from openalea.widgets.plantgl import PlantGL
+# from openalea.widgets.plantgl import PlantGL
 
 from openalea.hydroroot import flux, conductance, radius
 from openalea.hydroroot.main import hydroroot_flow, root_builder
@@ -286,13 +286,14 @@ if __name__ == '__main__':
 
 
     dK_constraint = -3.e-2 # dK/dx >= dK_constraint # arabidopsis paper Boursiac2022
+    Kx_max = np.inf
     _tol = 1.0e-9
     
     filename = []
     for f in parameter.archi['input_file']:
         filename = filename + (glob.glob(parameter.archi['input_dir'] + f))
 
-    fn = 'data/maize_cnf_data.csv'
+    fn = 'data/rice_cnf_data.csv'
     df_exp = pd.read_csv(fn, sep = ',', keep_default_na = True)
 
     # predict the number of simulation run
@@ -335,7 +336,7 @@ if __name__ == '__main__':
         radfold = parameter.output['radfold'][0]
 
         g_cut['tot'], primary_length, _length, surface, seed = root_builder(df = df, segment_length = parameter.archi['segment_length'],
-            order_decrease_factor = parameter.archi['order_decrease_factor'], ref_radius = parameter.archi['ref_radius'])
+            order_decrease_factor = parameter.archi['order_decrease_factor'], ref_radius = parameter.archi['ref_radius'], Flag_radius=True)
 
         g_cut['tot'], Keq, Jv = hydro_calculation(g_cut['tot'], psi_base = psi_base, psi_e = psi_base + DP_cnf[0])
 
@@ -394,7 +395,7 @@ if __name__ == '__main__':
         bnds = []
         n = len(x)
         for i, val in enumerate(x):
-            bnds.append((1.0e-20, 1.0))
+            bnds.append((1.0e-20, Kx_max))
         # linear constraints lb <= A.dot(x) <= ub
         A = np.zeros((n, n))
         lb = np.full(n, -np.inf)
@@ -509,16 +510,17 @@ if __name__ == '__main__':
 
     ax = dresults.plot.scatter('cut length (m)', 'Jexp (uL/s)', c = 'black')
     dresults.plot.line('cut length (m)', 'Jv (uL/s)', c = 'purple', ax = ax)
+    ax.set_title(index)
 
-
+    optim_results = {}
+    optim_results['x'] = copy.deepcopy(parameter.hydro['axial_conductance_data'][0])
+    optim_results['K 1st'] = copy.deepcopy(parameter.hydro['axial_conductance_data'][1])
     if Flag_Optim:
-        optim_results  = {}
-        optim_results['x'] = copy.deepcopy(parameter.hydro['axial_conductance_data'][0])
-        optim_results['K 1st'] = copy.deepcopy(parameter.hydro['axial_conductance_data'][1])
         _x = list(res.x)
         optim_results['K optimized'] = copy.deepcopy(_x)
 
         doptim = pd.DataFrame(optim_results, columns = ['x', 'K 1st', 'K optimized'])
+
         df = pd.concat([dresults, doptim], axis = 1)
 
         ax_K = doptim.plot.line('x', 'K 1st', c = 'black')
@@ -530,14 +532,23 @@ if __name__ == '__main__':
         fig, ax2 = plt.subplots()
         f1=ax2.bar(x=['radial k 1st','k optimized'], height = [parameter.hydro['k0'],k0])
         ax2.set_ylabel('radial k (10-9 m/s/MPa)')
+
     else:
-        df = dresults
-    
-    
+        doptim = pd.DataFrame(optim_results, columns = ['x', 'K 1st'])
+        doptim.plot.line('x', 'K 1st', c = 'black')
+        # df = dresults
+    df = pd.concat([dresults, doptim], axis=1)
+
+    # print R²
+    y_true = np.array(results['Jexp (uL/s)'])
+    y_pred = np.array(results['Jv (uL/s)'])
+    ss_res = np.sum((y_true - y_pred) ** 2)
+    ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+    r2 = 1 - ss_res / ss_tot
+    print('R^2: ', r2)
+
 
     plt.show()
 
-    # plot_architecture()
-    
     if output is not None: df.to_csv(output, index = False)
     print('running time is ', time.time() - start_time)
